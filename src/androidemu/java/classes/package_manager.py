@@ -16,6 +16,9 @@ class Signature(
     def __init__(self, sign_hex):
         self._sign_hex = sign_hex
 
+    def __reduce__(self):
+        return f'Signature(sign={self._sign_hex})'
+
     @java_method_def(name='toByteArray', signature='()[B', native=False)
     def toByteArray(self, emu):
         #raise NotImplementedError()

@@ -10,6 +10,9 @@ class String(metaclass=JavaClassDef, jvm_name='java/lang/String'):
         assert isinstance(pystr, str)
         self._str = pystr
 
+    def __repr__(self):
+        return f'String(\"{self._str}\")'
+
     def get_py_string(self):
         return self._str
 
@@ -32,9 +35,6 @@ class String(metaclass=JavaClassDef, jvm_name='java/lang/String'):
         barr = bytearray(self._str, pycharset)
         arr = ByteArray(barr)
         return arr
-
-    def __repr__(self):
-        return "JavaString(%s)" % self.get_py_string()
 
     # #TODO: 在继承多态机制完善后移动到Object类上
 

@@ -18,6 +18,9 @@ class Class(metaclass=JavaClassDef, jvm_name='java/lang/Class'):
         self._pyclazz = pyclazz
         self._descriptor_represent = pyclazz.jvm_name
 
+    def __repr__(self):
+        return f"Class({self._descriptor_represent})"
+
     @java_method_def(name='getClassLoader',
                      signature='()Ljava/lang/ClassLoader;',
                      native=False)
@@ -138,6 +141,3 @@ class Class(metaclass=JavaClassDef, jvm_name='java/lang/Class'):
         reflected_method = Method(self._pyclazz, pymethod)
         logger.debug("getDeclaredMethod return %r" % reflected_method)
         return reflected_method
-
-    def __repr__(self):
-        return "Class(%s)" % self._descriptor_represent

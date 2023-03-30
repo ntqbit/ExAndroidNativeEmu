@@ -9,6 +9,9 @@ class HashMap(metaclass=JavaClassDef, jvm_name='java/util/HashMap'):
     def __init__(self, pydict={}):
         self._pydict = pydict
 
+    def __repr__(self):
+        return f'HashMap({self._pydict})'
+
     @java_method_def(name='<init>', signature='()V', native=False)
     def ctor(self, emu):
         self._pydict = {}

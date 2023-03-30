@@ -15,7 +15,7 @@ class Boolean(metaclass=JavaClassDef, jvm_name='java/lang/Boolean'):
         return self._value
 
     def __repr__(self):
-        return "%r" % self._value
+        return 'true' if self._value else 'false'
 
     #TODO: 在继承多态机制完善后移动到Object类上
 
@@ -43,7 +43,7 @@ class Integer(metaclass=JavaClassDef, jvm_name='java/lang/Integer'):
         return self._value
 
     def __repr__(self):
-        return "%r" % self._value
+        return f'Int({self._value})'
 
     #TODO: 在继承多态机制完善后移动到Object类上
 
@@ -72,7 +72,7 @@ class Long(metaclass=JavaClassDef, jvm_name='java/lang/Long'):
         return self._value
 
     def __repr__(self):
-        return "%r" % self._value
+        return f'Long({self._value})'
 
     #TODO: 在继承多态机制完善后移动到Object类上
 
@@ -92,7 +92,7 @@ class Float(metaclass=JavaClassDef, jvm_name='java/lang/Float'):
         self._value = value
 
     def __repr__(self):
-        return "%r" % self._value
+        return f'Float({self._value})'
 
     # #TODO: 在继承多态机制完善后移动到Object类上
 

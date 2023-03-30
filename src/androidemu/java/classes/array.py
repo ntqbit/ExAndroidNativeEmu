@@ -21,7 +21,7 @@ class Array(metaclass=JavaClassDef, jvm_name='java/lang/reflect/Array'):
         self._pyitems[index] = value
 
     def __repr__(self):
-        return "JavaArray(%r)" % self.get_py_items()
+        return f"Array({self._pyitems})"
 
     @staticmethod
     @java_method_def(name='set',
@@ -44,6 +44,9 @@ class ByteArray(Array, metaclass=JavaClassDef, jvm_name="[B", jvm_super=Array):
     def __init__(self, item_list):
         Array.__init__(self, item_list)
 
+    def __repr__(self):
+        return f'ByteArray({self._pyitems})'
+
 
 # 外面用到，因为与Array jvm name不同，所以暂时手动定义，与Array作用一样
 class ObjectArray(
@@ -54,6 +57,9 @@ class ObjectArray(
     def __init__(self, item_list):
         Array.__init__(self, item_list)
 
+    def __repr__(self):
+        return f'ObjectArray({self._pyitems})'
+
 
 class ClassArray(
         Array,
@@ -63,6 +69,9 @@ class ClassArray(
     def __init__(self, item_list):
         Array.__init__(self, item_list)
 
+    def __repr__(self):
+        return f'ClassArray({self._pyitems})'
+
 
 class StringArray(
         Array,
@@ -71,3 +80,6 @@ class StringArray(
         jvm_super=Array):
     def __init__(self, item_list):
         Array.__init__(self, item_list)
+
+    def __repr__(self):
+        return f'StringArray({self._pyitems})'

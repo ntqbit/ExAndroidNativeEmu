@@ -10,6 +10,9 @@ class File(metaclass=JavaClassDef, jvm_name='java/io/File'):
         assert isinstance(path, str)
         self._path = path
 
+    def __repr__(self):
+        return f'File("{self._path}")'
+
     @java_method_def(name='getPath',
                      signature='()Ljava/lang/String;',
                      native=False)

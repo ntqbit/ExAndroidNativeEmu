@@ -10,6 +10,9 @@ class Bundle(metaclass=JavaClassDef, jvm_name='android/os/Bundle'):
     def __init__(self, py_map={}):
         self._pymap = py_map
 
+    def __repr__(self):
+        return f'Bundle({self._pymap})'
+
     @java_method_def(name='getString',
                      args_list=["jstring"],
                      signature='(Ljava/lang/String;)Ljava/lang/String;',

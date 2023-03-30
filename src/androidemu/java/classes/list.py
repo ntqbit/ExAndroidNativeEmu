@@ -8,6 +8,9 @@ class List(metaclass=JavaClassDef, jvm_name='java/util/List'):
     def __init__(self, pylist):
         self._pylist = pylist
 
+    def __repr__(self):
+        return f'List({self._pylist})'
+
     def __len__(self):
         return len(self._pylist)
 

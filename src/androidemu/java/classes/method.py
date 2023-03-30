@@ -27,6 +27,9 @@ class Method(metaclass=JavaClassDef,
         self.declaringClass = pydeclaringClass
         self.accessFlags = pymethod.modifier
 
+    def __repr__(self):
+        return f'Method({self._method.func_name})'
+
     @staticmethod
     @java_method_def(
         name="getMethodModifiers",
