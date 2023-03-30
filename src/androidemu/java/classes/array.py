@@ -45,7 +45,11 @@ class ByteArray(Array, metaclass=JavaClassDef, jvm_name="[B", jvm_super=Array):
         Array.__init__(self, item_list)
 
     def __repr__(self):
-        return f'ByteArray({self._pyitems})'
+        b = self._pyitems
+        if len(b) > 20:
+            b = b[:18] + '..'
+
+        return f'ByteArray({b})'
 
 
 # 外面用到，因为与Array jvm name不同，所以暂时手动定义，与Array作用一样
