@@ -2,7 +2,6 @@ import os
 import verboselogs
 from unicorn import *
 from androidemu.utils.misc_utils import page_end, page_start
-import verboselogs
 
 logger = verboselogs.VerboseLogger(__name__)
 
@@ -11,7 +10,6 @@ PAGE_SIZE = 0x1000
 
 
 class MemoryMap:
-
     def check_addr(self, addr, prot):
         for r in self._mu.mem_regions():
             if addr >= r[0] and addr < r[1] and prot & r[2]:
@@ -68,12 +66,10 @@ class MemoryMap:
 
                 if map_base > self._alloc_max_addr or map_base < self._alloc_min_addr:
                     raise RuntimeError(
-                        "mmap error map_base 0x%08X out of range (0x%08X-0x%08X)!!!" %
+                        "mmap error map_base 0x%08X out of range (0x%08X-0x%08X)" %
                         (map_base, self._alloc_min_addr, self._alloc_max_addr))
 
-                logger.debug(
-                    "before mem_map addr:0x%08X, sz:0x%08X" %
-                    (map_base, size))
+                logger.debug("before mem_map addr:0x%08X, sz:0x%08X" % (map_base, size))
 
                 self._mu.mem_map(map_base, size, perms=prot)
                 return map_base
@@ -146,9 +142,8 @@ class MemoryMap:
                 'map addr was not multiple of page size (%d, %d).' %
                 (address, PAGE_SIZE))
 
-        logger.debug(
-            "map addr:0x%08X, end:0x%08X, sz:0x%08X off=0x%08X" %
-            (address, address + size, size, offset))
+        logger.debug("map addr:0x%08X, end:0x%08X, sz:0x%08X off=0x%08X" %
+                     (address, address + size, size, offset))
         # traceback.print_stack()
         al_address = address
         al_size = page_end(al_address + size) - al_address
@@ -169,9 +164,8 @@ class MemoryMap:
             #logger.debug("mmap file ori_off %d"%(ori_off,))
             os.lseek(vf.descriptor, offset, os.SEEK_SET)
             data = self._read_fully(vf.descriptor, size)
-            logger.debug(
-                "read for offset %d sz %d data sz:%d" %
-                (offset, size, len(data)))
+            logger.debug("read for offset %d sz %d data sz:%d" %
+                         (offset, size, len(data)))
             # print("data:%r"%data)
             self._mu.mem_write(res_addr, data)
             self._file_map_addr[res_addr] = (res_addr + al_size, offset, vf)
@@ -190,9 +184,8 @@ class MemoryMap:
             self._mu.mem_protect(addr, len_in, prot)
         except UcError as e:
             # TODO:just for debug
-            logger.warning(
-                "Warning mprotect with addr: 0x%08X len: 0x%08X prot:0x%08X failed!!!" %
-                (addr, len, prot))
+            logger.warning("Warning mprotect with addr: 0x%08X len: 0x%08X prot:0x%08X failed!!!" %
+                           (addr, len, prot))
             # self.dump_maps(sys.stdout)
             # raise
             return -1
@@ -207,9 +200,8 @@ class MemoryMap:
 
         size = page_end(addr + size) - addr
         try:
-            logger.debug(
-                "unmap 0x%08X sz=0x0x%08X end=0x0x%08X" %
-                (addr, size, addr + size))
+            logger.debug("unmap 0x%08X sz=0x0x%08X end=0x0x%08X" %
+                         (addr, size, addr + size))
             if addr in self._file_map_addr:
                 file_map_attr = self._file_map_addr[addr]
                 if addr + size != file_map_attr[0]:
