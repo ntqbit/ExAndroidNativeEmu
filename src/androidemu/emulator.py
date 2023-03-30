@@ -122,7 +122,7 @@ class Emulator:
         self.mu.reg_write(UC_ARM64_REG_CPACR_EL1, x)
 
     def __add_classes(self):
-        clz = [
+        defualt_classes = [
             androidemu.java.classes.application.Application,
             androidemu.java.classes.debug.Debug,
             androidemu.java.classes.array.Array,
@@ -172,7 +172,6 @@ class Emulator:
             androidemu.java.classes.method.Method,
             androidemu.java.classes.map.HashMap,
             androidemu.java.classes.wifi.WifiInfo,
-            androidemu.java.classes.wifi.NetworkInfo,
             androidemu.java.classes.wifi.WifiConfiguration,
             androidemu.java.classes.wifi.DhcpInfo,
             androidemu.java.classes.wifi.WifiManager,
@@ -204,7 +203,7 @@ class Emulator:
             androidemu.java.classes.bundle.Bundle
         ]
 
-        for clz in preload_classes:
+        for clz in defualt_classes:
             self.java_classloader.add_class(clz)
 
         # also add classloader as java class

@@ -36,12 +36,6 @@ class WifiInfo(metaclass=JavaClassDef, jvm_name='android/net/wifi/WifiInfo'):
         return String("")
 
 
-class NetworkInfo(metaclass=JavaClassDef, jvm_name='android/net/NetworkInfo'):
-
-    def __init__(self):
-        pass
-
-
 class WifiConfiguration(
         metaclass=JavaClassDef,
         jvm_name='android/net/wifi/WifiConfiguration',
