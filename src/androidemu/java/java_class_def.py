@@ -1,7 +1,7 @@
 import inspect
 import itertools
 import verboselogs
-from androidemu.java.jvm_id_conter import *
+from androidemu.java.jvm_id_counter import *
 
 logger = verboselogs.VerboseLogger(__name__)
 

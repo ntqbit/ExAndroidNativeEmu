@@ -1,4 +1,4 @@
-from androidemu.java.jvm_id_conter import *
+from androidemu.java.jvm_id_counter import *
 
 
 class JavaFieldDef:

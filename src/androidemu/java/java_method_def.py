@@ -1,4 +1,4 @@
-from androidemu.java.jvm_id_conter import *
+from androidemu.java.jvm_id_counter import *
 from androidemu.java.java_class_def import JavaClassDef
 from androidemu.java.jni_ref import *
 from androidemu.const import emu_const
