@@ -36,44 +36,52 @@ class MemoryMap:
         self._alloc_max_addr = alloc_max_addr
         self._file_map_addr = {}
 
+    def _find_base_for_mapping(self, size):
+        regions = sorted(list(self._mu.mem_regions()))
+
+        map_base = -1
+        l_regions = len(regions)
+        if l_regions < 1:
+            map_base = self._alloc_min_addr
+        else:
+            prefer_start = self._alloc_min_addr
+            next_loop = True
+            while next_loop:
+                next_loop = False
+                for r in regions:
+                    if self._is_overlap(prefer_start,
+                                        prefer_start + size, r[0], r[1] + 1):
+                        prefer_start = r[1] + 1
+                        next_loop = True
+                        break
+
+            map_base = prefer_start
+
+        if map_base > self._alloc_max_addr or map_base < self._alloc_min_addr:
+            raise RuntimeError(
+                "mmap error map_base 0x%08X out of range (0x%08X-0x%08X)" %
+                (map_base, self._alloc_min_addr, self._alloc_max_addr))
+
+        return map_base
+
+    def _map_anywhere(self, size, prot=UC_PROT_READ | UC_PROT_WRITE):
+        # logger.debug('Map anywhere: [size=0x%X,prot=%d]', size, prot)
+
+        map_base = self._find_base_for_mapping(size)
+        self._mu.mem_map(map_base, size, perms=prot)
+
+        # logger.debug('Mapped 0x%X at base 0x%X', size, map_base)
+        return map_base
+
     def _map(self, address, size, prot=UC_PROT_READ | UC_PROT_WRITE):
+        # logger.debug('Map: [address=0x%X,size=0x%X,prot=%d]', address, size, prot)
+
         if size <= 0:
-            raise Exception('Heap map size was <= 0.')
+            raise Exception('Size of mapped region cannot be negative or zero.')
+
         try:
             if address == 0:
-                regions = []
-                for r in self._mu.mem_regions():
-                    regions.append(r)
-
-                regions.sort()
-                map_base = -1
-                l_regions = len(regions)
-                if l_regions < 1:
-                    map_base = self._alloc_min_addr
-                else:
-                    prefer_start = self._alloc_min_addr
-                    next_loop = True
-                    while next_loop:
-                        next_loop = False
-                        for r in regions:
-                            if self._is_overlap(prefer_start,
-                                                prefer_start + size, r[0], r[1] + 1):
-                                prefer_start = r[1] + 1
-                                next_loop = True
-                                break
-
-                    map_base = prefer_start
-
-                if map_base > self._alloc_max_addr or map_base < self._alloc_min_addr:
-                    raise RuntimeError(
-                        "mmap error map_base 0x%08X out of range (0x%08X-0x%08X)" %
-                        (map_base, self._alloc_min_addr, self._alloc_max_addr))
-
-                logger.debug("before mem_map addr:0x%08X, sz:0x%08X" % (map_base, size))
-
-                self._mu.mem_map(map_base, size, perms=prot)
-                return map_base
-
+                return self._map_anywhere(size, prot=prot)
             else:
                 # MAP_FIXED
                 try:
