@@ -35,6 +35,7 @@ class JNIEnv:
         self._class_loader = class_loader
         self._locals = ReferenceTable(start=1, max_entries=2048)
         self._globals = ReferenceTable(start=4096, max_entries=512000)
+
         arch = emu.get_arch()
         if arch == emu_const.ARCH_ARM32:
             self._read_args = self._read_args32
@@ -45,8 +46,7 @@ class JNIEnv:
         else:
             raise NotImplementedError("unsupport arch %d" % arch)
 
-        (self.address_ptr, self.address) = hooker.write_function_table(
-            self._get_jni_hooking_table())
+        (self.address_ptr, self.address) = hooker.write_function_table(self._get_jni_hooking_table())
 
     def _get_jni_hooking_table(self):
         JNI_CALLBACKS = {
@@ -303,8 +303,7 @@ class JNIEnv:
                 for arg, func_arg in zip(args, func_args)
             ]
 
-            args_filtered_none = filter(
-                lambda x: x[1] is not None, mapped_to_text)
+            args_filtered_none = filter(lambda x: x[1] is not None, mapped_to_text)
 
             args_with_names = [
                 f"{name}:{mapped_text}"
@@ -366,10 +365,7 @@ class JNIEnv:
         return r
 
     def delete_local_reference(self, obj):
-        if not isinstance(obj, jobject):
-            raise ValueError('Expected a jobject.')
-
-        self._locals.remove(obj)
+        return self._locals.remove(obj)
 
     def clear_locals(self):
         self._locals.clear()
@@ -384,9 +380,6 @@ class JNIEnv:
         return self._globals.get(idx)
 
     def delete_global_reference(self, obj):
-        if not isinstance(obj, jobject):
-            raise ValueError('Expected a jobject.')
-
         return self._globals.remove(obj)
 
     # args is a tuple or list
@@ -741,7 +734,7 @@ class JNIEnv:
         Creates a new global reference to the object referred to by the obj argument. The obj argument may be a
         global or local reference. Global references must be explicitly disposed of by calling DeleteGlobalRef().
         """
-        logger.debug("JNIEnv->NewGlobalRef(%d) was called" % jobj)
+        logger.debug("JNIEnv->NewGlobalRef(%d) was called", jobj)
 
         if jobj == 0:
             return 0
@@ -752,8 +745,7 @@ class JNIEnv:
             # TODO: Implement global > global support (?)
             raise NotImplementedError('Invalid local reference obj.')
 
-        index = self.add_global_reference(obj)
-        return index
+        return self.add_global_reference(obj)
 
     def delete_global_ref(self, mu, env, idx):
         """
@@ -764,8 +756,7 @@ class JNIEnv:
         if idx == 0:
             return None
 
-        obj = self.get_global_reference(idx)
-        self.delete_global_reference(obj)
+        self.delete_global_reference(idx)
 
     def delete_local_ref(self, mu, env, idx):
         """
@@ -776,8 +767,7 @@ class JNIEnv:
         if idx == 0:
             return None
 
-        obj = self.get_local_reference(idx)
-        self.delete_local_reference(obj)
+        self.delete_local_reference(idx)
 
     def is_same_object(self, mu, env, ref1, ref2):
         """

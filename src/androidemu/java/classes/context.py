@@ -79,6 +79,12 @@ class Context(
     def getFilesDir(self, emu):
         raise RuntimeError("pure virtual function call!!!")
 
+    @java_method_def(name='getCacheDir',
+                     signature='()Ljava/io/File;',
+                     native=False)
+    def getCacheDir(self, emu):
+        raise RuntimeError("pure virtual function call!!!")
+
     @java_method_def(name='getPackageName',
                      signature='()Ljava/lang/String;',
                      native=False)
@@ -190,6 +196,13 @@ class ContextImpl(
         fdir = "/data/data/%s/files" % (pkgName, )
         return File(fdir)
 
+    @java_method_def(name='getCacheDir',
+                     signature='()Ljava/io/File;',
+                     native=False)
+    def getCacheDir(self, emu):
+        pkgName = emu.config.get("pkg_name")
+        return File("/data/data/%s/cache" % pkgName)
+
     @java_method_def(name='getSharedPreferences',
                      args_list=["jstring",
                                 "jint"],
@@ -278,6 +291,12 @@ class ContextWrapper(
                      native=False)
     def getFilesDir(self, emu):
         return self._impl.getFilesDir(emu)
+
+    @java_method_def(name='getCacheDir',
+                     signature='()Ljava/io/File;',
+                     native=False)
+    def getCacheDir(self, emu):
+        return self._impl.getCacheDir(emu)
 
     @java_method_def(name='getSharedPreferences',
                      args_list=["jstring",

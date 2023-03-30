@@ -76,7 +76,7 @@ def java_method_def(
                     jclass(jvm_clazz))
 
             brace_index = signature.find(")")
-            if brace_index < 0:
+            if brace_index == -1:
                 raise RuntimeError(
                     "native_wrapper invalid function signature %s" %
                     signature)

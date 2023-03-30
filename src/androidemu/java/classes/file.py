@@ -20,5 +20,6 @@ class File(metaclass=JavaClassDef, jvm_name='java/io/File'):
                      signature='()Ljava/lang/String;',
                      native=False)
     def getAbsolutePath(self, emu):
+        raise NotImplementedError()
         # FIXME return abspath...
         return String(self._path)

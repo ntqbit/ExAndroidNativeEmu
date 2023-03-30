@@ -25,7 +25,7 @@ WRITE_FSTAT_TIMES = True
 
 class Config:
     def __init__(self, cfg_path):
-        with open(cfg_path, "r") as f:
+        with open(cfg_path, 'r', encoding='utf8') as f:
             js = f.read()
             self._configs = json.loads(js)
 
