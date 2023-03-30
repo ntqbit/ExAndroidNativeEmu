@@ -5,7 +5,7 @@ from androidemu.const import emu_const
 from androidemu.utils import memory_helpers
 
 
-class StackHelper():
+class StackHelper:
     def __init__(self, emu):
         self._emu = emu
         arch = emu.get_arch()
