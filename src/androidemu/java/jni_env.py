@@ -6,7 +6,7 @@ from androidemu.java.classes.constructor import Constructor
 from androidemu.java.classes.method import Method
 from androidemu.java.java_class_def import JavaClassDef
 from androidemu.java.constant_values import MODIFIER_STATIC
-from androidemu.java.helpers.native_method import native_method
+from androidemu.java.helpers.native_method import create_native_method_wrapper
 from androidemu.java.jni_const import *
 from androidemu.java.jni_ref import *
 from androidemu.java.reference_table import ReferenceTable
@@ -17,6 +17,7 @@ from androidemu.utils import memory_helpers
 from unicorn import *
 from androidemu.utils import debug_utils
 from androidemu.const import emu_const
+from androidemu.java.jni_functions import JNI_FUNCTIONS
 
 logger = logging.getLogger(__name__)
 
@@ -44,237 +45,295 @@ class JNIEnv:
         else:
             raise NotImplementedError("unsupport arch %d" % arch)
 
-        (self.address_ptr, self.address) = hooker.write_function_table({
-            4: self.get_version,
-            5: self.define_class,
-            6: self.find_class,
-            7: self.from_reflected_method,
-            8: self.from_reflected_field,
-            9: self.to_reflected_method,
-            10: self.get_superclass,
-            11: self.is_assignable_from,
-            12: self.to_reflected_field,
-            13: self.throw,
-            14: self.throw_new,
-            15: self.exception_occurred,
-            16: self.exception_describe,
-            17: self.exception_clear,
-            18: self.fatal_error,
-            19: self.push_local_frame,
-            20: self.pop_local_frame,
-            21: self.new_global_ref,
-            22: self.delete_global_ref,
-            23: self.delete_local_ref,
-            24: self.is_same_object,
-            25: self.new_local_ref,
-            26: self.ensure_local_capacity,
-            27: self.alloc_object,
-            28: self.new_object,
-            29: self.new_object_v,
-            30: self.new_object_a,
-            31: self.get_object_class,
-            32: self.is_instance_of,
-            33: self.get_method_id,
-            34: self.call_object_method,
-            35: self.call_object_method_v,
-            36: self.call_object_method_a,
-            37: self.call_boolean_method,
-            38: self.call_boolean_method_v,
-            39: self.call_boolean_method_a,
-            40: self.call_byte_method,
-            41: self.call_byte_method_v,
-            42: self.call_byte_method_a,
-            43: self.call_char_method,
-            44: self.call_char_method_v,
-            45: self.call_char_method_a,
-            46: self.call_short_method,
-            47: self.call_short_method_v,
-            48: self.call_short_method_a,
-            49: self.call_int_method,
-            50: self.call_int_method_v,
-            51: self.call_int_method_a,
-            52: self.call_long_method,
-            53: self.call_long_method_v,
-            54: self.call_long_method_a,
-            55: self.call_float_method,
-            56: self.call_float_method_v,
-            57: self.call_float_method_a,
-            58: self.call_double_method,
-            59: self.call_double_method_v,
-            60: self.call_double_method_a,
-            61: self.call_void_method,
-            62: self.call_void_method_v,
-            63: self.call_void_method_a,
-            64: self.call_nonvirtual_object_method,
-            65: self.call_nonvirtual_object_method_v,
-            66: self.call_nonvirtual_object_method_a,
-            67: self.call_nonvirtual_boolean_method,
-            68: self.call_nonvirtual_boolean_method_v,
-            69: self.call_nonvirtual_boolean_method_a,
-            70: self.call_nonvirtual_byte_method,
-            71: self.call_nonvirtual_byte_method_v,
-            72: self.call_nonvirtual_byte_method_a,
-            73: self.call_nonvirtual_char_method,
-            74: self.call_nonvirtual_char_method_v,
-            75: self.call_nonvirtual_char_method_a,
-            76: self.call_nonvirtual_short_method,
-            77: self.call_nonvirtual_short_method_v,
-            78: self.call_nonvirtual_short_method_a,
-            79: self.call_nonvirtual_int_method,
-            80: self.call_nonvirtual_int_method_v,
-            81: self.call_nonvirtual_int_method_a,
-            82: self.call_nonvirtual_long_method,
-            83: self.call_nonvirtual_long_method_v,
-            84: self.call_nonvirtual_long_method_a,
-            85: self.call_nonvirtual_float_method,
-            86: self.call_nonvirtual_float_method_v,
-            87: self.call_nonvirtual_float_method_a,
-            88: self.call_nonvirtual_double_method,
-            89: self.call_nonvirtual_double_method_v,
-            90: self.call_nonvirtual_double_method_a,
-            91: self.call_nonvirtual_void_method,
-            92: self.call_nonvirtual_void_method_v,
-            93: self.call_nonvirtual_void_method_a,
-            94: self.get_field_id,
-            95: self.get_object_field,
-            96: self.get_boolean_field,
-            97: self.get_byte_field,
-            98: self.get_char_field,
-            99: self.get_short_field,
-            100: self.get_int_field,
-            101: self.get_long_field,
-            102: self.get_float_field,
-            103: self.get_double_field,
-            104: self.set_object_field,
-            105: self.set_boolean_field,
-            106: self.set_byte_field,
-            107: self.set_char_field,
-            108: self.set_short_field,
-            109: self.set_int_field,
-            110: self.set_long_field,
-            111: self.set_float_field,
-            112: self.set_double_field,
-            113: self.get_static_method_id,
-            114: self.call_static_object_method,
-            115: self.call_static_object_method_v,
-            116: self.call_static_object_method_a,
-            117: self.call_static_boolean_method,
-            118: self.call_static_boolean_method_v,
-            119: self.call_static_boolean_method_a,
-            120: self.call_static_byte_method,
-            121: self.call_static_byte_method_v,
-            122: self.call_static_byte_method_a,
-            123: self.call_static_char_method,
-            124: self.call_static_char_method_v,
-            125: self.call_static_char_method_a,
-            126: self.call_static_short_method,
-            127: self.call_static_short_method_v,
-            128: self.call_static_short_method_a,
-            129: self.call_static_int_method,
-            130: self.call_static_int_method_v,
-            131: self.call_static_int_method_a,
-            132: self.call_static_long_method,
-            133: self.call_static_long_method_v,
-            134: self.call_static_long_method_a,
-            135: self.call_static_float_method,
-            136: self.call_static_float_method_v,
-            137: self.call_static_float_method_a,
-            138: self.call_static_double_method,
-            139: self.call_static_double_method_v,
-            140: self.call_static_double_method_a,
-            141: self.call_static_void_method,
-            142: self.call_static_void_method_v,
-            143: self.call_static_void_method_a,
-            144: self.get_static_field_id,
-            145: self.get_static_object_field,
-            146: self.get_static_boolean_field,
-            147: self.get_static_byte_field,
-            148: self.get_static_char_field,
-            149: self.get_static_short_field,
-            150: self.get_static_int_field,
-            151: self.get_static_long_field,
-            152: self.get_static_float_field,
-            153: self.get_static_double_field,
-            154: self.set_static_object_field,
-            155: self.set_static_boolean_field,
-            156: self.set_static_byte_field,
-            157: self.set_static_char_field,
-            158: self.set_static_short_field,
-            159: self.set_static_int_field,
-            160: self.set_static_long_field,
-            161: self.set_static_float_field,
-            162: self.set_static_double_field,
-            163: self.new_string,
-            164: self.get_string_length,
-            165: self.get_string_chars,
-            166: self.release_string_chars,
-            167: self.new_string_utf,
-            168: self.get_string_utf_length,
-            169: self.get_string_utf_chars,
-            170: self.release_string_utf_chars,
-            171: self.get_array_length,
-            172: self.new_object_array,
-            173: self.get_object_array_element,
-            174: self.set_object_array_element,
-            175: self.new_boolean_array,
-            176: self.new_byte_array,
-            177: self.new_char_array,
-            178: self.new_short_array,
-            179: self.new_int_array,
-            180: self.new_long_array,
-            181: self.new_float_array,
-            182: self.new_double_array,
-            183: self.get_boolean_array_elements,
-            184: self.get_byte_array_elements,
-            185: self.get_char_array_elements,
-            186: self.get_short_array_elements,
-            187: self.get_int_array_elements,
-            188: self.get_long_array_elements,
-            189: self.get_float_array_elements,
-            190: self.get_double_array_elements,
-            191: self.release_boolean_array_elements,
-            192: self.release_byte_array_elements,
-            193: self.release_char_array_elements,
-            194: self.release_short_array_elements,
-            195: self.release_int_array_elements,
-            196: self.release_long_array_elements,
-            197: self.release_float_array_elements,
-            198: self.release_double_array_elements,
-            199: self.get_boolean_array_region,
-            200: self.get_byte_array_region,
-            201: self.get_char_array_region,
-            202: self.get_short_array_region,
-            203: self.get_int_array_region,
-            204: self.get_long_array_region,
-            205: self.get_float_array_region,
-            206: self.get_double_array_region,
-            207: self.set_boolean_array_region,
-            208: self.set_byte_array_region,
-            209: self.set_char_array_region,
-            210: self.set_short_array_region,
-            211: self.set_int_array_region,
-            212: self.set_long_array_region,
-            213: self.set_float_array_region,
-            214: self.set_double_array_region,
-            215: self.register_natives,
-            216: self.unregister_natives,
-            217: self.monitor_enter,
-            218: self.monitor_exit,
-            219: self.get_java_vm,
-            220: self.get_string_region,
-            221: self.get_string_utf_region,
-            222: self.get_primitive_array_critical,
-            223: self.release_primitive_array_critical,
-            224: self.get_string_critical,
-            225: self.release_string_critical,
-            226: self.new_weak_global_ref,
-            227: self.delete_weak_global_ref,
-            228: self.exception_check,
-            229: self.new_direct_byte_buffer,
-            230: self.get_direct_buffer_address,
-            231: self.get_direct_buffer_capacity,
-            232: self.get_object_ref_type
-        })
+        (self.address_ptr, self.address) = hooker.write_function_table(self._get_jni_hooking_table())
+
+    def _get_jni_hooking_table(self):
+        JNI_CALLBACKS = {
+            "GetVersion": self.get_version,
+            "DefineClass": self.define_class,
+            "FindClass": self.find_class,
+            "FromReflectedMethod": self.from_reflected_method,
+            "FromReflectedField": self.from_reflected_field,
+            "ToReflectedMethod": self.to_reflected_method,
+            "GetSuperclass": self.get_superclass,
+            "IsAssignableFrom": self.is_assignable_from,
+            "ToReflectedField": self.to_reflected_field,
+            "Throw": self.throw,
+            "ThrowNew": self.throw_new,
+            "ExceptionOccurred": self.exception_occurred,
+            "ExceptionDescribe": self.exception_describe,
+            "ExceptionClear": self.exception_clear,
+            "FatalError": self.fatal_error,
+            "PushLocalFrame": self.push_local_frame,
+            "PopLocalFrame": self.pop_local_frame,
+            "NewGlobalRef": self.new_global_ref,
+            "DeleteGlobalRef": self.delete_global_ref,
+            "DeleteLocalRef": self.delete_local_ref,
+            "IsSameObject": self.is_same_object,
+            "NewLocalRef": self.new_local_ref,
+            "EnsureLocalCapacity": self.ensure_local_capacity,
+            "AllocObject": self.alloc_object,
+            "NewObject": self.new_object,
+            "NewObjectV": self.new_object_v,
+            "NewObjectA": self.new_object_a,
+            "GetObjectClass": self.get_object_class,
+            "IsInstanceOf": self.is_instance_of,
+            "GetMethodID": self.get_method_id,
+            "CallObjectMethod": self.call_object_method,
+            "CallObjectMethodV": self.call_object_method_v,
+            "CallObjectMethodA": self.call_object_method_a,
+            "CallBooleanMethod": self.call_boolean_method,
+            "CallBooleanMethodV": self.call_boolean_method_v,
+            "CallBooleanMethodA": self.call_boolean_method_a,
+            "CallByteMethod": self.call_byte_method,
+            "CallByteMethodV": self.call_byte_method_v,
+            "CallByteMethodA": self.call_byte_method_a,
+            "CallCharMethod": self.call_char_method,
+            "CallCharMethodV": self.call_char_method_v,
+            "CallCharMethodA": self.call_char_method_a,
+            "CallShortMethod": self.call_short_method,
+            "CallShortMethodV": self.call_short_method_v,
+            "CallShortMethodA": self.call_short_method_a,
+            "CallIntMethod": self.call_int_method,
+            "CallIntMethodV": self.call_int_method_v,
+            "CallIntMethodA": self.call_int_method_a,
+            "CallLongMethod": self.call_long_method,
+            "CallLongMethodV": self.call_long_method_v,
+            "CallLongMethodA": self.call_long_method_a,
+            "CallFloatMethod": self.call_float_method,
+            "CallFloatMethodV": self.call_float_method_v,
+            "CallFloatMethodA": self.call_float_method_a,
+            "CallDoubleMethod": self.call_double_method,
+            "CallDoubleMethodV": self.call_double_method_v,
+            "CallDoubleMethodA": self.call_double_method_a,
+            "CallVoidMethod": self.call_void_method,
+            "CallVoidMethodV": self.call_void_method_v,
+            "CallVoidMethodA": self.call_void_method_a,
+            "CallNonvirtualObjectMethod": self.call_nonvirtual_object_method,
+            "CallNonvirtualObjectMethodV": self.call_nonvirtual_object_method_v,
+            "CallNonvirtualObjectMethodA": self.call_nonvirtual_object_method_a,
+            "CallNonvirtualBooleanMethod": self.call_nonvirtual_boolean_method,
+            "CallNonvirtualBooleanMethodV": self.call_nonvirtual_boolean_method_v,
+            "CallNonvirtualBooleanMethodA": self.call_nonvirtual_boolean_method_a,
+            "CallNonvirtualByteMethod": self.call_nonvirtual_byte_method,
+            "CallNonvirtualByteMethodV": self.call_nonvirtual_byte_method_v,
+            "CallNonvirtualByteMethodA": self.call_nonvirtual_byte_method_a,
+            "CallNonvirtualCharMethod": self.call_nonvirtual_char_method,
+            "CallNonvirtualCharMethodV": self.call_nonvirtual_char_method_v,
+            "CallNonvirtualCharMethodA": self.call_nonvirtual_char_method_a,
+            "CallNonvirtualShortMethod": self.call_nonvirtual_short_method,
+            "CallNonvirtualShortMethodV": self.call_nonvirtual_short_method_v,
+            "CallNonvirtualShortMethodA": self.call_nonvirtual_short_method_a,
+            "CallNonvirtualIntMethod": self.call_nonvirtual_int_method,
+            "CallNonvirtualIntMethodV": self.call_nonvirtual_int_method_v,
+            "CallNonvirtualIntMethodA": self.call_nonvirtual_int_method_a,
+            "CallNonvirtualLongMethod": self.call_nonvirtual_long_method,
+            "CallNonvirtualLongMethodV": self.call_nonvirtual_long_method_v,
+            "CallNonvirtualLongMethodA": self.call_nonvirtual_long_method_a,
+            "CallNonvirtualFloatMethod": self.call_nonvirtual_float_method,
+            "CallNonvirtualFloatMethodV": self.call_nonvirtual_float_method_v,
+            "CallNonvirtualFloatMethodA": self.call_nonvirtual_float_method_a,
+            "CallNonvirtualDoubleMethod": self.call_nonvirtual_double_method,
+            "CallNonvirtualDoubleMethodV": self.call_nonvirtual_double_method_v,
+            "CallNonvirtualDoubleMethodA": self.call_nonvirtual_double_method_a,
+            "CallNonvirtualVoidMethod": self.call_nonvirtual_void_method,
+            "CallNonvirtualVoidMethodV": self.call_nonvirtual_void_method_v,
+            "CallNonvirtualVoidMethodA": self.call_nonvirtual_void_method_a,
+            "GetFieldID": self.get_field_id,
+            "GetObjectField": self.get_object_field,
+            "GetBooleanField": self.get_boolean_field,
+            "GetByteField": self.get_byte_field,
+            "GetCharField": self.get_char_field,
+            "GetShortField": self.get_short_field,
+            "GetIntField": self.get_int_field,
+            "GetLongField": self.get_long_field,
+            "GetFloatField": self.get_float_field,
+            "GetDoubleField": self.get_double_field,
+            "SetObjectField": self.set_object_field,
+            "SetBooleanField": self.set_boolean_field,
+            "SetByteField": self.set_byte_field,
+            "SetCharField": self.set_char_field,
+            "SetShortField": self.set_short_field,
+            "SetIntField": self.set_int_field,
+            "SetLongField": self.set_long_field,
+            "SetFloatField": self.set_float_field,
+            "SetDoubleField": self.set_double_field,
+            "GetStaticMethodID": self.get_static_method_id,
+            "CallStaticObjectMethod": self.call_static_object_method,
+            "CallStaticObjectMethodV": self.call_static_object_method_v,
+            "CallStaticObjectMethodA": self.call_static_object_method_a,
+            "CallStaticBooleanMethod": self.call_static_boolean_method,
+            "CallStaticBooleanMethodV": self.call_static_boolean_method_v,
+            "CallStaticBooleanMethodA": self.call_static_boolean_method_a,
+            "CallStaticByteMethod": self.call_static_byte_method,
+            "CallStaticByteMethodV": self.call_static_byte_method_v,
+            "CallStaticByteMethodA": self.call_static_byte_method_a,
+            "CallStaticCharMethod": self.call_static_char_method,
+            "CallStaticCharMethodV": self.call_static_char_method_v,
+            "CallStaticCharMethodA": self.call_static_char_method_a,
+            "CallStaticShortMethod": self.call_static_short_method,
+            "CallStaticShortMethodV": self.call_static_short_method_v,
+            "CallStaticShortMethodA": self.call_static_short_method_a,
+            "CallStaticIntMethod": self.call_static_int_method,
+            "CallStaticIntMethodV": self.call_static_int_method_v,
+            "CallStaticIntMethodA": self.call_static_int_method_a,
+            "CallStaticLongMethod": self.call_static_long_method,
+            "CallStaticLongMethodV": self.call_static_long_method_v,
+            "CallStaticLongMethodA": self.call_static_long_method_a,
+            "CallStaticFloatMethod": self.call_static_float_method,
+            "CallStaticFloatMethodV": self.call_static_float_method_v,
+            "CallStaticFloatMethodA": self.call_static_float_method_a,
+            "CallStaticDoubleMethod": self.call_static_double_method,
+            "CallStaticDoubleMethodV": self.call_static_double_method_v,
+            "CallStaticDoubleMethodA": self.call_static_double_method_a,
+            "CallStaticVoidMethod": self.call_static_void_method,
+            "CallStaticVoidMethodV": self.call_static_void_method_v,
+            "CallStaticVoidMethodA": self.call_static_void_method_a,
+            "GetStaticFieldID": self.get_static_field_id,
+            "GetStaticObjectField": self.get_static_object_field,
+            "GetStaticBooleanField": self.get_static_boolean_field,
+            "GetStaticByteField": self.get_static_byte_field,
+            "GetStaticCharField": self.get_static_char_field,
+            "GetStaticShortField": self.get_static_short_field,
+            "GetStaticIntField": self.get_static_int_field,
+            "GetStaticLongField": self.get_static_long_field,
+            "GetStaticFloatField": self.get_static_float_field,
+            "GetStaticDoubleField": self.get_static_double_field,
+            "SetStaticObjectField": self.set_static_object_field,
+            "SetStaticBooleanField": self.set_static_boolean_field,
+            "SetStaticByteField": self.set_static_byte_field,
+            "SetStaticCharField": self.set_static_char_field,
+            "SetStaticShortField": self.set_static_short_field,
+            "SetStaticIntField": self.set_static_int_field,
+            "SetStaticLongField": self.set_static_long_field,
+            "SetStaticFloatField": self.set_static_float_field,
+            "SetStaticDoubleField": self.set_static_double_field,
+            "NewString": self.new_string,
+            "GetStringLength": self.get_string_length,
+            "GetStringChars": self.get_string_chars,
+            "ReleaseStringChars": self.release_string_chars,
+            "NewStringUTF": self.new_string_utf,
+            "GetStringUTFLength": self.get_string_utf_length,
+            "GetStringUTFChars": self.get_string_utf_chars,
+            "ReleaseStringUTFChars": self.release_string_utf_chars,
+            "GetArrayLength": self.get_array_length,
+            "NewObjectArray": self.new_object_array,
+            "GetObjectArrayElement": self.get_object_array_element,
+            "SetObjectArrayElement": self.set_object_array_element,
+            "NewBooleanArray": self.new_boolean_array,
+            "NewByteArray": self.new_byte_array,
+            "NewCharArray": self.new_char_array,
+            "NewShortArray": self.new_short_array,
+            "NewIntArray": self.new_int_array,
+            "NewLongArray": self.new_long_array,
+            "NewFloatArray": self.new_float_array,
+            "NewDoubleArray": self.new_double_array,
+            "GetBooleanArrayElements": self.get_boolean_array_elements,
+            "GetByteArrayElements": self.get_byte_array_elements,
+            "GetCharArrayElements": self.get_char_array_elements,
+            "GetShortArrayElements": self.get_short_array_elements,
+            "GetIntArrayElements": self.get_int_array_elements,
+            "GetLongArrayElements": self.get_long_array_elements,
+            "GetFloatArrayElements": self.get_float_array_elements,
+            "GetDoubleArrayElements": self.get_double_array_elements,
+            "ReleaseBooleanArrayElements": self.release_boolean_array_elements,
+            "ReleaseByteArrayElements": self.release_byte_array_elements,
+            "ReleaseCharArrayElements": self.release_char_array_elements,
+            "ReleaseShortArrayElements": self.release_short_array_elements,
+            "ReleaseIntArrayElements": self.release_int_array_elements,
+            "ReleaseLongArrayElements": self.release_long_array_elements,
+            "ReleaseFloatArrayElements": self.release_float_array_elements,
+            "ReleaseDoubleArrayElements": self.release_double_array_elements,
+            "GetBooleanArrayRegion": self.get_boolean_array_region,
+            "GetByteArrayRegion": self.get_byte_array_region,
+            "GetCharArrayRegion": self.get_char_array_region,
+            "GetShortArrayRegion": self.get_short_array_region,
+            "GetIntArrayRegion": self.get_int_array_region,
+            "GetLongArrayRegion": self.get_long_array_region,
+            "GetFloatArrayRegion": self.get_float_array_region,
+            "GetDoubleArrayRegion": self.get_double_array_region,
+            "SetBooleanArrayRegion": self.set_boolean_array_region,
+            "SetByteArrayRegion": self.set_byte_array_region,
+            "SetCharArrayRegion": self.set_char_array_region,
+            "SetShortArrayRegion": self.set_short_array_region,
+            "SetIntArrayRegion": self.set_int_array_region,
+            "SetLongArrayRegion": self.set_long_array_region,
+            "SetFloatArrayRegion": self.set_float_array_region,
+            "SetDoubleArrayRegion": self.set_double_array_region,
+            "RegisterNatives": self.register_natives,
+            "UnregisterNatives": self.unregister_natives,
+            "MonitorEnter": self.monitor_enter,
+            "MonitorExit": self.monitor_exit,
+            "GetJavaVM": self.get_java_vm,
+            "GetStringRegion": self.get_string_region,
+            "GetStringUTFRegion": self.get_string_utf_region,
+            "GetPrimitiveArrayCritical": self.get_primitive_array_critical,
+            "ReleasePrimitiveArrayCritical": self.release_primitive_array_critical,
+            "GetStringCritical": self.get_string_critical,
+            "ReleaseStringCritical": self.release_string_critical,
+            "NewWeakGlobalRef": self.new_weak_global_ref,
+            "DeleteWeakGlobalRef": self.delete_weak_global_ref,
+            "ExceptionCheck": self.exception_check,
+            "NewDirectByteBuffer": self.new_direct_byte_buffer,
+            "GetDirectBufferAddress": self.get_direct_buffer_address,
+            "GetDirectBufferCapacity": self.get_direct_buffer_capacity,
+            "GetObjectRefType": self.get_object_ref_type
+        }
+
+        def map_var_type(var, var_type):
+            if var_type == 'JNIEnv*':
+                return None
+
+            if var_type == 'jclass':
+                return f'ref<{var},{repr(self.get_reference(var))}>'
+            
+            if var_type == 'jstring':
+                return '\'' + self.get_reference(var).value.get_py_string() + '\''
+
+            if var_type in 'char*':
+                return '\'' + memory_helpers.read_utf8(self._emu.mu, var) + '\''
+
+            return var
+
+        def get_args_log(args, func_args):
+            mapped_to_text = [
+                (func_arg['name'], map_var_type(arg, func_arg['type']))
+                for arg, func_arg in zip(args, func_args)
+            ]
+
+            args_filtered_none = filter(lambda x: x[1] is not None, mapped_to_text)
+
+            args_with_names = [
+                f"{name}:{mapped_text}"
+                for name, mapped_text in args_filtered_none
+            ]
+
+            return ','.join(args_with_names)
+
+        def create_wrapper(func, callback):
+            def wrapper(mu, *args):
+                log_text = f"JNIEnv->{func['name']}({get_args_log(args, func['args'])})"
+
+                try:
+                    ret = callback(mu, *args)
+                except Exception as e:
+                    log_text += f'. Thrown {e.__class__.__name__}({str(e)}).'
+                    logger.debug(log_text)
+                    raise
+
+                if func['ret'] != 'void':
+                    logger.debug('Getting return value')
+                    log_text += f' = {map_var_type(ret, func["ret"])}'
+
+                logger.debug(log_text)
+                return ret
+
+            return create_native_method_wrapper(wrapper, len(func['args']))
+
+        return {
+            func['id']: create_wrapper(func, JNI_CALLBACKS[func['name']])
+            for func in JNI_FUNCTIONS
+        }
 
     def get_reference(self, idx):
         if idx == 0:
@@ -518,16 +577,13 @@ class JNIEnv:
         else:
             raise RuntimeError("jobject_to_pyobject unknown obj type %r" % obj)
 
-    @native_method
     def get_version(self, mu, env):
         logger.debug("JNIEnv->GetVersion() was called")
         return 65542
 
-    @native_method
     def define_class(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def find_class(self, mu, env, name_ptr):
         """
         Returns a class object from a fully-qualified name, or NULL if the class cannot be found.
@@ -550,15 +606,12 @@ class JNIEnv:
         jvm_clazz = pyclazz.class_object
         return self.add_local_reference(jclass(jvm_clazz))
 
-    @native_method
     def from_reflected_method(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def from_reflected_field(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def to_reflected_method(self, mu, env, class_idx, method_id, is_static):
         """
         Converts a method ID derived from cls to a java.lang.reflect.Method or java.lang.reflect.Constructor object.
@@ -599,7 +652,6 @@ class JNIEnv:
         else:
             return Method(pyclazz, method)
 
-    @native_method
     def get_superclass(self, mu, env, clazz_idx):
         jclazz = self.get_reference(clazz_idx)
         if not isinstance(jclazz, jclass):
@@ -621,7 +673,6 @@ class JNIEnv:
         clazz_super_object = pyclazz_super.class_object
         return self.add_local_reference(jclass(clazz_super_object))
 
-    @native_method
     def is_assignable_from(self, mu, env, clazz_idx1, clazz_idx2):
         jclazz1 = self.get_reference(clazz_idx1)
         jclazz2 = self.get_reference(clazz_idx2)
@@ -649,28 +700,22 @@ class JNIEnv:
             (pyclass1.jvm_name, pyclass2.jvm_name, r))
         return r
 
-    @native_method
     def to_reflected_field(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def throw(self, mu, env):
         raise RuntimeError("throw is call, maybe bug")
 
-    @native_method
     def throw_new(self, mu, env):
         raise RuntimeError("throw_new is call, maybe bug")
 
-    @native_method
     def exception_occurred(self, mu, env):
         logger.info("exception_occurred called skip")
         return 0
 
-    @native_method
     def exception_describe(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def exception_clear(self, mu, env):
         """
         Clears any exception that is currently being thrown.
@@ -680,19 +725,15 @@ class JNIEnv:
         # TODO: Implement
         return None
 
-    @native_method
     def fatal_error(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def push_local_frame(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def pop_local_frame(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def new_global_ref(self, mu, env, jobj):
         """
         Creates a new global reference to the object referred to by the obj argument. The obj argument may be a
@@ -712,7 +753,6 @@ class JNIEnv:
         index = self.add_global_reference(obj)
         return index
 
-    @native_method
     def delete_global_ref(self, mu, env, idx):
         """
         Deletes the global reference pointed to by globalRef.
@@ -725,7 +765,6 @@ class JNIEnv:
         obj = self.get_global_reference(idx)
         self.delete_global_reference(obj)
 
-    @native_method
     def delete_local_ref(self, mu, env, idx):
         """
         Deletes the local reference pointed to by localRef.
@@ -738,7 +777,6 @@ class JNIEnv:
         obj = self.get_local_reference(idx)
         self.delete_local_reference(obj)
 
-    @native_method
     def is_same_object(self, mu, env, ref1, ref2):
         """
         Returns JNI_TRUE if ref1 and ref2 refer to the same Java object, or are both NULL; otherwise, returns JNI_FALSE.
@@ -758,7 +796,6 @@ class JNIEnv:
 
         return JNI_FALSE
 
-    @native_method
     def new_local_ref(self, mu, env, ref):
         """
         Creates a new local reference that refers to the same object as ref.
@@ -773,13 +810,11 @@ class JNIEnv:
 
         return self.add_local_reference(obj)
 
-    @native_method
     def ensure_local_capacity(self, mu, env):
         #raise NotImplementedError()
         # ignore
         return JNIEnv.JNI_OK
 
-    @native_method
     def alloc_object(self, mu, env):
         raise NotImplementedError()
 
@@ -817,7 +852,6 @@ class JNIEnv:
 
     # FIXME*args 无法确定参数个数，强行读取四个参数，未完善。
 
-    @native_method
     def new_object(
             self,
             mu,
@@ -831,15 +865,12 @@ class JNIEnv:
         return self.__new_object(
             mu, env, clazz_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
-    @native_method
     def new_object_v(self, mu, env, clazz_idx, method_id, args_v):
         return self.__new_object(mu, env, clazz_idx, method_id, args_v, 1)
 
-    @native_method
     def new_object_a(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def get_object_class(self, mu, env, obj_idx):
 
         obj = self.get_reference(obj_idx)
@@ -857,7 +888,6 @@ class JNIEnv:
         jvm_clazz = pyclazz.class_object
         return self.add_local_reference(jclass(jvm_clazz))
 
-    @native_method
     def is_instance_of(self, mu, env, obj_idx, class_idx):
         """
         Tests whether an object is an instance of a class.
@@ -880,7 +910,6 @@ class JNIEnv:
         pyobj = JNIEnv.jobject_to_pyobject(obj)
         return JNI_TRUE if pyobj.jvm_id == pyclazz.jvm_id else JNI_FALSE
 
-    @native_method
     def get_method_id(self, mu, env, clazz_idx, name_ptr, sig_ptr):
         """
         Returns the method ID for an instance (nonstatic) method of a class or interface. The method may be defined
@@ -958,7 +987,6 @@ class JNIEnv:
             rlow = v & 0x0FFFFFFFF
             return (rlow, rhigh)
 
-    @native_method
     def call_object_method(
             self,
             mu,
@@ -972,15 +1000,12 @@ class JNIEnv:
         return self.__call_xxx_method(
             mu, env, obj_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
-    @native_method
     def call_object_method_v(self, mu, env, obj_idx, method_id, args):
         return self.__call_xxx_method(mu, env, obj_idx, method_id, args, 1)
 
-    @native_method
     def call_object_method_a(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_boolean_method(
             self,
             mu,
@@ -994,15 +1019,12 @@ class JNIEnv:
         return self.__call_xxx_method(
             mu, env, obj_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
-    @native_method
     def call_boolean_method_v(self, mu, env, obj_idx, method_id, args):
         return self.__call_xxx_method(mu, env, obj_idx, method_id, args, 1)
 
-    @native_method
     def call_boolean_method_a(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_byte_method(
             self,
             mu,
@@ -1016,15 +1038,12 @@ class JNIEnv:
         return self.__call_xxx_method(
             mu, env, obj_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
-    @native_method
     def call_byte_method_v(self, mu, env, obj_idx, method_id, args):
         return self.__call_xxx_method(mu, env, obj_idx, method_id, args, 1)
 
-    @native_method
     def call_byte_method_a(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_char_method(
             self,
             mu,
@@ -1038,15 +1057,12 @@ class JNIEnv:
         return self.__call_xxx_method(
             mu, env, obj_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
-    @native_method
     def call_char_method_v(self, mu, env, obj_idx, method_id, args):
         return self.__call_xxx_method(mu, env, obj_idx, method_id, args, 1)
 
-    @native_method
     def call_char_method_a(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_short_method(
             self,
             mu,
@@ -1060,16 +1076,13 @@ class JNIEnv:
         return self.__call_xxx_method(
             mu, env, obj_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
-    @native_method
     def call_short_method_v(self, mu, env, obj_idx, method_id, args):
         return self.__call_xxx_method(mu, env, obj_idx, method_id, args, 1)
 
-    @native_method
     def call_short_method_a(self, mu, env):
         raise NotImplementedError()
 
     # 上层不知道个数，暂时读四个寄存器，不会错
-    @native_method
     def call_int_method(
             self,
             mu,
@@ -1083,15 +1096,12 @@ class JNIEnv:
         return self.__call_xxx_method(
             mu, env, obj_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
-    @native_method
     def call_int_method_v(self, mu, env, obj_idx, method_id, args):
         return self.__call_xxx_method(mu, env, obj_idx, method_id, args, 1)
 
-    @native_method
     def call_int_method_a(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_long_method(
             self,
             mu,
@@ -1105,16 +1115,13 @@ class JNIEnv:
         return self.__call_xxx_method(
             mu, env, obj_idx, method_id, (arg1, arg2, arg3, arg4), 0, True)
 
-    @native_method
     def call_long_method_v(self, mu, env, obj_idx, method_id, args):
         return self.__call_xxx_method(
             mu, env, obj_idx, method_id, args, 1, True)
 
-    @native_method
     def call_long_method_a(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_float_method(
             self,
             mu,
@@ -1128,15 +1135,12 @@ class JNIEnv:
         return self.__call_xxx_method(
             mu, env, obj_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
-    @native_method
     def call_float_method_v(self, mu, env, obj_idx, method_id, args):
         return self.__call_xxx_method(mu, env, obj_idx, method_id, args, 1)
 
-    @native_method
     def call_float_method_a(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_double_method(
             self,
             mu,
@@ -1151,16 +1155,13 @@ class JNIEnv:
         # return self.__call_xxx_method(mu, env, obj_idx, method_id, (arg1,
         # arg2, arg3, arg4), 0)
 
-    @native_method
     def call_double_method_v(self, mu, env, obj_idx, method_id, args):
         raise NotImplementedError()
         # return self.__call_xxx_method(mu, env, obj_idx, method_id, args, 1)
 
-    @native_method
     def call_double_method_a(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_void_method(
             self,
             mu,
@@ -1174,135 +1175,102 @@ class JNIEnv:
         self.__call_xxx_method(
             mu, env, obj_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
-    @native_method
     def call_void_method_a(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_void_method_v(self, mu, env, obj_idx, method_id, args):
         self.__call_xxx_method(mu, env, obj_idx, method_id, args, 1)
 
-    @native_method
     def call_nonvirtual_object_method(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_nonvirtual_object_method_v(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_nonvirtual_object_method_a(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_nonvirtual_boolean_method(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_nonvirtual_boolean_method_v(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_nonvirtual_boolean_method_a(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_nonvirtual_byte_method(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_nonvirtual_byte_method_v(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_nonvirtual_byte_method_a(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_nonvirtual_char_method(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_nonvirtual_char_method_v(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_nonvirtual_char_method_a(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_nonvirtual_short_method(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_nonvirtual_short_method_v(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_nonvirtual_short_method_a(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_nonvirtual_int_method(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_nonvirtual_int_method_v(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_nonvirtual_int_method_a(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_nonvirtual_long_method(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_nonvirtual_long_method_v(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_nonvirtual_long_method_a(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_nonvirtual_float_method(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_nonvirtual_float_method_v(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_nonvirtual_float_method_a(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_nonvirtual_double_method(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_nonvirtual_double_method_v(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_nonvirtual_double_method_a(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_nonvirtual_void_method(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_nonvirtual_void_method_v(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_nonvirtual_void_method_a(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def get_field_id(self, mu, env, clazz_idx, name_ptr, sig_ptr):
         """
         Returns the field ID for an instance (nonstatic) field of a class. The field is specified by its name and
@@ -1359,39 +1327,30 @@ class JNIEnv:
             rlow = v & 0x0FFFFFFFF
             return (rlow, rhigh)
 
-    @native_method
     def get_object_field(self, mu, env, obj_idx, field_id):
         return self.__get_xxx_field(mu, env, obj_idx, field_id)
 
-    @native_method
     def get_boolean_field(self, mu, env, obj_idx, field_id):
         return self.__get_xxx_field(mu, env, obj_idx, field_id)
 
-    @native_method
     def get_byte_field(self, mu, env, obj_idx, field_id):
         return self.__get_xxx_field(mu, env, obj_idx, field_id)
 
-    @native_method
     def get_char_field(self, mu, env, obj_idx, field_id):
         return self.__get_xxx_field(mu, env, obj_idx, field_id)
 
-    @native_method
     def get_short_field(self, mu, env, obj_idx, field_id):
         return self.__get_xxx_field(mu, env, obj_idx, field_id)
 
-    @native_method
     def get_int_field(self, mu, env, obj_idx, field_id):
         return self.__get_xxx_field(mu, env, obj_idx, field_id)
 
-    @native_method
     def get_long_field(self, mu, env, obj_idx, field_id):
         return self.__get_xxx_field(mu, env, obj_idx, field_id, True)
 
-    @native_method
     def get_float_field(self, mu, env, obj_idx, field_id):
         return self.__get_xxx_field(mu, env, obj_idx, field_id)
 
-    @native_method
     def get_double_field(self, mu, env, obj_idx, field_id):
         raise NotImplementedError()
 
@@ -1432,43 +1391,33 @@ class JNIEnv:
 
         setattr(pyobj, field.name, v)
 
-    @native_method
     def set_object_field(self, mu, env, obj_idx, field_id, value):
         self.__set_xxx_field(mu, env, obj_idx, field_id, value, True)
 
-    @native_method
     def set_boolean_field(self, mu, env, obj_idx, field_id, value):
         self.__set_xxx_field(mu, env, obj_idx, field_id, value)
 
-    @native_method
     def set_byte_field(self, mu, env, obj_idx, field_id, value):
         self.__set_xxx_field(mu, env, obj_idx, field_id, value)
 
-    @native_method
     def set_char_field(self, mu, env, obj_idx, field_id, value):
         self.__set_xxx_field(mu, env, obj_idx, field_id, value)
 
-    @native_method
     def set_short_field(self, mu, env, obj_idx, field_id, value):
         self.__set_xxx_field(mu, env, obj_idx, field_id, value)
 
-    @native_method
     def set_int_field(self, mu, env, obj_idx, field_id, value):
         self.__set_xxx_field(mu, env, obj_idx, field_id, value)
 
-    @native_method
     def set_long_field(self, mu, env, obj_idx, field_id, value):
         self.__set_xxx_field(mu, env, obj_idx, field_id, value)
 
-    @native_method
     def set_float_field(self, mu, env, obj_idx, field_id, value):
         self.__set_xxx_field(mu, env, obj_idx, field_id, value)
 
-    @native_method
     def set_double_field(self, mu, env, obj_idx, field_id, value):
         self.__set_xxx_field(mu, env, obj_idx, field_id, value)
 
-    @native_method
     def get_static_method_id(self, mu, env, clazz_idx, name_ptr, sig_ptr):
         """
         Returns the method ID for a static method of a class. The method is specified by its name and signature.
@@ -1546,7 +1495,6 @@ class JNIEnv:
             rlow = v & 0x0FFFFFFFF
             return (rlow, rhigh)
 
-    @native_method
     def call_static_object_method(
             self,
             mu,
@@ -1560,16 +1508,13 @@ class JNIEnv:
         return self.__call_static_xxx_method(
             mu, env, clazz_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
-    @native_method
     def call_static_object_method_v(self, mu, env, clazz_idx, method_id, args):
         return self.__call_static_xxx_method(
             mu, env, clazz_idx, method_id, args, 1)
 
-    @native_method
     def call_static_object_method_a(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_static_boolean_method(
             self,
             mu,
@@ -1583,17 +1528,14 @@ class JNIEnv:
         return self.__call_static_xxx_method(
             mu, env, clazz_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
-    @native_method
     def call_static_boolean_method_v(
             self, mu, env, clazz_idx, method_id, args):
         return self.__call_static_xxx_method(
             mu, env, clazz_idx, method_id, args, 1)
 
-    @native_method
     def call_static_boolean_method_a(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_static_byte_method(
             self,
             mu,
@@ -1607,16 +1549,13 @@ class JNIEnv:
         return self.__call_static_xxx_method(
             mu, env, clazz_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
-    @native_method
     def call_static_byte_method_v(self, mu, env, clazz_idx, method_id, args):
         return self.__call_static_xxx_method(
             mu, env, clazz_idx, method_id, args, 1)
 
-    @native_method
     def call_static_byte_method_a(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_static_char_method(
             self,
             mu,
@@ -1630,16 +1569,13 @@ class JNIEnv:
         return self.__call_static_xxx_method(
             mu, env, clazz_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
-    @native_method
     def call_static_char_method_v(self, mu, env, clazz_idx, method_id, args):
         return self.__call_static_xxx_method(
             mu, env, clazz_idx, method_id, args, 1)
 
-    @native_method
     def call_static_char_method_a(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_static_short_method(
             self,
             mu,
@@ -1653,16 +1589,13 @@ class JNIEnv:
         return self.__call_static_xxx_method(
             mu, env, clazz_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
-    @native_method
     def call_static_short_method_v(self, mu, env, clazz_idx, method_id, args):
         return self.__call_static_xxx_method(
             mu, env, clazz_idx, method_id, args, 1)
 
-    @native_method
     def call_static_short_method_a(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_static_int_method(
             self,
             mu,
@@ -1676,16 +1609,13 @@ class JNIEnv:
         return self.__call_static_xxx_method(
             mu, env, clazz_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
-    @native_method
     def call_static_int_method_v(self, mu, env, clazz_idx, method_id, args):
         return self.__call_static_xxx_method(
             mu, env, clazz_idx, method_id, args, 1)
 
-    @native_method
     def call_static_int_method_a(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_static_long_method(
             self,
             mu,
@@ -1700,17 +1630,14 @@ class JNIEnv:
         return self.__call_static_xxx_method(
             mu, env, clazz_idx, method_id, (arg1, arg2, arg3, arg4), 0, True)
 
-    @native_method
     def call_static_long_method_v(self, mu, env, clazz_idx, method_id, args):
         #raise NotImplementedError()
         return self.__call_static_xxx_method(
             mu, env, clazz_idx, method_id, args, 1, True)
 
-    @native_method
     def call_static_long_method_a(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_static_float_method(
             self,
             mu,
@@ -1724,16 +1651,13 @@ class JNIEnv:
         return self.__call_static_xxx_method(
             mu, env, clazz_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
-    @native_method
     def call_static_float_method_v(self, mu, env, clazz_idx, method_id, args):
         return self.__call_static_xxx_method(
             mu, env, clazz_idx, method_id, args, 1)
 
-    @native_method
     def call_static_float_method_a(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_static_double_method(
             self,
             mu,
@@ -1748,17 +1672,14 @@ class JNIEnv:
         # return self.__call_static_xxx_method(mu, env, clazz_idx, method_id,
         # (arg1, arg2, arg3, arg4), 0)
 
-    @native_method
     def call_static_double_method_v(self, mu, env, clazz_idx, method_id, args):
         raise NotImplementedError()
         # return self.__call_static_xxx_method(mu, env, clazz_idx, method_id,
         # args, 1)
 
-    @native_method
     def call_static_double_method_a(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def call_static_void_method(
             self,
             mu,
@@ -1772,15 +1693,12 @@ class JNIEnv:
         self.__call_static_xxx_method(
             mu, env, clazz_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
-    @native_method
     def call_static_void_method_v(self, mu, env, clazz_idx, method_id, args):
         self.__call_static_xxx_method(mu, env, clazz_idx, method_id, args, 1)
 
-    @native_method
     def call_static_void_method_a(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def get_static_field_id(self, mu, env, clazz_idx, name_ptr, sig_ptr):
         """
         Returns the field ID for a static field of a class. The field is specified by its name and signature. The
@@ -1843,67 +1761,51 @@ class JNIEnv:
             rlow = v & 0x0FFFFFFFF
             return (rlow, rhigh)
 
-    @native_method
     def get_static_object_field(self, mu, env, clazz_idx, field_id):
         return self.__get_static_xxx_field(mu, env, clazz_idx, field_id)
 
-    @native_method
     def get_static_boolean_field(self, mu, env, clazz_idx, field_id):
         return self.__get_static_xxx_field(mu, env, clazz_idx, field_id)
 
-    @native_method
     def get_static_byte_field(self, mu, env, clazz_idx, field_id):
         return self.__get_static_xxx_field(mu, env, clazz_idx, field_id)
 
-    @native_method
     def get_static_char_field(self, mu, env, clazz_idx, field_id):
         return self.__get_static_xxx_field(mu, env, clazz_idx, field_id)
 
-    @native_method
     def get_static_short_field(self, mu, env, clazz_idx, field_id):
         return self.__get_static_xxx_field(mu, env, clazz_idx, field_id)
 
-    @native_method
     def get_static_int_field(self, mu, env, clazz_idx, field_id):
         return self.__get_static_xxx_field(mu, env, clazz_idx, field_id)
 
-    @native_method
     def get_static_long_field(self, mu, env, clazz_idx, field_id):
         return self.__get_static_xxx_field(mu, env, clazz_idx, field_id, True)
 
-    @native_method
     def get_static_float_field(self, mu, env):
         return self.__get_static_xxx_field(mu, env, clazz_idx, field_id)
 
-    @native_method
     def get_static_double_field(self, mu, env):
         return self.__get_static_xxx_field(mu, env, clazz_idx, field_id, True)
 
-    @native_method
     def set_static_object_field(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def set_static_boolean_field(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def set_static_byte_field(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def set_static_char_field(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def set_static_short_field(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def set_static_int_field(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def set_static_long_field(
             self,
             mu,
@@ -1931,32 +1833,26 @@ class JNIEnv:
         # FIXME: 对field支持还不完善，非stativ value无法设置，需要改进
         field.static_value = value
 
-    @native_method
     def set_static_float_field(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def set_static_double_field(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def new_string(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def get_string_length(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def get_string_chars(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def release_string_chars(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def new_string_utf(self, mu, env, utf8_ptr):
+        logger.debug("JNIEnv->NewStringUtf(%x) was called" % utf8_ptr)
         pystr = memory_helpers.read_utf8(mu, utf8_ptr)
         logger.debug("JNIEnv->NewStringUtf(%s) was called" % pystr)
         string = String(pystr)
@@ -1964,7 +1860,6 @@ class JNIEnv:
         logger.debug("JNIEnv->NewStringUtf(%s) return id(%d)" % (pystr, idx))
         return idx
 
-    @native_method
     def get_string_utf_length(self, mu, env, string):
 
         str_ref = self.get_reference(string)
@@ -1975,7 +1870,6 @@ class JNIEnv:
         str_val = str_obj.get_py_string()
         return len(str_val)
 
-    @native_method
     def get_string_utf_chars(self, mu, env, string, is_copy_ptr):
         logger.debug(
             "JNIEnv->GetStringUtfChars(%u, %x) was called" %
@@ -2001,7 +1895,6 @@ class JNIEnv:
 
         return str_ptr
 
-    @native_method
     def release_string_utf_chars(self, mu, env, string, utf8_ptr):
 
         pystr = memory_helpers.read_utf8(mu, utf8_ptr)
@@ -2011,7 +1904,6 @@ class JNIEnv:
         if (utf8_ptr != 0):
             self._emu.memory.unmap(utf8_ptr, len(pystr) + 1)
 
-    @native_method
     def get_array_length(self, mu, env, array):
         logger.debug("JNIEnv->GetArrayLength(%u) was called" % array)
 
@@ -2020,7 +1912,6 @@ class JNIEnv:
         pyobj = JNIEnv.jobject_to_pyobject(obj)
         return len(pyobj)
 
-    @native_method
     def new_object_array(self, mu, env, size, class_idx, obj_init):
         logger.debug(
             "JNIEnv->NewObjectArray(%d, %u, %r) was called" %
@@ -2066,7 +1957,6 @@ class JNIEnv:
         arr = pyarray_clazz(pyarr)
         return self.add_local_reference(jobject(arr))
 
-    @native_method
     def get_object_array_element(self, mu, env, array_idx, item_idx):
         logger.debug(
             "JNIEnv->GetObjectArrayElement(%u, %u) was called" %
@@ -2080,7 +1970,6 @@ class JNIEnv:
             return JAVA_NULL
         return self.add_local_reference(jobject(pyobj_item))
 
-    @native_method
     def set_object_array_element(self, mu, env, array_idx, index, obj_idx):
         logger.debug(
             "JNIEnv->SetObjectArrayElement(%u, %u, %u) was called" %
@@ -2092,46 +1981,36 @@ class JNIEnv:
         pyobj = JNIEnv.jobject_to_pyobject(obj)
         array_pyobj[index] = pyobj
 
-    @native_method
     def new_boolean_array(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def new_byte_array(self, mu, env, bytelen):
         logger.debug("JNIEnv->NewByteArray(%u) was called" % bytelen)
         barr = bytearray([0] * bytelen)
         arr = Array(barr)
         return self.add_local_reference(jobject(arr))
 
-    @native_method
     def new_char_array(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def new_short_array(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def new_int_array(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def new_long_array(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def new_float_array(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def new_double_array(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def get_boolean_array_elements(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def get_byte_array_elements(self, mu, env, array_idx, is_copy_ptr):
         logger.debug(
             "JNIEnv->get_byte_array_elements(%u, %u) was called" %
@@ -2157,35 +2036,27 @@ class JNIEnv:
         mu.mem_write(buf + extra_n, b)
         return buf + extra_n
 
-    @native_method
     def get_char_array_elements(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def get_short_array_elements(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def get_int_array_elements(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def get_long_array_elements(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def get_float_array_elements(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def get_double_array_elements(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def release_boolean_array_elements(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def release_byte_array_elements(self, mu, env, array_idx, elems, mode):
         if (elems == JAVA_NULL):
             return
@@ -2199,35 +2070,27 @@ class JNIEnv:
         elems_sz = int.from_bytes(b, byteorder='little', signed=False)
         self._emu.memory.unmap(true_buf, elems_sz + 4)
 
-    @native_method
     def release_char_array_elements(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def release_short_array_elements(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def release_int_array_elements(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def release_long_array_elements(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def release_float_array_elements(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def release_double_array_elements(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def get_boolean_array_region(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def get_byte_array_region(
             self,
             mu,
@@ -2251,35 +2114,27 @@ class JNIEnv:
 
         return None
 
-    @native_method
     def get_char_array_region(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def get_short_array_region(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def get_int_array_region(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def get_long_array_region(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def get_float_array_region(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def get_double_array_region(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def set_boolean_array_region(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def set_byte_array_region(
             self,
             mu,
@@ -2293,31 +2148,24 @@ class JNIEnv:
         arr = Array(string)
         self.set_local_reference(arrayJREF, jobject(arr))
 
-    @native_method
     def set_char_array_region(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def set_short_array_region(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def set_int_array_region(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def set_long_array_region(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def set_float_array_region(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def set_double_array_region(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def register_natives(self, mu, env, clazz_id, methods, methods_count):
         logger.debug(
             "JNIEnv->RegisterNatives(%d, 0x%08X, %d) was called" %
@@ -2350,19 +2198,15 @@ class JNIEnv:
 
         return JNI_OK
 
-    @native_method
     def unregister_natives(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def monitor_enter(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def monitor_exit(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def get_java_vm(self, mu, env, vm):
         logger.debug("JNIEnv->GetJavaVM(0x%08x) was called" % vm)
 
@@ -2372,39 +2216,30 @@ class JNIEnv:
 
         return JNI_OK
 
-    @native_method
     def get_string_region(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def get_string_utf_region(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def get_primitive_array_critical(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def release_primitive_array_critical(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def get_string_critical(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def release_string_critical(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def new_weak_global_ref(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def delete_weak_global_ref(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def exception_check(self, mu, env):
         """
         Returns JNI_TRUE when there is a pending exception; otherwise, returns JNI_FALSE.
@@ -2413,18 +2248,14 @@ class JNIEnv:
         # TODO: Implement
         return JNI_FALSE
 
-    @native_method
     def new_direct_byte_buffer(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def get_direct_buffer_address(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def get_direct_buffer_capacity(self, mu, env):
         raise NotImplementedError()
 
-    @native_method
     def get_object_ref_type(self, mu, env):
         raise NotImplementedError()

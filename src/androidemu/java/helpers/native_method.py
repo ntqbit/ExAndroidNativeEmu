@@ -101,7 +101,7 @@ def native_write_arg_register(emu, reg, val):
 # 定义native层回调到python的方法
 
 
-def native_method(func):
+def create_native_method_wrapper(func, args_count):
     def native_method_wrapper(*argv):
         """
         :type self
@@ -112,29 +112,21 @@ def native_method(func):
         emu = argv[1] if len(argv) == 2 else argv[0]
         mu = emu.mu
 
-        args = inspect.getfullargspec(func).args
-        args_count = len(args) - (2 if 'self' in args else 1)
-
-        if args_count < 0:
-            raise RuntimeError(
-                "NativeMethod accept at least (self, mu) or (mu).")
-
         native_args = native_read_args_in_hook_code(emu, args_count)
 
         if len(argv) == 1:
             result = func(mu, *native_args)
         else:
-            le = len(native_args)
             result = func(argv[0], mu, *native_args)
 
         ret_reg0 = UC_ARM_REG_R0
         ret_reg1 = UC_ARM_REG_R1
-        if (emu.get_arch() == emu_const.ARCH_ARM64):
+        if emu.get_arch() == emu_const.ARCH_ARM64:
             ret_reg0 = UC_ARM64_REG_X0
             ret_reg1 = UC_ARM64_REG_X1
 
         if result is not None:
-            if (isinstance(result, tuple)):
+            if isinstance(result, tuple):
                 # tuple作为特殊返回8字节数据约定
                 rlow = result[0]
                 rhigh = result[1]
@@ -146,3 +138,16 @@ def native_method(func):
                 native_write_arg_register(emu, ret_reg0, result)
 
     return native_method_wrapper
+
+
+def native_method(func):
+    args = inspect.getfullargspec(func).args
+    args_count = len(args) - 1
+
+    if 'self' in args:
+        args_count -= 1
+
+    if args_count < 0:
+        raise RuntimeError("NativeMethod accept at least (self, mu) or (mu).")
+
+    return create_native_method_wrapper(func, args_count)

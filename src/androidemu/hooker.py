@@ -4,7 +4,6 @@ from unicorn.arm_const import *
 from unicorn.arm64_const import *
 from androidemu.const import emu_const
 import sys
-import traceback
 import logging
 
 
@@ -120,7 +119,5 @@ class Hooker:
         except Exception as e:
             # Make sure we catch exceptions inside hooks and stop emulation.
             mu.emu_stop()
-            traceback.print_exc()
-            logging.exception("catch error on _hook")
-            sys.exit(-1)
+            logging.exception("catch error in _hook")
             raise
