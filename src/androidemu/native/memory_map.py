@@ -3,7 +3,7 @@ import os
 import sys
 import logging
 from unicorn import *
-from ..utils.misc_utils import page_end, page_start
+from androidemu.utils.misc_utils import page_end, page_start
 
 # android中，不论64还是32，PAGE_SIZE都是4096
 PAGE_SIZE = 0x1000

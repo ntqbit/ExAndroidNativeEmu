@@ -1,7 +1,7 @@
-from ..java_class_def import JavaClassDef
-from ..java_field_def import JavaFieldDef
-from ..java_method_def import java_method_def, JavaMethodDef
-from .array import *
+from androidemu.java.java_class_def import JavaClassDef
+from androidemu.java.java_field_def import JavaFieldDef
+from androidemu.java.java_method_def import java_method_def, JavaMethodDef
+from androidemu.java.classes.array import *
 
 
 class String(metaclass=JavaClassDef, jvm_name='java/lang/String'):

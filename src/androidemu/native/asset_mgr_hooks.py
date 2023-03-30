@@ -1,12 +1,12 @@
 import logging
 import os
 import sys
-from ..hooker import Hooker
-from ..internal.modules import Modules
+from androidemu.hooker import Hooker
+from androidemu.internal.modules import Modules
 
-from ..java.helpers.native_method import native_method
-from ..utils import memory_helpers, misc_utils
-from ..java.jni_env import JNIEnv
+from androidemu.java.helpers.native_method import native_method
+from androidemu.utils import memory_helpers, misc_utils
+from androidemu.java.jni_env import JNIEnv
 from unicorn import *
 
 logger = logging.getLogger(__name__)

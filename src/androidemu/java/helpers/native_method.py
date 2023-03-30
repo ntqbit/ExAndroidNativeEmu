@@ -3,11 +3,11 @@ import inspect
 from unicorn import Uc
 from unicorn.arm_const import *
 from unicorn.arm64_const import *
-from ...const import emu_const
+from androidemu.const import emu_const
 
-from ..java_class_def import JavaClassDef
-from ..jni_const import JNI_ERR
-from ..jni_ref import jobject
+from androidemu.java.java_class_def import JavaClassDef
+from androidemu.java.jni_const import JNI_ERR
+from androidemu.java.jni_ref import jobject
 
 
 def native_write_args(emu, *argv):

@@ -1,6 +1,6 @@
 import sys
 import os
-from .debug_utils import *
+from androidemu.utils.debug_utils import *
 
 
 class MemoryMonitor:

@@ -2,12 +2,12 @@ from keystone import Ks, KS_ARCH_ARM, KS_MODE_THUMB, KS_ARCH_ARM64, KS_MODE_LITT
 from unicorn import *
 from unicorn.arm_const import *
 from unicorn.arm64_const import *
-from .const import emu_const
-from . import config
+from androidemu.const import emu_const
+from androidemu import config
 import sys
 import traceback
 import logging
-from .java.helpers.native_method import native_write_args, native_read_args_in_hook_code
+from androidemu.java.helpers.native_method import native_write_args, native_read_args_in_hook_code
 
 
 def is_thumb(cpsr):

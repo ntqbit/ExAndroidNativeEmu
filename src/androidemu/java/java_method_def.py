@@ -1,10 +1,10 @@
-from .jvm_id_conter import *
-from .java_class_def import JavaClassDef
-from .jni_ref import *
-from ..const import emu_const
+from androidemu.java.jvm_id_conter import *
+from androidemu.java.java_class_def import JavaClassDef
+from androidemu.java.jni_ref import *
+from androidemu.const import emu_const
 import sys
 
-from .constant_values import JAVA_NULL
+from androidemu.java.constant_values import JAVA_NULL
 
 
 class JavaMethodDef:

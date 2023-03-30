@@ -1,9 +1,9 @@
-from ..java_class_def import JavaClassDef
-from ..java_field_def import JavaFieldDef
-from ..java_method_def import java_method_def, JavaMethodDef
-from ..classes.list import List
-from ..classes.string import String
-from ... import config
+from androidemu.java.java_class_def import JavaClassDef
+from androidemu.java.java_field_def import JavaFieldDef
+from androidemu.java.java_method_def import java_method_def, JavaMethodDef
+from androidemu.java.classes.list import List
+from androidemu.java.classes.string import String
+from androidemu import config
 
 
 class WifiInfo(metaclass=JavaClassDef, jvm_name='android/net/wifi/WifiInfo'):

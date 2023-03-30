@@ -1,8 +1,8 @@
 from unicorn import Uc, UC_PROT_READ, UC_PROT_WRITE
-from ..cpu.syscall_handlers import SyscallHandlers
-from .memory_map import MemoryMap
-from ..const import emu_const
-from .. import pcb
+from androidemu.cpu.syscall_handlers import SyscallHandlers
+from androidemu.native.memory_map import MemoryMap
+from androidemu.const import emu_const
+from androidemu import pcb
 import logging
 import os
 

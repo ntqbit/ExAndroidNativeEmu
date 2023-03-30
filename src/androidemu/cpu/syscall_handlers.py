@@ -4,10 +4,10 @@ from unicorn import *
 from unicorn.arm_const import *
 from unicorn.arm64_const import *
 
-from .interrupt_handler import InterruptHandler
-from .syscall_handler import SyscallHandler
-from ..utils import memory_helpers
-from ..const import emu_const
+from androidemu.cpu.interrupt_handler import InterruptHandler
+from androidemu.cpu.syscall_handler import SyscallHandler
+from androidemu.utils import memory_helpers
+from androidemu.const import emu_const
 import unicorn
 import traceback
 import sys

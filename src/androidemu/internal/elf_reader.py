@@ -2,7 +2,7 @@ import struct
 import os
 import sys
 
-from ..utils import memory_helpers, misc_utils
+from androidemu.utils import memory_helpers, misc_utils
 
 PT_NULL = 0
 PT_LOAD = 1

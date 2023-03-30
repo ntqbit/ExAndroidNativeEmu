@@ -2,7 +2,7 @@ from keystone import Ks, KS_ARCH_ARM, KS_MODE_THUMB, KS_ARCH_ARM64, KS_MODE_LITT
 from unicorn import *
 from unicorn.arm_const import *
 from unicorn.arm64_const import *
-from .const import emu_const
+from androidemu.const import emu_const
 import sys
 import traceback
 import logging

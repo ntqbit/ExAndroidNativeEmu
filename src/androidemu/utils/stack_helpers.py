@@ -1,8 +1,8 @@
 import struct
 from unicorn.arm_const import *
 from unicorn.arm64_const import *
-from ..const import emu_const
-from . import memory_helpers
+from androidemu.const import emu_const
+from androidemu.utils import memory_helpers
 
 
 class StackHelper():

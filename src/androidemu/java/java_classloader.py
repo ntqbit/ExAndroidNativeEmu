@@ -1,5 +1,5 @@
-from .java_class_def import JavaClassDef
-from .classes.clazz import Class
+from androidemu.java.java_class_def import JavaClassDef
+from androidemu.java.classes.clazz import Class
 
 
 class JavaClassLoader(

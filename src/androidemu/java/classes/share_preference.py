@@ -1,9 +1,9 @@
-from ..java_class_def import JavaClassDef
-from ..java_field_def import JavaFieldDef
-from ..java_method_def import java_method_def, JavaMethodDef
-from ..constant_values import *
-from ...utils import misc_utils
-from .string import String
+from androidemu.java.java_class_def import JavaClassDef
+from androidemu.java.java_field_def import JavaFieldDef
+from androidemu.java.java_method_def import java_method_def, JavaMethodDef
+from androidemu.java.constant_values import *
+from androidemu.utils import misc_utils
+from androidemu.java.classes.string import String
 
 from xml.dom.minidom import parse
 import xml.dom.minidom

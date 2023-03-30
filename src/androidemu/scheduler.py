@@ -13,10 +13,10 @@ from random import randint
 from unicorn import *
 from unicorn.arm_const import *
 from unicorn.arm64_const import *
-from . import config
-from . import pcb
-from .const import emu_const
-from .utils import misc_utils
+from androidemu import config
+from androidemu import pcb
+from androidemu.const import emu_const
+from androidemu.utils import misc_utils
 
 
 class Task:

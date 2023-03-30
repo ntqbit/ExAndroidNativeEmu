@@ -12,26 +12,26 @@ from random import randint
 from unicorn import *
 from unicorn.arm_const import *
 from unicorn.arm64_const import *
-from . import config
-from . import pcb
-from .const import emu_const
-from .cpu.syscall_handlers import SyscallHandlers
-from .cpu.syscall_hooks import SyscallHooks
-from .hooker import Hooker
-from .internal.modules import Modules
-from .java.helpers.native_method import native_write_args
-from .java.java_classloader import JavaClassLoader
-from .java.java_vm import JavaVM
-from .native.symbol_hooks import SymbolHooks
-from .native.memory_syscall_handler import MemorySyscallHandler
-from .native.memory_map import MemoryMap
-from .vfs.file_system import VirtualFileSystem
-from .vfs.virtual_file import VirtualFile
-from .utils import misc_utils
-from .scheduler import Scheduler
+from androidemu import config
+from androidemu import pcb
+from androidemu.const import emu_const
+from androidemu.cpu.syscall_handlers import SyscallHandlers
+from androidemu.cpu.syscall_hooks import SyscallHooks
+from androidemu.hooker import Hooker
+from androidemu.internal.modules import Modules
+from androidemu.java.helpers.native_method import native_write_args
+from androidemu.java.java_classloader import JavaClassLoader
+from androidemu.java.java_vm import JavaVM
+from androidemu.native.symbol_hooks import SymbolHooks
+from androidemu.native.memory_syscall_handler import MemorySyscallHandler
+from androidemu.native.memory_map import MemoryMap
+from androidemu.vfs.file_system import VirtualFileSystem
+from androidemu.vfs.virtual_file import VirtualFile
+from androidemu.utils import misc_utils
+from androidemu.scheduler import Scheduler
 
-from .java.java_class_def import JavaClassDef
-from .java.constant_values import JAVA_NULL
+from androidemu.java.java_class_def import JavaClassDef
+from androidemu.java.constant_values import JAVA_NULL
 
 import androidemu.java.classes.application
 import androidemu.java.classes.debug

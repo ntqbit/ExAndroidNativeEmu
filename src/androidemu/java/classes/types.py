@@ -1,7 +1,7 @@
-from ..java_class_def import JavaClassDef
-from ..java_field_def import JavaFieldDef
-from ..java_method_def import java_method_def, JavaMethodDef
-from ...utils import debug_utils
+from androidemu.java.java_class_def import JavaClassDef
+from androidemu.java.java_field_def import JavaFieldDef
+from androidemu.java.java_method_def import java_method_def, JavaMethodDef
+from androidemu.utils import debug_utils
 import sys
 
 

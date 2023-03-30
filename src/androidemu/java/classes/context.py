@@ -1,14 +1,14 @@
-from ... import config
-from .file import File
-from .string import String
-from .contentresolver import ContentResolver
-from .wifi import TelephonyManager, WifiManager, ConnectivityManager
-from .share_preference import *
-from .asset_manager import *
-from .package_manager import *
-from ..java_class_def import JavaClassDef
-from ..java_field_def import JavaFieldDef
-from ..java_method_def import java_method_def, JavaMethodDef
+from androidemu import config
+from androidemu.java.classes.file import File
+from androidemu.java.classes.string import String
+from androidemu.java.classes.contentresolver import ContentResolver
+from androidemu.java.classes.wifi import TelephonyManager, WifiManager, ConnectivityManager
+from androidemu.java.classes.share_preference import *
+from androidemu.java.classes.asset_manager import *
+from androidemu.java.classes.package_manager import *
+from androidemu.java.java_class_def import JavaClassDef
+from androidemu.java.java_field_def import JavaFieldDef
+from androidemu.java.java_method_def import java_method_def, JavaMethodDef
 
 
 class Context(

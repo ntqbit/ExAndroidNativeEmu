@@ -5,7 +5,7 @@ import io
 from unicorn import *
 from unicorn.arm_const import *
 from unicorn.arm64_const import *
-from ..const import emu_const
+from androidemu.const import emu_const
 
 
 def dump_memory(emu, fd, min_addr=0, max_addr=0xFFFFFFFF):

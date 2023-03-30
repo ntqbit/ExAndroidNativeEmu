@@ -1,11 +1,11 @@
-from .activity_thread import ActivityThread, ActivityManagerNative
-from ..java_class_def import JavaClassDef
-from ..java_field_def import JavaFieldDef
-from ..java_method_def import java_method_def, JavaMethodDef
-from ..constant_values import *
-from .string import *
-from .method import *
-from .field import *
+from androidemu.java.classes.activity_thread import ActivityThread, ActivityManagerNative
+from androidemu.java.java_class_def import JavaClassDef
+from androidemu.java.java_field_def import JavaFieldDef
+from androidemu.java.java_method_def import java_method_def, JavaMethodDef
+from androidemu.java.constant_values import *
+from androidemu.java.classes.string import *
+from androidemu.java.classes.method import *
+from androidemu.java.classes.field import *
 
 import io
 

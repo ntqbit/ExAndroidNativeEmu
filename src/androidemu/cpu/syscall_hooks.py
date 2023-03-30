@@ -1,7 +1,7 @@
-from ..utils import debug_utils, misc_utils
-from .. import pcb
-from .. import config
-from ..utils import memory_helpers
+from androidemu.utils import debug_utils, misc_utils
+from androidemu import pcb
+from androidemu import config
+from androidemu.utils import memory_helpers
 import calendar
 import logging
 import math
@@ -15,10 +15,10 @@ from random import randint
 from unicorn import Uc
 from unicorn.arm_const import *
 
-from ..const.android import *
-from ..const.linux import *
-from ..const import emu_const
-from .syscall_handlers import SyscallHandlers
+from androidemu.const.android import *
+from androidemu.const.linux import *
+from androidemu.const import emu_const
+from androidemu.cpu.syscall_handlers import SyscallHandlers
 
 OVERRIDE_TIMEOFDAY = False
 OVERRIDE_TIMEOFDAY_SEC = 0

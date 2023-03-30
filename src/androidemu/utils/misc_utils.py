@@ -3,7 +3,7 @@ import os
 import platform
 
 import platform
-from ..const import emu_const
+from androidemu.const import emu_const
 
 from unicorn import *
 from unicorn.arm_const import *
