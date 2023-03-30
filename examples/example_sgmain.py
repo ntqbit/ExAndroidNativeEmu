@@ -24,7 +24,7 @@ g_cfd = ChainLogger(sys.stdout, "./ins-sgmain.txt")
 def hook_code(mu, address, size, user_data):
     try:
         emu = user_data
-        if (not emu.memory.check_addr(address, UC_PROT_EXEC)):
+        if not emu.memory.check_addr(address, UC_PROT_EXEC):
             logger.error("addr 0x%08X out of range" % (address,))
             sys.exit(-1)
 
@@ -134,7 +134,7 @@ class SPUtility2(
                      signature='(Landroid/content/Context;Ljava/lang/String;)Ljava/lang/String;',
                      native=False)
     def readSS(mu, ctx, s1):
-        if (s1 in _kv):
+        if s1 in _kv:
             return _kv[s1]
         return String("")
 
@@ -143,7 +143,7 @@ class SPUtility2(
                      signature='(Ljava/lang/String;)Ljava/lang/String;',
                      native=False)
     def read(mu, s1):
-        if (s1 in _kv):
+        if s1 in _kv:
             return _kv[s1]
         return String("")
 
@@ -152,7 +152,7 @@ class SPUtility2(
                      signature='(Ljava/lang/String;Ljava/lang/String;)V',
                      native=False)
     def write(mu, s1, s2):
-        if (s1 in _kv):
+        if s1 in _kv:
             return _kv[s1]
         return String("")
 

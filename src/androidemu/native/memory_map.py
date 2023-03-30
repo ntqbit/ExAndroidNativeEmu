@@ -13,7 +13,7 @@ class MemoryMap:
 
     def check_addr(self, addr, prot):
         for r in self._mu.mem_regions():
-            if (addr >= r[0] and addr < r[1] and prot & r[2]):
+            if addr >= r[0] and addr < r[1] and prot & r[2]:
                 return True
 
         return False
@@ -41,7 +41,7 @@ class MemoryMap:
         if size <= 0:
             raise Exception('Heap map size was <= 0.')
         try:
-            if (address == 0):
+            if address == 0:
                 regions = []
                 for r in self._mu.mem_regions():
                     regions.append(r)
@@ -49,7 +49,7 @@ class MemoryMap:
                 regions.sort()
                 map_base = -1
                 l_regions = len(regions)
-                if (l_regions < 1):
+                if l_regions < 1:
                     map_base = self._alloc_min_addr
                 else:
                     prefer_start = self._alloc_min_addr
@@ -83,7 +83,7 @@ class MemoryMap:
                 try:
                     self._mu.mem_map(address, size, perms=prot)
                 except unicorn.UcError as e:
-                    if (e.errno == UC_ERR_MAP):
+                    if e.errno == UC_ERR_MAP:
                         blocks = set()
                         extra_protect = set()
                         for b in range(address, address + size, 0x1000):
@@ -94,7 +94,7 @@ class MemoryMap:
                             raddr = r[0]
                             rend = r[1] + 1
                             for b in range(raddr, rend, 0x1000):
-                                if (b in blocks):
+                                if b in blocks:
                                     blocks.remove(b)
                                     extra_protect.add(b)
 
@@ -119,15 +119,15 @@ class MemoryMap:
         b_read = os.read(fd, size)
         #print (b_read)
         sz_read = len(b_read)
-        if (sz_read <= 0):
+        if sz_read <= 0:
             return b_read
 
         sz_left = size - sz_read
-        while (sz_left > 0):
+        while sz_left > 0:
             this_read = os.read(fd, sz_left)
             len_this_read = len(this_read)
             #print (len_this_read)
-            if (len_this_read <= 0):
+            if len_this_read <= 0:
                 break
             b_read = b_read + this_read
             sz_left = sz_left - len_this_read
@@ -153,14 +153,14 @@ class MemoryMap:
         al_address = address
         al_size = page_end(al_address + size) - al_address
         res_addr = self._map(al_address, al_size, prot)
-        if (res_addr != -1 and vf is not None):
+        if res_addr != -1 and vf is not None:
             # 需要mmap映射文件的时候,开辟一块内存,并将文件内容复制过去模拟
-            if (not self._is_page_align(offset)):
+            if not self._is_page_align(offset):
                 raise RuntimeError(
                     'map offset was not multiple of page size (%d, %d).' %
                     (offset, PAGE_SIZE))
 
-            if (offset > 0xffffffff):
+            if offset > 0xffffffff:
                 raise NotImplementedError(
                     "map offset %d > 4G not support now" % offset)
 
@@ -210,9 +210,9 @@ class MemoryMap:
             logging.debug(
                 "unmap 0x%08X sz=0x0x%08X end=0x0x%08X" %
                 (addr, size, addr + size))
-            if (addr in self._file_map_addr):
+            if addr in self._file_map_addr:
                 file_map_attr = self._file_map_addr[addr]
-                if (addr + size != file_map_attr[0]):
+                if addr + size != file_map_attr[0]:
                     raise RuntimeError(
                         "unmap error, range 0x%08X-0x%08X does not match file map range 0x%08X-0x%08X from file %s" %
                         (addr, addr + size, addr, file_map_attr[0]))
@@ -239,7 +239,7 @@ class MemoryMap:
             v = self._file_map_addr[addr]
             mstart = addr
             mend = v[0]
-            if (start >= mstart and end <= mend):
+            if start >= mstart and end <= mend:
                 vf = v[2]
                 return v[1], vf.name
 
@@ -269,7 +269,7 @@ class MemoryMap:
         '''
 
         n = len(regions)
-        if (n < 1):
+        if n < 1:
             return
         output = []
         last_attr = self._get_attrs(regions[0])
@@ -277,7 +277,7 @@ class MemoryMap:
         for i in range(1, n):
             region = regions[i]
             attr = self._get_attrs(region)
-            if (last_attr[1] == attr[0] and last_attr[2:] == attr[2:]):
+            if last_attr[1] == attr[0] and last_attr[2:] == attr[2:]:
                 pass
             else:
                 output.append((start,) + last_attr[1:])

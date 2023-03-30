@@ -24,24 +24,24 @@ def stat_to_memory2(uc, buf_ptr, stat, uid, st_mode):
     unsigned long long st_ino;
     '''
     st_rdev = 0
-    if (hasattr(stat, "st_rdev")):
+    if hasattr(stat, "st_rdev"):
         st_rdev = stat.st_rdev
 
     st_blksize = 0
-    if (hasattr(stat, "st_blksize")):
+    if hasattr(stat, "st_blksize"):
         st_blksize = stat.st_blksize
 
     st_blocks = 0
-    if (hasattr(stat, "st_blocks")):
+    if hasattr(stat, "st_blocks"):
         st_blocks = stat.st_blocks
 
     stdev = stat.st_dev
-    if (stdev < 0):
+    if stdev < 0:
         # 随便给个数值就行了
         stdev = stdev * -1
 
     st_ino = 0
-    if (stat.st_ino <= 0xFFFFFFFF):
+    if stat.st_ino <= 0xFFFFFFFF:
         st_ino = stat.st_ino
 
     uc.mem_write(buf_ptr, int(stdev).to_bytes(8, byteorder='little'))
@@ -74,19 +74,19 @@ def stat_to_memory2(uc, buf_ptr, stat, uid, st_mode):
 
 def stat_to_memory64(uc, buf_ptr, stat, uid, st_mode):
     st_rdev = 0
-    if (hasattr(stat, "st_rdev")):
+    if hasattr(stat, "st_rdev"):
         st_rdev = stat.st_rdev
 
     st_blksize = 0
-    if (hasattr(stat, "st_blksize")):
+    if hasattr(stat, "st_blksize"):
         st_blksize = stat.st_blksize
 
     st_blocks = 0
-    if (hasattr(stat, "st_blocks")):
+    if hasattr(stat, "st_blocks"):
         st_blocks = stat.st_blocks
 
     stdev = stat.st_dev
-    if (stdev < 0):
+    if stdev < 0:
         # 随便给个数值就行了
         stdev = stdev * -1
 

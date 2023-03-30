@@ -36,7 +36,7 @@ class SymbolHooks:
             'dl_unwind_find_exidx',
             hooker.write_function(
                 self.dl_unwind_find_exidx))
-        if (not emu.get_muti_task_support()):
+        if not emu.get_muti_task_support():
             modules.add_symbol_hook(
                 'pthread_create',
                 hooker.write_function(
@@ -86,18 +86,18 @@ class SymbolHooks:
         logger.debug("Called dlopen(%s)" % path)
 
         r = 0
-        if (path.find("/") < 0):
+        if path.find("/") < 0:
             # FIXME:重新考虑谁做vfs路径到android路径的转换关系
             # 如果是libxxx.so这种字符串，则直接从
             for mod in self._modules.modules:
-                if (mod.filename.find(path) > -1):
+                if mod.filename.find(path) > -1:
                     r = mod.soinfo_ptr
                     logger.debug("Called dlopen(%s) return 0x%08x" % (path, r))
                     return r
 
         # redirect path on matter what path in vm runing
         fullpath = self._modules.find_so_on_disk(path)
-        if (fullpath is not None):
+        if fullpath is not None:
             mod = self._emu.load_library(fullpath)
             r = mod.soinfo_ptr
         else:
@@ -145,7 +145,7 @@ class SymbolHooks:
         symbol_str = memory_helpers.read_utf8(uc, symbol)
         logger.debug("Called dlsym(0x%x, %s)" % (handle, symbol_str))
         global_handle = 0xffffffff
-        if (self._emu.get_arch() == emu_const.ARCH_ARM64):
+        if self._emu.get_arch() == emu_const.ARCH_ARM64:
             global_handle = 0
 
         if handle == global_handle:
@@ -154,7 +154,7 @@ class SymbolHooks:
             soinfo = handle
             base = -1
             # FIXME 这里写死偏移不好，需要修复
-            if (self._emu.get_arch() == emu_const.ARCH_ARM64):
+            if self._emu.get_arch() == emu_const.ARCH_ARM64:
                 base = memory_helpers.read_ptr_sz(
                     uc, soinfo + 152, self._emu.get_ptr_size())
             else:

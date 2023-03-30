@@ -219,7 +219,7 @@ class ActivityThread(metaclass=JavaClassDef, jvm_name='android/app/ActivityThrea
                      signature='()Landroid/app/ActivityThread;', native=False)
     def currentActivityThread(emu):
         pyPkgName = emu.config.get("pkg_name")
-        if (pyPkgName not in ActivityThread.s_am):
+        if pyPkgName not in ActivityThread.s_am:
             ActivityThread.s_am[pyPkgName] = ActivityThread(pyPkgName)
 
         return ActivityThread.s_am[pyPkgName]

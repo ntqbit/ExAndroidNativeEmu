@@ -15,7 +15,7 @@ def native_write_args(emu, *argv):
     reg_base = UC_ARM_REG_R0
     sp_reg = UC_ARM_REG_SP
 
-    if (emu.get_arch() == emu_const.ARCH_ARM64):
+    if emu.get_arch() == emu_const.ARCH_ARM64:
         max_regs_args = 8
         reg_base = UC_ARM64_REG_X0
         sp_reg = UC_ARM64_REG_SP
@@ -24,7 +24,7 @@ def native_write_args(emu, *argv):
     amount = len(argv)
 
     nreg = max_regs_args
-    if (amount < max_regs_args):
+    if amount < max_regs_args:
         nreg = amount
 
     for i in range(0, nreg):
@@ -52,7 +52,7 @@ def native_read_args_in_hook_code(emu, args_count):
     reg_base = UC_ARM_REG_R0
     sp_reg = UC_ARM_REG_SP
 
-    if (emu.get_arch() == emu_const.ARCH_ARM64):
+    if emu.get_arch() == emu_const.ARCH_ARM64:
         max_regs_args = 8
         reg_base = UC_ARM64_REG_X0
         sp_reg = UC_ARM64_REG_SP
@@ -60,7 +60,7 @@ def native_read_args_in_hook_code(emu, args_count):
     ptr_sz = emu.get_ptr_size()
 
     nreg = max_regs_args
-    if (args_count < max_regs_args):
+    if args_count < max_regs_args:
         nreg = args_count
 
     native_args = []

@@ -36,10 +36,10 @@ class JNIEnv:
         self._locals = ReferenceTable(start=1, max_entries=2048)
         self._globals = ReferenceTable(start=4096, max_entries=512000)
         arch = emu.get_arch()
-        if (arch == emu_const.ARCH_ARM32):
+        if arch == emu_const.ARCH_ARM32:
             self._read_args = self._read_args32
             self._read_args_v = self._read_args_v32
-        elif (arch == emu_const.ARCH_ARM64):
+        elif arch == emu_const.ARCH_ARM64:
             self._read_args = self._read_args64
             self._read_args_v = self._read_args_v64
         else:
@@ -403,7 +403,7 @@ class JNIEnv:
         args_list_index = 0
         while args_list_index < n:
             arg_name = args_type_list[args_list_index]
-            if (args_index == 0 and arg_name in ("jlong", "jdouble")):
+            if args_index == 0 and arg_name in ("jlong", "jdouble"):
                 # 处理第一个参数(call_xxx第四个参数)跳过问题
                 args_index = args_index + 1
                 continue
@@ -414,7 +414,7 @@ class JNIEnv:
 
             elif arg_name in ("jlong", "jdouble"):
                 args_index = args_index + 1
-                if (args_index >= nargs):
+                if args_index >= nargs:
                     raise RuntimeError(
                         "read_args get long on args_type_list, but args len is not enough to read high bytes")
 
@@ -426,7 +426,7 @@ class JNIEnv:
                 ref = v
                 jobj = self.get_reference(ref)
                 obj = None
-                if (jobj is None):
+                if jobj is None:
                     logging.warning(
                         "arg_name %s ref %d is not vaild maybe wrong arglist" %
                         (arg_name, ref))
@@ -466,7 +466,7 @@ class JNIEnv:
                 ref = v
                 jobj = self.get_reference(ref)
                 obj = None
-                if (jobj is None):
+                if jobj is None:
                     logging.warning(
                         "arg_name %s ref %d is not vaild maybe wrong arglist" %
                         (arg_name, ref))
@@ -503,7 +503,7 @@ class JNIEnv:
                 ref = v
                 jobj = self.get_reference(ref)
                 obj = None
-                if (jobj is None):
+                if jobj is None:
                     logging.warning(
                         "arg_name %s ref %d is not vaild maybe wrong arglist" %
                         (arg_name, ref))
@@ -543,7 +543,7 @@ class JNIEnv:
                 ref = v
                 jobj = self.get_reference(ref)
                 obj = None
-                if (jobj is None):
+                if jobj is None:
                     logging.warning(
                         "arg_name %s ref %d is not vaild maybe wrong arglist" %
                         (arg_name, ref))
@@ -561,10 +561,10 @@ class JNIEnv:
     # arg_type = 0 tuple or list, 1 arg_v, 2 array
 
     def _read_args_common(self, mu, args, args_type_list, arg_type):
-        if (arg_type == 0):
+        if arg_type == 0:
             args_items = args
             return self._read_args(mu, args_items, args_type_list)
-        elif (arg_type == 1):
+        elif arg_type == 1:
             args_ptr = args
             return self._read_args_v(mu, args_ptr, args_type_list)
         else:
@@ -572,7 +572,7 @@ class JNIEnv:
 
     @staticmethod
     def jobject_to_pyobject(obj):
-        if (isinstance(obj, jobject)):
+        if isinstance(obj, jobject):
             return obj.value
         else:
             raise RuntimeError("jobject_to_pyobject unknown obj type %r" % obj)
@@ -664,7 +664,7 @@ class JNIEnv:
         logger.debug("JNIEnv->GetSuperClass (%s) is called" % pyclass.jvm_name)
 
         pyclazz_super = pyclass.jvm_super
-        if (not pyclazz_super):
+        if not pyclazz_super:
             raise RuntimeError(
                 "super class for %s is None!!! you should at least inherit Object!!!")
 
@@ -689,7 +689,7 @@ class JNIEnv:
         r = JNI_FALSE
         jvm_super = pyclass1.jvm_super
         while jvm_super is not None:
-            if (jvm_super == pyclass2):
+            if jvm_super == pyclass2:
                 r = JNI_TRUE
                 break
 
@@ -874,7 +874,7 @@ class JNIEnv:
     def get_object_class(self, mu, env, obj_idx):
 
         obj = self.get_reference(obj_idx)
-        if (obj is None):
+        if obj is None:
             # TODO: Proper Java error?
             raise RuntimeError(
                 'get_object_class can not get class for object id %d for JNIEnv.' %
@@ -980,7 +980,7 @@ class JNIEnv:
         real_method = pyobj.__class__.find_method(name, sig)
         v = real_method.func(pyobj, self._emu, *constructor_args)
 
-        if (not is_wide):
+        if not is_wide:
             return v
         else:
             rhigh = v >> 32
@@ -1320,7 +1320,7 @@ class JNIEnv:
         logger.debug("JNIEnv->GetXXXField(%s, %s <%s>) was called" %
                      (pyobj.jvm_name, field.name, field.signature))
         v = getattr(pyobj, field.name)
-        if (not is_wide):
+        if not is_wide:
             return v
         else:
             rhigh = v >> 32
@@ -1381,7 +1381,7 @@ class JNIEnv:
             (pyobj.jvm_name, field.name, field.signature, value))
 
         v = None
-        if (is_obj_value):
+        if is_obj_value:
             value_idx = value
             value_obj = self.get_reference(value_idx)
             v = JNIEnv.jobject_to_pyobject(value_obj)
@@ -1488,7 +1488,7 @@ class JNIEnv:
 
         v = method.func(self._emu, *constructor_args)
         # FIXME python的double怎么办？？？
-        if (not is_wide):
+        if not is_wide:
             return v
         else:
             rhigh = v >> 32
@@ -1754,7 +1754,7 @@ class JNIEnv:
         r = field.static_value
         logger.debug("JNIEnv->GetStaticXXXField return %r" % r)
         v = field.static_value
-        if (not is_wide):
+        if not is_wide:
             return v
         else:
             rhigh = v >> 32
@@ -1864,7 +1864,7 @@ class JNIEnv:
 
         str_ref = self.get_reference(string)
         str_obj = str_ref.value
-        if (str_obj == JAVA_NULL):
+        if str_obj == JAVA_NULL:
             return 0
 
         str_val = str_obj.get_py_string()
@@ -1877,7 +1877,7 @@ class JNIEnv:
 
         str_ref = self.get_reference(string)
         str_obj = str_ref.value
-        if (str_obj == JAVA_NULL):
+        if str_obj == JAVA_NULL:
             return JAVA_NULL
 
         str_val = str_obj.get_py_string()
@@ -1901,7 +1901,7 @@ class JNIEnv:
         logger.debug(
             "JNIEnv->ReleaseStringUtfChars(%u, %s) was called" %
             (string, pystr))
-        if (utf8_ptr != 0):
+        if utf8_ptr != 0:
             self._emu.memory.unmap(utf8_ptr, len(pystr) + 1)
 
     def get_array_length(self, mu, env, array):
@@ -1931,21 +1931,21 @@ class JNIEnv:
         for i in range(0, size):
             pyarr.append(JAVA_NULL)
 
-        if (obj_init != JAVA_NULL):
+        if obj_init != JAVA_NULL:
             obj = self.get_reference(obj_init)
             pyobj = self.jobject_to_pyobject(obj)
             pyarr[0] = pyobj
 
         new_jvm_name = ""
         # FIXME check if is array
-        if (arr_item_cls_name[0] == "["):
+        if arr_item_cls_name[0] == "[":
             new_jvm_name = "[%s" % arr_item_cls_name
 
         else:
             new_jvm_name = "[L%s;" % arr_item_cls_name
 
         pyarray_clazz = self._class_loader.find_class_by_name(new_jvm_name)
-        if (pyarray_clazz is None):
+        if pyarray_clazz is None:
             # jvm_name=None, jvm_fields=None, jvm_ignore=False, jvm_super=None
             # 动态创建Array新类，因为Descriptor会变
             #pyarray_clazz = JavaClassDef("%s_Array"%arr_item_cls_name, (Array,), {}, jvm_name=new_jvm_name, jvm_super=Array)
@@ -1966,7 +1966,7 @@ class JNIEnv:
 
         array_pyobj = JNIEnv.jobject_to_pyobject(array_obj)
         pyobj_item = array_pyobj[item_idx]
-        if (pyobj_item == JAVA_NULL):
+        if pyobj_item == JAVA_NULL:
             return JAVA_NULL
         return self.add_local_reference(jobject(pyobj_item))
 
@@ -2058,7 +2058,7 @@ class JNIEnv:
         raise NotImplementedError()
 
     def release_byte_array_elements(self, mu, env, array_idx, elems, mode):
-        if (elems == JAVA_NULL):
+        if elems == JAVA_NULL:
             return
 
         # 前四个字节必为长度

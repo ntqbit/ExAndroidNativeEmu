@@ -65,10 +65,10 @@ class Class(metaclass=JavaClassDef, jvm_name='java/lang/Class'):
     def getCanonicalName(self, emu):
         name = self.getName(emu).get_py_string()
 
-        if (name[0] == "["):
+        if name[0] == "[":
             dims = 0
             for ch in name:
-                if (ch == '['):
+                if ch == '[':
                     dims += 1
 
                 else:
@@ -76,7 +76,7 @@ class Class(metaclass=JavaClassDef, jvm_name='java/lang/Class'):
 
             # 去除[
             name = name[dims:]
-            if (name[0] == "L"):
+            if name[0] == "L":
                 # 去除类型前的L
                 name = name[1:]
 
@@ -117,7 +117,7 @@ class Class(metaclass=JavaClassDef, jvm_name='java/lang/Class'):
         sbuf.write("(")
         for item in parameterTypes:
             desc = item.get_jni_descriptor()
-            if (desc[0] == "[" or desc in Class._basic_types):
+            if desc[0] == "[" or desc in Class._basic_types:
                 sbuf.write(desc)
 
             else:
@@ -131,7 +131,7 @@ class Class(metaclass=JavaClassDef, jvm_name='java/lang/Class'):
         pyname = name.get_py_string()
         pymethod = self._pyclazz.find_method_sig_with_no_ret(
             pyname, signature_no_ret)
-        if (pymethod is None):
+        if pymethod is None:
             assert False, "getDeclaredMethod not found..."
             return JAVA_NULL
 

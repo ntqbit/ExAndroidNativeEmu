@@ -21,23 +21,23 @@ def dump_memory(emu, fd, min_addr=0, max_addr=0xFFFFFFFF):
         offset = r[0]
         fd.write("region (0x%08X-0x%08X) prot:%d\n" % (r[0], r[1], r[2]))
         for addr in range(r[0], r[1] + 1):
-            if (addr < min_addr or addr > max_addr):
+            if addr < min_addr or addr > max_addr:
                 continue
 
-            if (offset % line_connt == 0):
+            if offset % line_connt == 0:
                 fd.write("0x%08X: " % offset)
 
             b = mu.mem_read(addr, 1).hex().upper()
             fd.write(" %s" % b)
             offset = offset + 1
-            if (offset % line_connt == 0):
+            if offset % line_connt == 0:
                 fd.write("\n")
 
 
 def dump_registers(emu, fd):
     regs = ""
     mu = emu.mu
-    if (emu.get_arch() == emu_const.ARCH_ARM32):
+    if emu.get_arch() == emu_const.ARCH_ARM32:
         r0 = mu.reg_read(UC_ARM_REG_R0)
         r1 = mu.reg_read(UC_ARM_REG_R1)
         r2 = mu.reg_read(UC_ARM_REG_R2)
@@ -102,7 +102,7 @@ def get_module_by_addr(emu, addr):
     ms = emu.modules
     module = None
     for m in ms:
-        if (addr >= m.base and addr <= m.base + m.size):
+        if addr >= m.base and addr <= m.base + m.size:
             module = m
             break
 
@@ -116,10 +116,10 @@ DUMP_REG_WRITE = 2
 
 def dump_code(emu, address, size, fd, dump_reg_type=DUMP_REG_READ):
     mu = emu.mu
-    if (emu.get_arch() == emu_const.ARCH_ARM32):
+    if emu.get_arch() == emu_const.ARCH_ARM32:
         # 判断是否arm，用不同的decoder
         cpsr = mu.reg_read(UC_ARM_REG_CPSR)
-        if (cpsr & (1 << 5)):
+        if cpsr & (1 << 5):
             md = g_md_thumb
         else:
             md = g_md_arm
@@ -139,14 +139,14 @@ def dump_code(emu, address, size, fd, dump_reg_type=DUMP_REG_READ):
         base = 0
         funName = None
         module = get_module_by_addr(emu, addr)
-        if (module is not None):
+        if module is not None:
             name = os.path.basename(module.filename)
             base = module.base
             funName = module.is_symbol_addr(addr)
 
         instruction_str = ''.join('{:02X} '.format(x) for x in i.bytes)
         tid = ""
-        if (emu.get_muti_task_support()):
+        if emu.get_muti_task_support():
             sch = emu.get_schduler()
             tid = "%d:" % sch.get_current_tid()
         line = "%s(%20s[0x%08X])[%-12s]0x%08X:\t%s\t%s" % (tid,
@@ -156,13 +156,13 @@ def dump_code(emu, address, size, fd, dump_reg_type=DUMP_REG_READ):
                                                            addr - base,
                                                            i.mnemonic.upper(),
                                                            i.op_str.upper())
-        if (funName is not None):
+        if funName is not None:
             line = line + " ; %s" % funName
 
         regs = i.regs_access()
-        if (DUMP_REG_READ == dump_reg_type):
+        if DUMP_REG_READ == dump_reg_type:
             regs_dump = regs[0]
-        elif (DUMP_REG_WRITE == dump_reg_type):
+        elif DUMP_REG_WRITE == dump_reg_type:
             regs_dump = regs[1]
 
         regs_io = io.StringIO()
@@ -172,7 +172,7 @@ def dump_code(emu, address, size, fd, dump_reg_type=DUMP_REG_READ):
             regs_io.write(reg_str)
 
         regs = regs_io.getvalue()
-        if (regs != ""):
+        if regs != "":
             line = "%s\t;(%s)" % (line, regs)
 
         fd.write(line + "\n")
@@ -181,7 +181,7 @@ def dump_code(emu, address, size, fd, dump_reg_type=DUMP_REG_READ):
 def dump_stack(emu, fd, max_deep=512):
     mu = emu.mu
     sp = 0
-    if (emu.get_arch() == emu_const.ARCH_ARM32()):
+    if emu.get_arch() == emu_const.ARCH_ARM32():
         sp = mu.reg_read(UC_ARM_REG_SP)
     else:
         sp = mu.reg_read(UC_ARM64_REG_SP)

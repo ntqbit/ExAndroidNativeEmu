@@ -56,7 +56,7 @@ class Method(metaclass=JavaClassDef,
     def invoke(self, emu, obj, args):
         logger.debug('Method.invoke(%r, %r)' % (obj, args))
 
-        if (obj == JAVA_NULL):
+        if obj == JAVA_NULL:
             # static method
             v = self._method.func(emu, *args)
 

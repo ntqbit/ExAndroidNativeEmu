@@ -89,7 +89,7 @@ class PackageInfo(
         self.firstInstallTime = int(PackageInfo.s_t)
         self.lastUpdateTime = self.firstInstallTime
         self.versionCode = version_code
-        if (sign_hex):
+        if sign_hex:
             self.signatures = ObjectArray([Signature(sign_hex)])
 
 
@@ -116,18 +116,18 @@ class PackageManager(
                      native=False)
     def getPackageInfo(self, emu, package_name, flags):
         # TODO 实现其他packageName 的 packageInfo
-        if (package_name.get_py_string() != package_name.get_py_string()):
+        if package_name.get_py_string() != package_name.get_py_string():
             raise NotImplementedError(
                 "not own package package-info not support now..")
 
         sign_hex = emu.config.get("sign_hex", "0")
-        if (flags == PackageManager.GET_SIGNATURES):
-            if (sign_hex == "0"):
+        if flags == PackageManager.GET_SIGNATURES:
+            if sign_hex == "0":
                 raise RuntimeError(
                     "getPackageInfo with PackageManager.GET_SIGNATURES is called but no 'sign_hex' set in config!!!")
 
         version_code = emu.config.get("version_code")
-        if (version_code is None):
+        if version_code is None:
             version_code = 0
             logging.info("version_code not config default to 0")
 

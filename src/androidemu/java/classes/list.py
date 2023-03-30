@@ -22,7 +22,7 @@ class List(metaclass=JavaClassDef, jvm_name='java/util/List'):
                      signature='(I)Ljava/lang/Object;',
                      native=False)
     def get(self, emu, index):
-        if (index < len(self._pylist)):
+        if index < len(self._pylist):
             return self._pylist[index]
         return JAVA_NULL
 

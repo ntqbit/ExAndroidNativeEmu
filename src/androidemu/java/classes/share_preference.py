@@ -42,7 +42,7 @@ class SharedPreferences(metaclass=JavaClassDef,
         string_node = root.getElementsByTagName("string")
 
         for node in string_node:
-            if (node.hasAttribute("name")):
+            if node.hasAttribute("name"):
                 k = node.getAttribute("name")
                 v = str(node.childNodes[0].data)
                 self._string_values[k] = String(v)
@@ -60,7 +60,7 @@ class SharedPreferences(metaclass=JavaClassDef,
                      native=False)
     def getString(self, emu, skey, sdefault):
         pyKey = skey.get_py_string()
-        if (pyKey in self._string_values):
+        if pyKey in self._string_values:
             return self._string_values[pyKey]
 
         else:

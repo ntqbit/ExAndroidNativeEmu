@@ -23,7 +23,7 @@ class SyscallHandlers:
         self._handlers = dict()
         self._sch = schduler
         self._interrupt_handler = InterruptHandler(mu)
-        if (arch == emu_const.ARCH_ARM32):
+        if arch == emu_const.ARCH_ARM32:
             self._interrupt_handler.set_handler(2, self._handle_syscall)
         else:
             # arm64

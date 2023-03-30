@@ -30,7 +30,7 @@ class Pcb:
         return fd
 
     def get_fd_detail(self, fd):
-        if (fd not in self._fds):
+        if fd not in self._fds:
             return None
         return self._fds[fd]
 

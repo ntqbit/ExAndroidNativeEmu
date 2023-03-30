@@ -38,9 +38,9 @@ class StackHelper():
 
     def commit(self):
         # 对齐sp
-        if (self._emu.get_arch() == emu_const.ARCH_ARM32):
+        if self._emu.get_arch() == emu_const.ARCH_ARM32:
             self._sp = self._sp & (~7)
-        elif (self._emu.get_arch() == emu_const.ARCH_ARM64):
+        elif self._emu.get_arch() == emu_const.ARCH_ARM64:
             self._sp = self._sp & (~15)
 
         self._emu.mu.reg_write(self._sp_reg, self._sp)

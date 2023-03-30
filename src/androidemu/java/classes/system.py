@@ -18,7 +18,7 @@ class System(metaclass=JavaClassDef, jvm_name='java/lang/System'):
     def getProperty(mu, s1):
         key = s1.get_py_string()
         # TODO 放到配置文件
-        if (key == "java.vm.version"):
+        if key == "java.vm.version":
             # 1.6.0 for 4.4
             # 2.1.0 for 6.0
             return String("1.6.0")

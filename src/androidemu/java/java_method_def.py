@@ -44,7 +44,7 @@ def java_method_def(
             emulator = None
             extra_args = None
             first_obj = 0xFA
-            if (isinstance(clz, JavaClassDef)):
+            if isinstance(clz, JavaClassDef):
                 # 如果第一个参数是Java类，则是self
                 emulator = args[1]
                 extra_args = args[2:]
@@ -66,7 +66,7 @@ def java_method_def(
                     vals = vals[attr]
 
                 pyclazz = vals
-                if (not isinstance(pyclazz, JavaClassDef)):
+                if not isinstance(pyclazz, JavaClassDef):
                     raise RuntimeError(
                         "Error class %s is not register as jvm class!!!" %
                         clsname)
@@ -77,7 +77,7 @@ def java_method_def(
                     jclass(jvm_clazz))
 
             brace_index = signature.find(")")
-            if (brace_index < 0):
+            if brace_index < 0:
                 raise RuntimeError(
                     "native_wrapper invalid function signature %s" %
                     signature)
@@ -86,7 +86,7 @@ def java_method_def(
             return_ch = signature[return_index]
             res = None
             arch = emulator.get_arch()
-            if (return_ch in ('J', 'D') and arch == emu_const.ARCH_ARM32):
+            if return_ch in ('J', 'D') and arch == emu_const.ARCH_ARM32:
                 # 返回值是jlong或者jdouble,在32位下需要读取两个寄存器
                 res = emulator.call_native_return_2reg(
                     native_wrapper.jvm_method.native_addr,
@@ -105,7 +105,7 @@ def java_method_def(
                 )
 
             r = None
-            if (return_ch in ('[', 'L')):
+            if return_ch in ('[', 'L'):
                 # 返回值是object的话,需要转换jniref到真实object,方便使用
                 result_idx = res
                 result = emulator.java_vm.jni_env.get_local_reference(

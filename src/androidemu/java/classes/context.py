@@ -118,7 +118,7 @@ class ContextImpl(
                      signature='()Landroid/content/res/AssetManager;',
                      native=False)
     def getAssets(self, emu):
-        if (not self._asset_mgr):
+        if not self._asset_mgr:
             # 调用getAssets才初始化assert_manager
             # 因为不是每个so模拟执行都需要打开apk
             pyapk_path = self._pkg_mgr.getPackageInfo(
@@ -198,7 +198,7 @@ class ContextImpl(
     def getSharedPreferences(self, emu, name, mode):
         pkgName = emu.config.get("pkg_name")
         pyName = name.get_py_string()
-        if (pyName in self._sp_map):
+        if pyName in self._sp_map:
             return self._sp_map[pyName]
 
         else:

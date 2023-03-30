@@ -41,7 +41,7 @@ class SyscallHooks:
         self._emu = emu
         self._ptr_sz = emu.get_ptr_size()
         self._syscall_handler = syscall_handler
-        if (self._emu.get_arch() == emu_const.ARCH_ARM32):
+        if self._emu.get_arch() == emu_const.ARCH_ARM32:
             self._syscall_handler.set_handler(0x1, "exit", 1, self._exit)
             self._syscall_handler.set_handler(0x2, "fork", 0, self._fork)
             self._syscall_handler.set_handler(0x0B, "execve", 3, self._execve)
@@ -165,7 +165,7 @@ class SyscallHooks:
     def _do_fork(self, mu):
         logging.debug("fork called")
         r = os.fork()
-        if (r == 0):
+        if r == 0:
             pass
             # 实测这样改没效果
             #logging.basicConfig(level=logging.DEBUG, format='%(process)d - %(asctime)s - %(levelname)s - %(message)s', stream=sys.stdout)
@@ -178,7 +178,7 @@ class SyscallHooks:
     def _exit(self, mu, err_code):
         sch = self._emu.get_schduler()
         cur_tid = sch.get_current_tid()
-        if (cur_tid in self._tid_2_tid_addr):
+        if cur_tid in self._tid_2_tid_addr:
             # CLONE_CHILD_CLEARTID 语义，退出时候唤醒线程对应的tid_addr对应的futex
             # 这是线程退出自动清理futex的关键
             # 见https://man7.org/linux/man-pages/man2/clone.2.html
@@ -206,7 +206,7 @@ class SyscallHooks:
         while True:
             off = memory_helpers.read_ptr_sz(mu, ptr, self._ptr_sz)
             param = memory_helpers.read_utf8(mu, off)
-            if (len(param) == 0):
+            if len(param) == 0:
                 break
             params.append(param)
             ptr += self._emu.get_ptr_size()
@@ -216,23 +216,23 @@ class SyscallHooks:
 
         pkg_name = self._cfg.get("pkg_name")
         pm = "pm path %s" % (pkg_name,)
-        if (cmd.find(pm) > -1):
+        if cmd.find(pm) > -1:
             output = "package:/data/app/%s-1.apk" % pkg_name
             logging.debug("write to stdout [%s]" % output)
             os.write(1, output.encode("utf-8"))
             sys.exit(0)
 
-        elif (cmd.find('wm density') > -1):
+        elif cmd.find('wm density') > -1:
             output = "Physical density: 420"
             logging.info("write to stdout [%s]" % output)
             os.write(1, output.encode("utf-8"))
             sys.exit(0)
-        elif (cmd.find('wm size') > -1):
+        elif cmd.find('wm size') > -1:
             output = "Physical size: 1080x1920"
             logging.info("write to stdout [%s]" % output)
             os.write(1, output.encode("utf-8"))
             sys.exit(0)
-        elif (cmd.find('adbd') > -1):
+        elif cmd.find('adbd') > -1:
             output = ""
             logging.info("write to stdout [%s]" % output)
             os.write(1, output.encode("utf-8"))
@@ -252,7 +252,7 @@ class SyscallHooks:
 
     def _kill(self, mu, pid, sig):
         logging.warning("kill is call pid=0x%x sig=%d" % (pid, sig))
-        if (pid == self._getpid(mu)):
+        if pid == self._getpid(mu):
             logging.error(
                 "process 0x%x is killing self!!! maybe encounter anti-debug!!!" %
                 pid)
@@ -260,7 +260,7 @@ class SyscallHooks:
 
     def _pipe_common(self, mu, files_ptr, flags):
         #logging.warning("skip syscall pipe files [0x%08X]"%files_ptr)
-        if (hasattr(os, "pipe2")):
+        if hasattr(os, "pipe2"):
             ps = os.pipe2(flags)
         else:
             logging.warning("pipe2 not support use pipe")
@@ -583,14 +583,14 @@ class SyscallHooks:
             logging.warning("syscall clone do fork...")
             return self._do_fork(mu)
 
-        elif (flags & thread_flags == thread_flags):
+        elif flags & thread_flags == thread_flags:
             logging.warning("syscall clone do thread clone...")
             # clone一定要成功， 4.4
             # 的libc有bug，当clone失败之后会释放一个锁，而锁的内存在child_stack中，而他逻辑先释放了stack再unlock锁，必蹦，之所以不出问题的原因是在真机上clone不会失败，这里注意
             sch = self._emu.get_schduler()
             # 父线程调用clone，返回子线程tid
             tls_ptr = 0
-            if (flags & (CLONE_SETTLS | CLONE_CHILD_SETTID | CLONE_CHILD_CLEARTID) != 0):
+            if flags & (CLONE_SETTLS | CLONE_CHILD_SETTID | CLONE_CHILD_CLEARTID) != 0:
                 tls_ptr = new_tls
             tid = sch.add_sub_task(child_stack, tls_ptr)
             logging.debug(
@@ -603,10 +603,10 @@ class SyscallHooks:
                          CLONE_CHILD_SETTID | CLONE_CHILD_CLEARTID) != 0):
                 mu.mem_write(parent_tid, tid.to_bytes(4, byteorder='little'))
 
-            if (flags & (CLONE_CHILD_SETTID | CLONE_CHILD_CLEARTID) != 0):
+            if flags & (CLONE_CHILD_SETTID | CLONE_CHILD_CLEARTID) != 0:
                 mu.mem_write(child_tid, tid.to_bytes(4, byteorder='little'))
 
-            if (flags & CLONE_CHILD_CLEARTID):
+            if flags & CLONE_CHILD_CLEARTID:
                 # save the child_tid ptr
                 self._tid_2_tid_addr[tid] = child_tid
 
@@ -633,7 +633,7 @@ class SyscallHooks:
                         PR_GET_FPEXC,
                         PR_GET_TIMING,
                         PR_GET_NAME])
-        if (option in get_sets and arg2 == 0):
+        if option in get_sets and arg2 == 0:
             # 传入非法指针，linux内核不会出发crash而只会返回失败
             logging.warning("prctl getter but buffer is 0")
             return -1
@@ -699,7 +699,7 @@ class SyscallHooks:
     def _set_tid_address(self, mu, tidptr):
         sch = self._emu.get_schduler
         tid = sch.get_current_tid()
-        if (not tidptr):
+        if not tidptr:
             self._tid_2_tid_addr.pop(tid)
         else:
             self._tid_2_tid_addr[tid] = tidptr
@@ -721,7 +721,7 @@ class SyscallHooks:
                 (op, uaddr, v, val, timeout_ptr))
             if v == val:
                 timeout = -1
-                if (timeout_ptr):
+                if timeout_ptr:
                     req_tv_sec = memory_helpers.read_ptr_sz(
                         mu, timeout_ptr, self._ptr_sz)
                     req_tv_nsec = memory_helpers.read_ptr_sz(
@@ -766,13 +766,13 @@ class SyscallHooks:
         return 0
 
     def _handle_tgkill(self, mu, tgid, tid, sig):
-        if (tgid == self._getpid(mu) and sig == 6):
+        if tgid == self._getpid(mu) and sig == 6:
             raise RuntimeError("tgkill abort self....")
             return 0
 
         return 0
-        if (tgid == self._getpid(mu) and tid == self._gettid(mu)):
-            if (sig in self._sig_maps):
+        if tgid == self._getpid(mu) and tid == self._gettid(mu):
+            if sig in self._sig_maps:
 
                 sigact = self._sig_maps[sig]
                 addr = sigact[0]
@@ -838,11 +838,11 @@ class SyscallHooks:
                 (clk_id, clk_id))
 
     def _socket(self, mu, family, type_in, protocol):
-        if (family == 16):
+        if family == 16:
             logging.warning("family 16 not support")
             return -1
 
-        if (protocol == 0):
+        if protocol == 0:
             logging.warning("protocol 0 not support")
             return -1
 
@@ -901,7 +901,7 @@ class SyscallHooks:
             size_t iov_len;     /* Number of bytes to transfer */
         };
         '''
-        if (pid != self._getpid(mu)):
+        if pid != self._getpid(mu):
             raise NotImplementedError(
                 "__process_vm_readv return other process not support...")
         off_r = remote_iov

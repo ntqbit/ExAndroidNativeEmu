@@ -62,7 +62,7 @@ class Scheduler:
         self._blocking_set = set()
 
     def _get_pc(self):
-        if (self._emu.get_arch() == emu_const.ARCH_ARM32):
+        if self._emu.get_arch() == emu_const.ARCH_ARM32:
             pc = self._emu.mu.reg_read(UC_ARM_REG_PC)
             return pc
         else:
@@ -70,28 +70,28 @@ class Scheduler:
 
     def _clear_reg0(self):
 
-        if (self._emu.get_arch() == emu_const.ARCH_ARM32):
+        if self._emu.get_arch() == emu_const.ARCH_ARM32:
             self._mu.reg_write(UC_ARM_REG_R0, 0)
         else:
             self._mu.reg_write(UC_ARM64_REG_X0, 0)
 
     def _set_sp(self, sp):
-        if (self._emu.get_arch() == emu_const.ARCH_ARM32):
+        if self._emu.get_arch() == emu_const.ARCH_ARM32:
             self._emu.mu.reg_write(UC_ARM_REG_SP, sp)
         else:
             self._emu.mu.reg_write(UC_ARM64_REG_SP, sp)
 
     def _set_tls(self, tls_ptr):
-        if (self._emu.get_arch() == emu_const.ARCH_ARM32):
+        if self._emu.get_arch() == emu_const.ARCH_ARM32:
             self._emu.mu.reg_write(UC_ARM_REG_C13_C0_3, tls_ptr)
         else:
             self._emu.mu.reg_write(UC_ARM64_REG_TPIDR_EL0, tls_ptr)
 
     def _get_interrupted_entry(self):
         pc = self._get_pc()
-        if (self._emu.get_arch() == emu_const.ARCH_ARM32):
+        if self._emu.get_arch() == emu_const.ARCH_ARM32:
             cpsr = self._emu.mu.reg_read(UC_ARM_REG_CPSR)
-            if (cpsr & (1 << 5)):
+            if cpsr & (1 << 5):
                 pc = pc | 1
 
         return pc
@@ -107,7 +107,7 @@ class Scheduler:
 
     def _set_main_task(self):
         tid = self._emu.get_pcb().get_pid()
-        if (tid in self._tasks_map):
+        if tid in self._tasks_map:
             raise RuntimeError(
                 "set_main_task fail for main task %d exist!!!" %
                 tid)
@@ -142,7 +142,7 @@ class Scheduler:
     def futex_wake(self, futex_ptr):
         cur_tid = self.get_current_tid()
 
-        if (futex_ptr in self._futex_blocking_map):
+        if futex_ptr in self._futex_blocking_map:
             block_set = self._futex_blocking_map[futex_ptr]
             if len(block_set) > 0:
                 tid = block_set.pop()
@@ -192,7 +192,7 @@ class Scheduler:
 
     def exec(self, main_entry, clear_task_when_return=True):
         self._set_main_task()
-        if (self._emu.get_arch() == emu_const.ARCH_ARM32):
+        if self._emu.get_arch() == emu_const.ARCH_ARM32:
             self._emu.mu.reg_write(UC_ARM_REG_LR, self._stop_pos)
         else:
             self._emu.mu.reg_write(UC_ARM64_REG_X30, self._stop_pos)
@@ -200,11 +200,11 @@ class Scheduler:
         while True:
             for tid in reversed(self._ordered_tasks_list):
                 task = self._tasks_map[tid]
-                if (tid in self._blocking_set):
+                if tid in self._blocking_set:
                     # 处理block
-                    if (len(self._ordered_tasks_list) == 1):
+                    if len(self._ordered_tasks_list) == 1:
                         # 只有主线程，而且被block
-                        if (task.blocking_timeout < 0):
+                        if task.blocking_timeout < 0:
                             # 只有一个线程且被无限期block，有bug
                             raise RuntimeError(
                                 "only one task %d exists, but blocking infinity dead lock bug!!!!" % tid)
@@ -220,7 +220,7 @@ class Scheduler:
                     else:
                         if task.blocking_timeout > 0:
                             now = int(time.time() * 1000)
-                            if (now - task.halt_ts < task.blocking_timeout):
+                            if now - task.halt_ts < task.blocking_timeout:
                                 # 仍然未睡够，继续睡
                                 logging.debug(
                                     "%d is blocking skip scheduling ts has block %d ms timeout %d ms" %
@@ -245,8 +245,8 @@ class Scheduler:
                 self._cur_tid = tid
                 # run
                 start_pos = 0
-                if (task.is_main):
-                    if (task.is_init):
+                if task.is_main:
+                    if task.is_init:
                         start_pos = main_entry
                         task.is_init = False
 
@@ -261,10 +261,10 @@ class Scheduler:
                     self._emu.mu.context_restore(task.context)
                     start_pos = self._get_interrupted_entry()
 
-                    if (task.is_init):
+                    if task.is_init:
                         # 如果是第一次进入，需要设置child_stack指针
                         self._set_sp(task.init_stack_ptr)
-                        if (task.tls_ptr):
+                        if task.tls_ptr:
                             self._set_tls(task.tls_ptr)
                         # 第一次进入子线程，需要将r0清空成0，这里模仿linux clone子线程返回0的逻辑
                         self._clear_reg0()
@@ -280,7 +280,7 @@ class Scheduler:
                 task.context = ctx
 
                 # 运行结束，任务标记成可删除
-                if (self._get_pc() == self._stop_pos or task.is_exit):
+                if self._get_pc() == self._stop_pos or task.is_exit:
                     self._tid_2_remove.add(self._cur_tid)
                     logging.debug("%d scheduling exit" % tid)
 
@@ -306,7 +306,7 @@ class Scheduler:
                 logging.debug(
                     "main_thead tid [%d] exit exec return" %
                     self._pid)
-                if (clear_task_when_return):
+                if clear_task_when_return:
                     # clear all unfinished task
                     self._tasks_map.clear()
                 return

@@ -107,7 +107,7 @@ class java_lang_Thread(metaclass=JavaClassDef, jvm_name='java/lang/Thread'):
 def hook_mem_read(uc, access, address, size, value, user_data):
     pc = uc.reg_read(UC_ARM_REG_PC)
 
-    if (address == 3419067861):
+    if address == 3419067861:
         data = uc.mem_read(address, size)
         v = int.from_bytes(data, byteorder='little', signed=False)
         print("read")
@@ -115,7 +115,7 @@ def hook_mem_read(uc, access, address, size, value, user_data):
 
 def hook_mem_write(uc, access, address, size, value, user_data):
     pc = uc.reg_read(UC_ARM_REG_PC)
-    if (address == 3419067861):
+    if address == 3419067861:
         print("write")
 
 
@@ -126,7 +126,7 @@ g_cfd = ChainLogger(sys.stdout, "./ins-douyin.txt")
 def hook_code(mu, address, size, user_data):
     try:
         emu = user_data
-        if (not emu.memory.check_addr(address, UC_PROT_EXEC)):
+        if not emu.memory.check_addr(address, UC_PROT_EXEC):
             logger.error("addr 0x%08X out of range" % (address,))
             sys.exit(-1)
 

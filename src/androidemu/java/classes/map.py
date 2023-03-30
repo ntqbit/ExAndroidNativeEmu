@@ -31,7 +31,7 @@ class HashMap(metaclass=JavaClassDef, jvm_name='java/util/HashMap'):
                      signature='(Ljava/lang/Object;)Ljava/lang/Object;',
                      native=False)
     def get(self, emu, key):
-        if (key in self._pydict):
+        if key in self._pydict:
             return self._pydict[key]
         return JAVA_NULL
 
@@ -42,7 +42,7 @@ class HashMap(metaclass=JavaClassDef, jvm_name='java/util/HashMap'):
                      native=False)
     def put(self, emu, key, value):
         prev = JAVA_NULL
-        if (key in self._pydict):
+        if key in self._pydict:
             prev = self._pydict[key]
 
         self._pydict[key] = value

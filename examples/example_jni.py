@@ -22,7 +22,7 @@ g_cfd = ChainLogger(sys.stdout, "./ins-jni.txt")
 def hook_code(mu, address, size, user_data):
     try:
         emu = user_data
-        if (not emu.memory.check_addr(address, UC_PROT_EXEC)):
+        if not emu.memory.check_addr(address, UC_PROT_EXEC):
             logger.error("addr 0x%08X out of range" % (address,))
             sys.exit(-1)
 
@@ -36,7 +36,7 @@ def hook_code(mu, address, size, user_data):
 def hook_mem_read(uc, access, address, size, value, user_data):
     pc = uc.reg_read(UC_ARM_REG_PC)
 
-    if (address == 0xCBC80640):
+    if address == 0xCBC80640:
         logger.debug("read mutex")
         data = uc.mem_read(address, size)
         v = int.from_bytes(data, byteorder='little', signed=False)
@@ -47,7 +47,7 @@ def hook_mem_read(uc, access, address, size, value, user_data):
 
 def hook_mem_write(uc, access, address, size, value, user_data):
     pc = uc.reg_read(UC_ARM_REG_PC)
-    if (address == 0xCBC80640):
+    if address == 0xCBC80640:
         logger.debug("write mutex")
         logger.debug(
             ">>> Memory WRITE at 0x%08X, data size = %u, data value = 0x%08X, pc: 0x%08X" %

@@ -25,7 +25,7 @@ g_cfd = ChainLogger(sys.stdout, "./ins-bb.txt")
 def hook_code(mu, address, size, user_data):
     try:
         emu = user_data
-        if (not emu.memory.check_addr(address, UC_PROT_EXEC)):
+        if not emu.memory.check_addr(address, UC_PROT_EXEC):
             logger.error("addr 0x%08X out of range" % (address,))
             sys.exit(-1)
 

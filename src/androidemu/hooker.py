@@ -46,7 +46,7 @@ class Hooker:
         self._hook_current += 4
 
         hook_addr = self._hook_current
-        if (self._emu.get_arch() == emu_const.ARCH_ARM32):
+        if self._emu.get_arch() == emu_const.ARCH_ARM32:
             # Create the ARM assembly code.
             # 注意，这里不要改sp，因为后面hook code会靠sp来定位参数
             # Write assembly code to the emulator.

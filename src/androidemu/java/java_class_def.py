@@ -73,7 +73,7 @@ class JavaClassDef(type):
             if method.name == name and method.signature == signature:
                 return method
 
-        if (cls.jvm_super is not None):
+        if cls.jvm_super is not None:
             return cls.jvm_super.find_method(name, signature)
 
         return None
@@ -89,14 +89,14 @@ class JavaClassDef(type):
                     signature_no_ret):
                 return method
 
-        if (cls.jvm_super is not None):
+        if cls.jvm_super is not None:
             return cls.jvm_super.find_method_sig_with_no_ret(
                 name, signature_no_ret)
 
         return None
 
     def find_method_by_id(cls, jvm_id):
-        if (jvm_id in cls.jvm_methods):
+        if jvm_id in cls.jvm_methods:
             return cls.jvm_methods[jvm_id]
         if cls.jvm_super is not None:
             return cls.jvm_super.find_method_by_id(jvm_id)
@@ -108,13 +108,13 @@ class JavaClassDef(type):
             if field.name == name and field.signature == signature and field.is_static == is_static:
                 return field
 
-        if (cls.jvm_super is not None):
+        if cls.jvm_super is not None:
             return cls.jvm_super.find_field(name, signature, is_static)
 
         return None
 
     def find_field_by_id(cls, jvm_id):
-        if (jvm_id in cls.jvm_fields):
+        if jvm_id in cls.jvm_fields:
             return cls.jvm_fields[jvm_id]
         if cls.jvm_super is not None:
             return cls.jvm_super.find_field_by_id(jvm_id)

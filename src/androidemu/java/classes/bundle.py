@@ -16,7 +16,7 @@ class Bundle(metaclass=JavaClassDef, jvm_name='android/os/Bundle'):
                      native=False)
     def getString(self, emu, k):
         pykey = k.get_py_string()
-        if (pykey in self._pymap):
+        if pykey in self._pymap:
             return String(self._pymap[pykey])
         else:
             # attention do not return None, return None means no return value
@@ -29,7 +29,7 @@ class Bundle(metaclass=JavaClassDef, jvm_name='android/os/Bundle'):
                      native=False)
     def getBoolean(self, emu, k):
         pykey = k.get_py_string()
-        if (pykey in self._pymap):
+        if pykey in self._pymap:
             return bool(self._pymap[pykey])
         else:
             # attention do not return None, return None means no return value

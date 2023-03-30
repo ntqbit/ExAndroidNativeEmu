@@ -9,7 +9,7 @@ class ChainLogger:
 
     def write(self, message):
         self.terminal.write(message)
-        if (self.log is None):
+        if self.log is None:
             self.log = open(self.path, "w")
 
         self.log.write(message)

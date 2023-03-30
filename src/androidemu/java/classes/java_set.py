@@ -22,7 +22,7 @@ class Set(metaclass=JavaClassDef, jvm_name='java/util/Set'):
     '''
     @java_method_def(name='get', args_list=["jobject"], signature='(Ljava/lang/Object;)Ljava/lang/Object;', native=False)
     def get(self, emu, key):
-        if (key in self._pyset):
+        if key in self._pyset:
             return self._pyset[key]
         return JAVA_NULL
 
@@ -31,7 +31,7 @@ class Set(metaclass=JavaClassDef, jvm_name='java/util/Set'):
     @java_method_def(name='put', args_list=["jobject", "jobject"], signature='(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;', native=False)
     def get(self, emu, key, value):
         prev = JAVA_NULL
-        if (key in self._pyset):
+        if key in self._pyset:
             prev = self._pyset[key]
 
         self._pyset[key] = value

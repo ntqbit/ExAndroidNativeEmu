@@ -29,7 +29,7 @@ class MemoryMonitor:
             addr = item[0]
             pc = item[1]
             moudle_mem = get_module_by_addr(self._emu, addr)
-            if (moudle_mem is not None):
+            if moudle_mem is not None:
                 name_read = os.path.basename(moudle_mem.filename)
                 base_read = moudle_mem.base
 
@@ -39,7 +39,7 @@ class MemoryMonitor:
 
             moudle_pc = get_module_by_addr(self._emu, pc)
 
-            if (moudle_pc is not None):
+            if moudle_pc is not None:
                 name_pc = os.path.basename(moudle_pc.filename)
                 base_pc = moudle_pc.base
 

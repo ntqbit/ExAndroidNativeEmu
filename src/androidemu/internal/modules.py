@@ -158,7 +158,7 @@ class Modules:
             mu, tls_ptr + 3 * ptr_sz, kernel_args_base, ptr_sz)
         arch = self.emu.get_arch()
 
-        if (arch == emu_const.ARCH_ARM32):
+        if arch == emu_const.ARCH_ARM32:
             mu.reg_write(UC_ARM_REG_C13_C0_3, tls_ptr)
         else:
             mu.reg_write(UC_ARM64_REG_TPIDR_EL0, tls_ptr)
@@ -183,7 +183,7 @@ class Modules:
         self._tls_init()
 
     def _get_ld_library_path(self):
-        if (self.emu.get_arch() == emu_const.ARCH_ARM32):
+        if self.emu.get_arch() == emu_const.ARCH_ARM32:
             return ["/system/lib/"]
         else:
             return ["/system/lib64/"]
@@ -199,7 +199,7 @@ class Modules:
                 lib_full_path = "%s/%s" % (lib_path, so_name)
                 vfs_lib_path = misc_utils.vfs_path_to_system_path(
                     self._vfs_root, lib_full_path)
-                if (os.path.exists(vfs_lib_path)):
+                if os.path.exists(vfs_lib_path):
                     return vfs_lib_path
 
         return None
@@ -230,7 +230,7 @@ class Modules:
         absp1 = os.path.abspath(filename)
         for m in self.modules:
             absm = os.path.abspath(m.filename)
-            if (absp1 == absm):
+            if absp1 == absm:
                 return m
 
     def mem_reserve(self, start, end):
@@ -241,13 +241,13 @@ class Modules:
 
     def load_module(self, filename, do_init=True):
         m = self.find_module_by_name(filename)
-        if (m is not None):
+        if m is not None:
             return m
 
         logger.debug("Loading module '%s'." % filename)
         # do sth like linker
         reader = elf_reader.ELFReader(filename)
-        if (self.emu.get_arch() == emu_const.ARCH_ARM32 and not reader.is_elf32()):
+        if self.emu.get_arch() == emu_const.ARCH_ARM32 and not reader.is_elf32():
             raise RuntimeError(
                 "arch is ARCH_ARM32 but so %s is not elf32!!!" %
                 filename)
@@ -326,7 +326,7 @@ class Modules:
             file_page_start = page_start(file_start)
             file_length = file_end - file_page_start
             assert (file_length > 0)
-            if (file_length > 0):
+            if file_length > 0:
                 self.emu.memory.map(
                     seg_page_start,
                     file_length,
@@ -349,7 +349,7 @@ class Modules:
                         -1,
                         0);
             '''
-            if (seg_page_end > seg_file_end):
+            if seg_page_end > seg_file_end:
                 self.emu.memory.map(
                     seg_file_end, seg_page_end - seg_file_end, prot)
 
@@ -362,7 +362,7 @@ class Modules:
         ld_library_path = self._get_ld_library_path()
         for so_name in so_needed:
             path = self.find_so_on_disk(so_name)
-            if (path is None):
+            if path is None:
                 logger.warning(
                     "%s needed by %s do not exist in vfs %s" %
                     (so_name, filename, self._vfs_root))
@@ -416,7 +416,7 @@ class Modules:
                             rel_addr, value.to_bytes(
                                 4, byteorder='little'))
 
-                elif (rel_info_type in (arm.R_AARCH64_ABS64, arm.R_AARCH64_ABS32)):
+                elif rel_info_type in (arm.R_AARCH64_ABS64, arm.R_AARCH64_ABS32):
                     if sym_name in symbols_resolved:
                         # 同arm32 只是地址变成8个字节
                         sym_addr = symbols_resolved[sym_name]
@@ -501,17 +501,17 @@ class Modules:
                         "Unhandled relocation type %i." %
                         rel_info_type)
 
-        if (init_addr != 0):
+        if init_addr != 0:
             init_array.append(load_bias + init_addr)
 
         init_item_sz = 4
-        if (not reader.is_elf32()):
+        if not reader.is_elf32():
             init_item_sz = 8
 
         for _ in range(int(init_array_size / init_item_sz)):
             b = self.emu.mu.mem_read(load_bias + init_array_addr, init_item_sz)
             fun_ptr = int.from_bytes(b, byteorder='little', signed=False)
-            if (fun_ptr != 0):
+            if fun_ptr != 0:
                 init_array.append(fun_ptr)
 
             init_array_addr += init_item_sz
