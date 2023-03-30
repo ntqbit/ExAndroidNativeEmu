@@ -1,6 +1,4 @@
-import traceback
 import os
-import sys
 import logging
 from unicorn import *
 from androidemu.utils.misc_utils import page_end, page_start
@@ -82,7 +80,7 @@ class MemoryMap:
                 # MAP_FIXED
                 try:
                     self._mu.mem_map(address, size, perms=prot)
-                except unicorn.UcError as e:
+                except UcError as e:
                     if e.errno == UC_ERR_MAP:
                         blocks = set()
                         extra_protect = set()
@@ -188,7 +186,7 @@ class MemoryMap:
         len_in = page_end(addr + len) - addr
         try:
             self._mu.mem_protect(addr, len_in, prot)
-        except unicorn.UcError as e:
+        except UcError as e:
             # TODO:just for debug
             logging.warning(
                 "Warning mprotect with addr: 0x%08X len: 0x%08X prot:0x%08X failed!!!" %
@@ -214,7 +212,7 @@ class MemoryMap:
                 file_map_attr = self._file_map_addr[addr]
                 if addr + size != file_map_attr[0]:
                     raise RuntimeError(
-                        "unmap error, range 0x%08X-0x%08X does not match file map range 0x%08X-0x%08X from file %s" %
+                        "unmap error, range 0x%08X-0x%08X does not match file map range 0x%08X-0x%08X from file" %
                         (addr, addr + size, addr, file_map_attr[0]))
 
                 self._file_map_addr.pop(addr)

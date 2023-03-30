@@ -1,7 +1,6 @@
-from unicorn import Uc, UC_PROT_READ, UC_PROT_WRITE
-from androidemu.cpu.syscall_handlers import SyscallHandlers
-from androidemu.native.memory_map import MemoryMap
-import os
+import verboselogs
+
+logger = verboselogs.VerboseLogger(__name__)
 
 
 class NativeMemory:
@@ -15,18 +14,16 @@ class NativeMemory:
         self._file_system = file_system
         self._memory = memory
         self._syscall_handler = syscall_handler
+
         self._syscall_handler.set_handler(0x2d, "brk", 1, self._handle_brk)
-        self._syscall_handler.set_handler(
-            0x5B, "munmap", 2, self._handle_munmap)
-        self._syscall_handler.set_handler(
-            0x7D, "mprotect", 3, self._handle_mprotect)
+        self._syscall_handler.set_handler(0x5B, "munmap", 2, self._handle_munmap)
+        self._syscall_handler.set_handler(0x7D, "mprotect", 3, self._handle_mprotect)
         self._syscall_handler.set_handler(0xC0, "mmap2", 6, self._handle_mmap2)
-        self._syscall_handler.set_handler(
-            0xDC, "madvise", 3, self._handle_madvise)
+        self._syscall_handler.set_handler(0xDC, "madvise", 3, self._handle_madvise)
 
     def _handle_brk(self, uc, brk):
         # TODO: set errno
-        #TODO: implement
+        # TODO: implement
         return -1
 
     def _handle_munmap(self, uc, addr, len_in):
@@ -47,10 +44,9 @@ class NativeMemory:
         # define MAP_ANONYMOUS 0x20
         # define MAP_UNINITIALIZED 0x0
         res = None
-        if fd != 0xffffffff:  # 如果有fd
+        if fd != 0xffffffff:
             if fd <= 2:
-                raise NotImplementedError(
-                    "Unsupported read operation for file descriptor %d." % fd)
+                raise NotImplementedError("Unsupported read operation for file descriptor %d." % fd)
 
             if fd not in self._file_system._virtual_files:
                 # TODO: Return valid error.
@@ -62,7 +58,7 @@ class NativeMemory:
         else:
             res = self._memory.map(addr, length, prot)
 
-        print("mmap return 0x%08X" % res)
+        logger.debug("mmap return 0x%08X" % res)
         return res
 
     def _handle_madvise(self, mu, start, len_in, behavior):

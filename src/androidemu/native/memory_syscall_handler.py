@@ -1,10 +1,8 @@
-from unicorn import Uc, UC_PROT_READ, UC_PROT_WRITE
-from androidemu.cpu.syscall_handlers import SyscallHandlers
-from androidemu.native.memory_map import MemoryMap
 from androidemu.const import emu_const
-from androidemu import pcb
-import logging
-import os
+
+import verboselogs
+
+logger = verboselogs.VerboseLogger(__name__)
 
 
 class MemorySyscallHandler:
@@ -20,26 +18,17 @@ class MemorySyscallHandler:
         self._syscall_handler = syscall_handler
         if self._emu.get_arch() == emu_const.ARCH_ARM32:
             self._syscall_handler.set_handler(0x2d, "brk", 1, self._handle_brk)
-            self._syscall_handler.set_handler(
-                0x5B, "munmap", 2, self._handle_munmap)
-            self._syscall_handler.set_handler(
-                0x7D, "mprotect", 3, self._handle_mprotect)
-            self._syscall_handler.set_handler(
-                0xC0, "mmap2", 6, self._handle_mmap2)
-            self._syscall_handler.set_handler(
-                0xDC, "madvise", 3, self._handle_madvise)
+            self._syscall_handler.set_handler(0x5B, "munmap", 2, self._handle_munmap)
+            self._syscall_handler.set_handler(0x7D, "mprotect", 3, self._handle_mprotect)
+            self._syscall_handler.set_handler(0xC0, "mmap2", 6, self._handle_mmap2)
+            self._syscall_handler.set_handler(0xDC, "madvise", 3, self._handle_madvise)
         else:
             # arm64
             self._syscall_handler.set_handler(0xd6, "brk", 1, self._handle_brk)
-            self._syscall_handler.set_handler(
-                0xd7, "munmap", 2, self._handle_munmap)
-            self._syscall_handler.set_handler(
-                0xe2, "mprotect", 3, self._handle_mprotect)
-            # arm64 只有mmap调用，没有mmap2
-            self._syscall_handler.set_handler(
-                0xde, "mmap", 6, self._handle_mmap)
-            self._syscall_handler.set_handler(
-                0xe9, "madvise", 3, self._handle_madvise)
+            self._syscall_handler.set_handler(0xd7, "munmap", 2, self._handle_munmap)
+            self._syscall_handler.set_handler(0xe2, "mprotect", 3, self._handle_mprotect)
+            self._syscall_handler.set_handler(0xde, "mmap", 6, self._handle_mmap)
+            self._syscall_handler.set_handler(0xe9, "madvise", 3, self._handle_madvise)
 
     def _handle_brk(self, uc, brk):
         # TODO: set errno
@@ -68,8 +57,7 @@ class MemorySyscallHandler:
             res = self._memory.map(addr, length, prot)
         elif fd != 0xffffffff:  # 如果有fd
             if fd <= 2:
-                raise NotImplementedError(
-                    "Unsupported read operation for file descriptor %d." % fd)
+                raise NotImplementedError("Unsupported read operation for file descriptor %d." % fd)
 
             if not self._pcb.has_fd(fd):
                 # TODO: Return valid error.
@@ -90,7 +78,7 @@ class MemorySyscallHandler:
         else:
             res = self._memory.map(addr, length, prot)
 
-        logging.debug("mmap return 0x%08X" % res)
+        logger.debug("mmap return 0x%08X" % res)
         return res
 
     def _handle_mmap(self, mu, addr, length, prot, flags, fd, offset):
@@ -112,8 +100,7 @@ class MemorySyscallHandler:
             res = self._memory.map(addr, length, prot)
         elif fd != 0xffffffff:  # 如果有fd
             if fd <= 2:
-                raise NotImplementedError(
-                    "Unsupported read operation for file descriptor %d." % fd)
+                raise NotImplementedError("Unsupported read operation for file descriptor %d." % fd)
 
             if not self._pcb.has_fd(fd):
                 # TODO: Return valid error.
@@ -125,7 +112,7 @@ class MemorySyscallHandler:
         else:
             res = self._memory.map(addr, length, prot)
 
-        logging.debug("mmap return 0x%016X" % res)
+        logger.debug("mmap return 0x%016X" % res)
         return res
 
     def _handle_madvise(self, mu, start, len_in, behavior):
