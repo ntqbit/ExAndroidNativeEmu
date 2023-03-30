@@ -1,4 +1,4 @@
-import logging
+import verboselogs
 import traceback
 
 from androidemu.hooker import Hooker
@@ -6,7 +6,7 @@ from androidemu.java.helpers.native_method import native_method
 from androidemu.java.jni_const import *
 from androidemu.java.jni_env import JNIEnv
 
-logger = logging.getLogger(__name__)
+logger = verboselogs.VerboseLogger(__name__)
 
 
 # https://docs.oracle.com/javase/7/docs/technotes/guides/jni/spec/invocation.html

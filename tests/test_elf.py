@@ -1,8 +1,10 @@
-import logging
+import verboselogs
 import posixpath
 import sys
 import unittest
 from androidemu.internal.elf_reader import ELFReader
+
+logger = verboselogs.VerboseLogger(__name__)
 
 
 class TestElf(unittest.TestCase):

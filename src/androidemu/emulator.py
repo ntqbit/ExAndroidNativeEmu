@@ -1,4 +1,4 @@
-import logging
+import verboselogs
 import os
 import time
 import importlib
@@ -66,8 +66,7 @@ import androidemu.java.classes.activity_thread
 import androidemu.java.classes.settings
 import androidemu.java.classes.bundle
 
-#logger = logging.getLogger(__name__)
-# logging.getLogger().setLevel(logging.DEBUG)
+logger = verboselogs.VerboseLogger(__name__)
 
 
 class Emulator:
@@ -231,7 +230,7 @@ class Emulator:
         self._support_muti_task = muti_task
         self._pcb = pcb.Pcb()
 
-        logging.info("process pid:%d" % self._pcb.get_pid())
+        logger.info("process pid:%d" % self._pcb.get_pid())
 
         sp_reg = 0
         if arch == emu_const.ARCH_ARM32:
@@ -418,7 +417,7 @@ class Emulator:
         symbol_addr = module.find_symbol(symbol_name)
 
         if symbol_addr is None:
-            logging.error(
+            logger.error(
                 'Unable to find symbol \'%s\' in module \'%s\'.' %
                 (symbol_name, module.filename))
             return

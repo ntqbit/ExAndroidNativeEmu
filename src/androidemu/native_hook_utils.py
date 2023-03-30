@@ -5,8 +5,10 @@ from unicorn.arm64_const import *
 from androidemu.const import emu_const
 from androidemu import config
 import sys
-import logging
+import verboselogs
 from androidemu.java.helpers.native_method import native_write_args, native_read_args_in_hook_code
+
+logger = verboselogs.VerboseLogger(__name__)
 
 
 def is_thumb(cpsr):
@@ -69,7 +71,7 @@ class FuncHooker:
             # Make sure we catch exceptions inside hooks and stop emulation.
             mu.emu_stop()
             traceback.print_exc()
-            logging.exception("catch error in __hook_stub")
+            logger.exception("catch error in __hook_stub")
             raise
 
     def __init__(self, emu):
@@ -93,7 +95,7 @@ class FuncHooker:
             if address not in self._hook_params:
                 return
 
-            logging.debug("trigger hook on 0x%08X" % address)
+            logger.debug("trigger hook on 0x%08X" % address)
             hook_param = self._hook_params[address]
             nargs = hook_param[0]
             args = native_read_args_in_hook_code(self._emu, nargs)
@@ -172,7 +174,7 @@ class FuncHooker:
         except Exception as e:
             # Make sure we catch exceptions inside hooks and stop emulation.
             mu.emu_stop()
-            logging.exception("catch error in __hook_func_head")
+            logger.exception("catch error in __hook_func_head")
             raise
 
     def fun_hook(self, fun_addr, nargs, cb_before, cb_after):

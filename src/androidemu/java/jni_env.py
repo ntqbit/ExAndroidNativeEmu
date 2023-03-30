@@ -1,4 +1,4 @@
-import logging
+import verboselogs
 import sys
 
 from androidemu.hooker import Hooker
@@ -19,7 +19,7 @@ from androidemu.utils import debug_utils
 from androidemu.const import emu_const
 from androidemu.java.jni_functions import JNI_FUNCTIONS
 
-logger = logging.getLogger(__name__)
+logger = verboselogs.VerboseLogger(__name__)
 
 
 # This class attempts to mimic the JNINativeInterface table.
@@ -325,7 +325,6 @@ class JNIEnv:
                     raise
 
                 if func['ret'] != 'void':
-                    logger.debug('Getting return value')
                     log_text += f' = {map_var_type(ret, func["ret"])}'
 
                 logger.debug(log_text)
@@ -430,7 +429,7 @@ class JNIEnv:
                 jobj = self.get_reference(ref)
                 obj = None
                 if jobj is None:
-                    logging.warning(
+                    logger.warning(
                         "arg_name %s ref %d is not vaild maybe wrong arglist" %
                         (arg_name, ref))
                     obj = JAVA_NULL
@@ -470,7 +469,7 @@ class JNIEnv:
                 jobj = self.get_reference(ref)
                 obj = None
                 if jobj is None:
-                    logging.warning(
+                    logger.warning(
                         "arg_name %s ref %d is not vaild maybe wrong arglist" %
                         (arg_name, ref))
                     obj = JAVA_NULL
@@ -507,7 +506,7 @@ class JNIEnv:
                 jobj = self.get_reference(ref)
                 obj = None
                 if jobj is None:
-                    logging.warning(
+                    logger.warning(
                         "arg_name %s ref %d is not vaild maybe wrong arglist" %
                         (arg_name, ref))
                     obj = JAVA_NULL
@@ -547,7 +546,7 @@ class JNIEnv:
                 jobj = self.get_reference(ref)
                 obj = None
                 if jobj is None:
-                    logging.warning(
+                    logger.warning(
                         "arg_name %s ref %d is not vaild maybe wrong arglist" %
                         (arg_name, ref))
                     obj = JAVA_NULL
@@ -932,7 +931,7 @@ class JNIEnv:
 
         pyclazz = class_obj.get_py_clazz()
 
-        logging.debug("get_method_id type %s" % (pyclazz))
+        logger.debug("get_method_id type %s" % (pyclazz))
         method = pyclazz.find_method(name, sig)
 
         if method is None:
@@ -1888,7 +1887,6 @@ class JNIEnv:
         str_ptr = self._emu.memory.map(
             0, len(str_val) + 1, UC_PROT_READ | UC_PROT_WRITE)
 
-        logger.debug("=> %s" % str_val)
         if is_copy_ptr != 0:
             # TODO 观察行为,真机总是返回true,但是根据文档,返回false应该也没问题
             # https://stackoverflow.com/questions/30992989/is-iscopy-field-always-necessary-in-android

@@ -4,8 +4,9 @@ from unicorn.arm_const import *
 from unicorn.arm64_const import *
 from androidemu.const import emu_const
 import sys
-import logging
+import verboselogs
 
+logger = verboselogs.VerboseLogger(__name__)
 
 # Utility class to create a bridge between ARM and Python.
 class Hooker:
@@ -111,7 +112,7 @@ class Hooker:
             signed=False)
 
         hook_func = self._hooks[hook_id]
-        #logging.debug("hook_id:%d, hook_func:%r"%(hook_id, hook_func))
+        #logger.debug("hook_id:%d, hook_func:%r"%(hook_id, hook_func))
 
         # Call hook.
         try:
@@ -119,5 +120,5 @@ class Hooker:
         except Exception as e:
             # Make sure we catch exceptions inside hooks and stop emulation.
             mu.emu_stop()
-            logging.exception("catch error in _hook")
+            logger.exception("catch error in _hook")
             raise

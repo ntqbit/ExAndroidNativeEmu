@@ -1,4 +1,4 @@
-import logging
+import verboselogs
 import traceback
 import inspect
 
@@ -8,7 +8,7 @@ from unicorn.arm64_const import *
 
 import sys
 
-logger = logging.getLogger(__name__)
+logger = verboselogs.VerboseLogger(__name__)
 
 
 class InterruptHandler:
@@ -40,8 +40,8 @@ class InterruptHandler:
                 traceback.print_stack()
                 frame = inspect.currentframe()
                 stack_trace = traceback.format_stack(frame)
-                logging.error("catch error in _hook_interrupt")
-                logging.error(stack_trace[:-1])
+                logger.error("catch error in _hook_interrupt")
+                logger.error(stack_trace[:-1])
                 self._mu.emu_stop()
                 sys.exit(-1)
         except Exception as e:

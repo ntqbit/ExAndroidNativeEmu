@@ -4,7 +4,9 @@ from androidemu.java.java_method_def import java_method_def, JavaMethodDef
 from androidemu.java.classes.string import String
 from androidemu.java.classes.array import ObjectArray, ByteArray
 import time
-import logging
+import verboselogs
+
+logger = verboselogs.VerboseLogger(__name__)
 
 
 class Signature(
@@ -129,7 +131,7 @@ class PackageManager(
         version_code = emu.config.get("version_code")
         if version_code is None:
             version_code = 0
-            logging.info("version_code not config default to 0")
+            logger.info("version_code not config default to 0")
 
         pkg_info = PackageInfo(self._pyPkgName, sign_hex, version_code)
         return pkg_info

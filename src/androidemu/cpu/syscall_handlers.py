@@ -1,4 +1,4 @@
-import logging
+import verboselogs
 
 from unicorn import *
 from unicorn.arm_const import *
@@ -11,6 +11,8 @@ from androidemu.const import emu_const
 import unicorn
 import traceback
 import sys
+
+logger = verboselogs.VerboseLogger(__name__)
 
 
 class SyscallHandlers:
@@ -36,7 +38,7 @@ class SyscallHandlers:
         idx = mu.reg_read(UC_ARM_REG_R7)
         lr = mu.reg_read(UC_ARM_REG_LR)
         tid = self._sch.get_current_tid()
-        logging.debug("%d syscall %d lr=0x%08X", tid, idx, lr)
+        logger.debug("%d syscall %d lr=0x%08X", tid, idx, lr)
         args = [
             mu.reg_read(reg_idx) for reg_idx in range(
                 UC_ARM_REG_R0,
@@ -45,13 +47,13 @@ class SyscallHandlers:
             handler = self._handlers[idx]
             args = args[:handler.arg_count]
             args_formatted = ", ".join(["0x%08X" % arg for arg in args])
-            logging.debug(
+            logger.debug(
                 "%d Executing syscall %s(%s) at 0x%08X" %
                 (tid, handler.name, args_formatted, mu.reg_read(UC_ARM_REG_PC)))
             try:
                 result = handler.callback(mu, *args)
             except BaseException:
-                logging.exception(
+                logger.exception(
                     "%d An error occured during in %x syscall hander, stopping emulation" %
                     (tid, idx))
                 mu.emu_stop()
@@ -64,7 +66,7 @@ class SyscallHandlers:
             error = "%d Unhandled syscall 0x%x (%u) at 0x%x, args(%s) stopping emulation" % (
                 tid, idx, idx, mu.reg_read(UC_ARM_REG_PC), args_formatted)
 
-            logging.exception(error)
+            logger.exception(error)
             mu.emu_stop()
             raise RuntimeError(error)
 
@@ -73,7 +75,7 @@ class SyscallHandlers:
         lr = mu.reg_read(UC_ARM64_REG_LR)
         tid = self._sch.get_current_tid()
 
-        logging.debug("%d syscall %d lr=0x%016X", tid, idx, lr)
+        logger.debug("%d syscall %d lr=0x%016X", tid, idx, lr)
         args = [
             mu.reg_read(reg_idx) for reg_idx in range(
                 UC_ARM64_REG_X0,
@@ -83,13 +85,13 @@ class SyscallHandlers:
             handler = self._handlers[idx]
             args = args[:handler.arg_count]
             args_formatted = ", ".join(["0x%016X" % arg for arg in args])
-            logging.debug(
+            logger.debug(
                 "%d Executing syscall %s(%s) at 0x%016X" %
                 (tid, handler.name, args_formatted, mu.reg_read(UC_ARM64_REG_PC)))
             try:
                 result = handler.callback(mu, *args)
             except BaseException:
-                logging.exception(
+                logger.exception(
                     "%d An error occured during in %x syscall hander, stopping emulation" %
                     (tid, idx))
                 mu.emu_stop()
@@ -102,6 +104,6 @@ class SyscallHandlers:
             error = "%d Unhandled syscall 0x%x (%u) at 0x%x, args(%s) stopping emulation" % (
                 tid, idx, idx, mu.reg_read(UC_ARM64_REG_PC), args_formatted)
 
-            logging.exception(error)
+            logger.exception(error)
             mu.emu_stop()
             raise RuntimeError(error)

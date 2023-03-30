@@ -1,4 +1,4 @@
-import logging
+import verboselogs
 
 from unicorn import UC_PROT_ALL, UC_PROT_WRITE, UC_PROT_READ
 
@@ -16,7 +16,7 @@ from androidemu.internal import elf_reader
 from androidemu.const import linux
 import os
 
-logger = logging.getLogger(__name__)
+logger = verboselogs.VerboseLogger(__name__)
 
 
 class Modules:

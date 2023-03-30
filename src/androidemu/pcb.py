@@ -1,12 +1,7 @@
-import logging
-import os
-import time
-import importlib
-import inspect
-import pkgutil
-from random import randint
-from androidemu.vfs.virtual_file import VirtualFile
 import sys
+import os
+
+from androidemu.vfs.virtual_file import VirtualFile
 
 # 模仿进程控制块信息
 # process all info get be get from here including fd etc

@@ -1,10 +1,12 @@
-import logging
+import verboselogs
 import posixpath
 import sys
 import unittest
 from androidemu.const import emu_const
 from androidemu.emulator import Emulator
 from androidemu.native_hook_utils import FuncHooker
+
+logger = verboselogs.VerboseLogger(__name__)
 
 
 class TestThread(unittest.TestCase):
@@ -18,7 +20,7 @@ class TestThread(unittest.TestCase):
 
     def _pthread_create32_before_hook(self, emu, *arg):
         start_routine = arg[2]
-        logging.warning(
+        logger.warning(
             "pthread_create call thread:[0x%08X] attr:[0x%08X] start_routine:[0x%08X] arg:[0x%08X]" %
             (arg[0], arg[1], start_routine, arg[3]))
         self._is32_before_call = True
@@ -26,7 +28,7 @@ class TestThread(unittest.TestCase):
         return False
 
     def _pthread_create32_after_hook(self, emu, r0, r1):
-        logging.warning("pthread_create return 0x%08X" % (r0,))
+        logger.warning("pthread_create return 0x%08X" % (r0,))
         self._is32_after_call = True
         self.assertEqual(r0, 0)
         return False
@@ -49,7 +51,7 @@ class TestThread(unittest.TestCase):
 
     def _pthread_create64_before_hook(self, emu, *arg):
         start_routine = arg[2]
-        logging.warning(
+        logger.warning(
             "pthread_create call thread:[0x%08X] attr:[0x%08X] start_routine:[0x%08X] arg:[0x%08X]" %
             (arg[0], arg[1], start_routine, arg[3]))
         self.assertTrue(start_routine != 0)
@@ -58,7 +60,7 @@ class TestThread(unittest.TestCase):
         return False
 
     def _pthread_create64_after_hook(self, emu, r0, r1):
-        logging.warning("pthread_create 64 return 0x%08X" % (r0,))
+        logger.warning("pthread_create 64 return 0x%08X" % (r0,))
         self._is64_after_call = True
         self.assertEqual(r0, 0)
         return False

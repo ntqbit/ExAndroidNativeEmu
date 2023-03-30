@@ -1,9 +1,9 @@
 import inspect
 import itertools
-import logging
+import verboselogs
 from androidemu.java.jvm_id_conter import *
 
-logger = logging.getLogger(__name__)
+logger = verboselogs.VerboseLogger(__name__)
 
 # Class函数实现基本原则：
 # 1.所有python函数(包括__init__)传入传出参数能用python基本类型表示的，一律用python类型表示，例如字符串用pystring，整数为用1

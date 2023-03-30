@@ -1,7 +1,9 @@
 from androidemu.java.java_class_def import JavaClassDef
 from androidemu.java.java_field_def import JavaFieldDef
 from androidemu.java.java_method_def import java_method_def, JavaMethodDef
-import logging
+import verboselogs
+
+logger = verboselogs.VerboseLogger(__name__)
 
 
 class AccessibleObject(metaclass=JavaClassDef,
@@ -15,7 +17,7 @@ class AccessibleObject(metaclass=JavaClassDef,
                      signature='(Z)V',
                      native=False)
     def setAccessible(self, emu, access):
-        logging.debug("AccessibleObject setAccessible call skip")
+        logger.debug("AccessibleObject setAccessible call skip")
 
 
 class Field(
@@ -34,7 +36,7 @@ class Field(
                      signature='(Ljava/lang/Object;)Ljava/lang/Object;',
                      native=False)
     def get(self, emu, obj):
-        logging.debug("Field.get(%r)" % obj)
+        logger.debug("Field.get(%r)" % obj)
 
         v = getattr(obj, self._fieldName)
         return v

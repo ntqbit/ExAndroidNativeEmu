@@ -1,4 +1,4 @@
-import logging
+import verboselogs
 import posixpath
 import sys
 import unittest
@@ -19,7 +19,8 @@ from androidemu.utils import misc_utils, debug_utils, memory_helpers
 from unicorn import UcError
 
 from androidemu.utils import debug_utils
-logger = logging.getLogger(__name__)
+
+logger = verboselogs.VerboseLogger(__name__)
 
 
 class TestClass(

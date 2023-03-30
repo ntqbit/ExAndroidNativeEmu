@@ -1,4 +1,4 @@
-import logging
+import verboselogs
 import os
 import sys
 from androidemu.hooker import Hooker
@@ -9,7 +9,7 @@ from androidemu.utils import memory_helpers, misc_utils
 from androidemu.java.jni_env import JNIEnv
 from unicorn import *
 
-logger = logging.getLogger(__name__)
+logger = verboselogs.VerboseLogger(__name__)
 
 
 class AssetManagerHooks:

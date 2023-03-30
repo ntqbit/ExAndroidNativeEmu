@@ -1,4 +1,4 @@
-import logging
+import verboselogs
 import os
 import sys
 import random
@@ -13,7 +13,7 @@ from androidemu.native.asset_mgr_hooks import AssetManagerHooks
 from androidemu.utils import debug_utils
 import sys
 
-logger = logging.getLogger(__name__)
+logger = verboselogs.VerboseLogger(__name__)
 
 
 class SymbolHooks:
@@ -189,7 +189,7 @@ class SymbolHooks:
 
     @native_method
     def pthread_create(self, uc, pthread_t_ptr, attr, start_routine, arg):
-        logging.warning(
+        logger.warning(
             "pthread_create called start_routine [0x%08X]" %
             (start_routine,))
         # pthread_t结构体实际上只是一个long
@@ -211,14 +211,14 @@ class SymbolHooks:
     @native_method
     def rand(self, uc):
         # 这个函数实现同random，但4.4的libc没有这个符号
-        logging.info("rand call")
+        logger.info("rand call")
         r = random.randint(0, 0xFFFFFFFF)
         return r
 
     @native_method
     def newlocale(self, uc):
         # 4.4的libc太旧没有这个函数，先这样绕过
-        logging.info("newlocale call return 0 skip")
+        logger.info("newlocale call return 0 skip")
         return 0
 
     def nop(self, name):

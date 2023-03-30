@@ -1,4 +1,4 @@
-import logging
+import verboselogs
 import os
 import time
 import importlib
@@ -17,6 +17,9 @@ from androidemu import config
 from androidemu import pcb
 from androidemu.const import emu_const
 from androidemu.utils import misc_utils
+
+
+logger = verboselogs.VerboseLogger(__name__)
 
 
 class Task:
@@ -147,18 +150,18 @@ class Scheduler:
             if len(block_set) > 0:
                 tid = block_set.pop()
                 self._blocking_set.remove(tid)
-                logging.debug(
+                logger.debug(
                     "%d futex_wake tid %d waiting in futex_ptr 0x%08X is unblocked" %
                     (cur_tid, tid, futex_ptr))
                 return True
             else:
-                logging.info(
+                logger.info(
                     "%d futex_wake unblock nobody waiting in futex ptr 0x%08X" %
                     (cur_tid, futex_ptr))
                 return False
 
         else:
-            logging.info(
+            logger.info(
                 "%d futex_wake unblock nobody waiting in futex ptr 0x%08X" %
                 (cur_tid, futex_ptr))
             return False
@@ -180,7 +183,7 @@ class Scheduler:
     # yield the task.
 
     def yield_task(self):
-        logging.debug("tid %d yield" % self._cur_tid)
+        logger.debug("tid %d yield" % self._cur_tid)
         self._emu.mu.emu_stop()
 
     def exit_current_task(self):
@@ -210,7 +213,7 @@ class Scheduler:
                                 "only one task %d exists, but blocking infinity dead lock bug!!!!" % tid)
                         else:
                             # 优化，如果仅仅只有一个线程block，而且有timeout，直接sleep就行了，因为再继续运行都是没意义的循环
-                            logging.debug(
+                            logger.debug(
                                 "only on task %d block with timeout %d ms do sleep" %
                                 (tid, task.blocking_timeout))
                             time.sleep(task.blocking_timeout / 1000)
@@ -222,12 +225,12 @@ class Scheduler:
                             now = int(time.time() * 1000)
                             if now - task.halt_ts < task.blocking_timeout:
                                 # 仍然未睡够，继续睡
-                                logging.debug(
+                                logger.debug(
                                     "%d is blocking skip scheduling ts has block %d ms timeout %d ms" %
                                     (tid, now - task.halt_ts, task.blocking_timeout))
                                 continue
                             else:
-                                logging.debug(
+                                logger.debug(
                                     "%d is wait up for timeout" %
                                     (tid, ))
                                 task.blocking_timeout = -1
@@ -235,12 +238,12 @@ class Scheduler:
                                 # 睡够了，不跳过循环 继续执行调度
                         else:
                             # 无限期block，直接跳过调度
-                            logging.debug(
+                            logger.debug(
                                 "%d is blocking skip scheduling" %
                                 (tid,))
                             continue
 
-                logging.debug("%d scheduling enter " % tid)
+                logger.debug("%d scheduling enter " % tid)
 
                 self._cur_tid = tid
                 # run
@@ -282,10 +285,10 @@ class Scheduler:
                 # 运行结束，任务标记成可删除
                 if self._get_pc() == self._stop_pos or task.is_exit:
                     self._tid_2_remove.add(self._cur_tid)
-                    logging.debug("%d scheduling exit" % tid)
+                    logger.debug("%d scheduling exit" % tid)
 
                 else:
-                    logging.debug("%d scheduling paused" % tid)
+                    logger.debug("%d scheduling paused" % tid)
 
             # 在调度里面清掉退出的线程
             for tid in self._tid_2_remove:
@@ -303,7 +306,7 @@ class Scheduler:
 
             if self._pid not in self._tasks_map:
                 # 主线程退出，退出调度循环
-                logging.debug(
+                logger.debug(
                     "main_thead tid [%d] exit exec return" %
                     self._pid)
                 if clear_task_when_return:

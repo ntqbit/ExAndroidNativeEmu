@@ -1,4 +1,4 @@
-import logging
+import verboselogs
 
 from androidemu.java.classes.executable import Executable
 from androidemu.java.java_class_def import JavaClassDef
@@ -6,7 +6,7 @@ from androidemu.java.java_field_def import JavaFieldDef
 from androidemu.java.java_method_def import java_method_def, JavaMethodDef
 from androidemu.java.constant_values import *
 
-logger = logging.getLogger(__name__)
+logger = verboselogs.VerboseLogger(__name__)
 
 
 class Method(metaclass=JavaClassDef,
