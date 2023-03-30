@@ -375,7 +375,7 @@ class Emulator:
             # 映射常用的文件，cpu一些原子操作的函数实现地方
             path = "%s/system/lib/vectors" % vfs_root
             vf = VirtualFile(
-                "[vectors]", misc_utils.my_open(
+                "[vectors]", misc_utils.platform_open(
                     path, os.O_RDONLY), path)
             self.memory.map(
                 0xffff0000,
@@ -389,7 +389,7 @@ class Emulator:
             sz = os.path.getsize(path)
             vf = VirtualFile(
                 "/system/bin/app_process32",
-                misc_utils.my_open(
+                misc_utils.platform_open(
                     path,
                     os.O_RDONLY),
                 path)
@@ -401,7 +401,7 @@ class Emulator:
             sz = os.path.getsize(path)
             vf = VirtualFile(
                 "/system/bin/app_process64",
-                misc_utils.my_open(
+                misc_utils.platform_open(
                     path,
                     os.O_RDONLY),
                 path)

@@ -295,7 +295,7 @@ class VirtualFileSystem:
             if oflag & 0o010000000:
                 flags |= os.O_PATH
 
-            fd = misc_utils.my_open(file_path, flags)
+            fd = misc_utils.platform_open(file_path, flags)
             self._pcb.add_fd(filename, file_path, fd)
             logging.info(
                 "open [%s][0x%x] return fd %d" %

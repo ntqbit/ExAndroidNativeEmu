@@ -54,7 +54,7 @@ def get_segment_protection(prot_in):
     return prot
 
 
-def my_open(fd, flag):
+def platform_open(fd, flag):
     global g_isWin
     if g_isWin:
         flag = flag | os.O_BINARY

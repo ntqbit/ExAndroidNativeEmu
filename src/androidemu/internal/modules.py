@@ -309,7 +309,7 @@ class Modules:
 
         vf = VirtualFile(
             misc_utils.system_path_to_vfs_path(
-                self._vfs_root, filename), misc_utils.my_open(
+                self._vfs_root, filename), misc_utils.platform_open(
                 filename, os.O_RDONLY), filename)
         for segment in load_segments:
             p_flags = segment["p_flags"]
