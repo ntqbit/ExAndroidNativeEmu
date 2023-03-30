@@ -20,7 +20,6 @@ logger = verboselogs.VerboseLogger(__name__)
 
 
 class Modules:
-
     def _tls_init(self):
         sp_helpers = StackHelper(self.emu)
 

@@ -2,7 +2,6 @@ from androidemu.java.jni_ref import *
 
 
 class ReferenceTable:
-
     """
     :type _table dict[int, jobject|None]
     """

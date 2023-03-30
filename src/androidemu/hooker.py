@@ -10,7 +10,6 @@ logger = verboselogs.VerboseLogger(__name__)
 
 # Utility class to create a bridge between ARM and Python.
 class Hooker:
-
     """
     :type emu androidemu.emulator.Emulator
     """

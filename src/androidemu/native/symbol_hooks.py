@@ -17,7 +17,6 @@ logger = verboselogs.VerboseLogger(__name__)
 
 
 class SymbolHooks:
-
     def __init__(self, emu, modules, hooker, vfs_root):
         self._emu = emu
         self._modules = modules

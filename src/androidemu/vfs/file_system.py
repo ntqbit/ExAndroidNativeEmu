@@ -69,7 +69,6 @@ nonvoluntary_ctxt_switches:     11520
 
 
 class VirtualFileSystem:
-
     def _translate_path(self, filename):
         return misc_utils.vfs_path_to_system_path(self._root_path, filename)
 

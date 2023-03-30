@@ -4,7 +4,6 @@ logger = verboselogs.VerboseLogger(__name__)
 
 
 class Module:
-
     """
     :type filename str
     :type base int

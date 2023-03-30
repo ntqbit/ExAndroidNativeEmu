@@ -12,7 +12,6 @@ logger = verboselogs.VerboseLogger(__name__)
 
 
 class InterruptHandler:
-
     """
     :type mu Uc
     """

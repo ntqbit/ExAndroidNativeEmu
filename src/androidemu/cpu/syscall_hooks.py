@@ -31,7 +31,6 @@ logger = verboselogs.VerboseLogger(__name__)
 
 
 class SyscallHooks:
-
     # system call table
     # https://chromium.googlesource.com/chromiumos/docs/+/master/constants/syscalls.md#arm-32_bit_EABI
     """

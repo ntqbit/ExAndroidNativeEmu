@@ -16,7 +16,6 @@ logger = verboselogs.VerboseLogger(__name__)
 
 
 class SyscallHandlers:
-
     """
     :type interrupt_handler InterruptHandler
     """

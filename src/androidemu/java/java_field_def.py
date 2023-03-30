@@ -2,7 +2,6 @@ from androidemu.java.jvm_id_counter import *
 
 
 class JavaFieldDef:
-
     def __init__(
             self,
             name,

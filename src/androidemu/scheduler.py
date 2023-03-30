@@ -40,7 +40,6 @@ class Task:
 
 
 class Scheduler:
-
     def __init__(self, emu):
         self._emu = emu
         self._mu = self._emu.mu

@@ -8,7 +8,6 @@ from androidemu.java.constant_values import JAVA_NULL
 
 
 class JavaMethodDef:
-
     def __init__(
             self,
             func_name,

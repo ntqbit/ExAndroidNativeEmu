@@ -12,7 +12,6 @@ logger = verboselogs.VerboseLogger(__name__)
 # https://docs.oracle.com/javase/7/docs/technotes/guides/jni/spec/invocation.html
 # This class attempts to mimic the JNIInvokeInterface table.
 class JavaVM:
-
     """
     :type class_loader JavaClassLoader
     :type hooker Hooker
