@@ -53,7 +53,7 @@ import androidemu.java.classes.file
 import androidemu.java.classes.object
 import androidemu.java.classes.executable
 import androidemu.java.classes.types
-import androidemu.java.classes.share_preference
+import androidemu.java.classes.shared_preferences
 import androidemu.java.classes.dexfile
 import androidemu.java.classes.context
 import androidemu.java.classes.network_interface
@@ -162,8 +162,8 @@ class Emulator:
             androidemu.java.classes.types.Integer,
             androidemu.java.classes.types.Long,
             androidemu.java.classes.types.Float,
-            androidemu.java.classes.share_preference.Editor,
-            androidemu.java.classes.share_preference.SharedPreferences,
+            androidemu.java.classes.shared_preferences.Editor,
+            androidemu.java.classes.shared_preferences.SharedPreferences,
             androidemu.java.classes.dexfile.DexFile,
             androidemu.java.classes.context.Context,
             androidemu.java.classes.context.ContextImpl,

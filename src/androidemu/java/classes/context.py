@@ -3,7 +3,7 @@ from androidemu.java.classes.file import File
 from androidemu.java.classes.string import String
 from androidemu.java.classes.contentresolver import ContentResolver
 from androidemu.java.classes.wifi import TelephonyManager, WifiManager, ConnectivityManager
-from androidemu.java.classes.share_preference import *
+from androidemu.java.classes.shared_preferences import *
 from androidemu.java.classes.asset_manager import *
 from androidemu.java.classes.package_manager import *
 from androidemu.java.java_class_def import JavaClassDef
