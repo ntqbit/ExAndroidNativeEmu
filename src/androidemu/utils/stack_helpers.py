@@ -47,4 +47,3 @@ class StackHelper():
 
     def get_sp():
         return self._sp
-

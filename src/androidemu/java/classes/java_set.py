@@ -48,4 +48,3 @@ class Set(metaclass=JavaClassDef, jvm_name='java/util/Set'):
     @java_method_def(name='size', signature='()I', native=False)
     def size(self, emu):
         return len(self._pyset)
-

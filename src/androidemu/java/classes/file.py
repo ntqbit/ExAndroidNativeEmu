@@ -22,4 +22,3 @@ class File(metaclass=JavaClassDef, jvm_name='java/io/File'):
     def getAbsolutePath(self, emu):
         # FIXME return abspath...
         return String(self._path)
-

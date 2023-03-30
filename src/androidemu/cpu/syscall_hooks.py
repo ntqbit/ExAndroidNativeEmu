@@ -590,7 +590,8 @@ class SyscallHooks:
             sch = self._emu.get_schduler()
             # 父线程调用clone，返回子线程tid
             tls_ptr = 0
-            if flags & (CLONE_SETTLS | CLONE_CHILD_SETTID | CLONE_CHILD_CLEARTID) != 0:
+            if flags & (CLONE_SETTLS | CLONE_CHILD_SETTID |
+                        CLONE_CHILD_CLEARTID) != 0:
                 tls_ptr = new_tls
             tid = sch.add_sub_task(child_stack, tls_ptr)
             logging.debug(
@@ -824,7 +825,7 @@ class SyscallHooks:
                 # Seconds passed since clock_start was set.
                 clock_add = time.time() - self._clock_start
 
-                mu.mem_write(tp_ptr + 0, int(self._clock_start +
+                mu.mem_write(tp_ptr + 0, int(self._clock_start + \
                              clock_add).to_bytes(self._ptr_sz, byteorder='little'))
                 mu.mem_write(
                     tp_ptr + self._ptr_sz,

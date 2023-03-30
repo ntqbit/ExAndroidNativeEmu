@@ -58,7 +58,7 @@ class MemoryMap:
                         next_loop = False
                         for r in regions:
                             if (self._is_overlap(prefer_start,
-                                                  prefer_start + size, r[0], r[1] + 1)):
+                                                 prefer_start + size, r[0], r[1] + 1)):
                                 prefer_start = r[1] + 1
                                 next_loop = True
                                 break

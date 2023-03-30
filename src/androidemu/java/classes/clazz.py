@@ -141,4 +141,3 @@ class Class(metaclass=JavaClassDef, jvm_name='java/lang/Class'):
 
     def __repr__(self):
         return "Class(%s)" % self._descriptor_represent
-

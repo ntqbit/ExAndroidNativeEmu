@@ -310,4 +310,3 @@ class Scheduler:
                     # clear all unfinished task
                     self._tasks_map.clear()
                 return
-

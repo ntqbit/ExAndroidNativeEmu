@@ -45,7 +45,8 @@ class JNIEnv:
         else:
             raise NotImplementedError("unsupport arch %d" % arch)
 
-        (self.address_ptr, self.address) = hooker.write_function_table(self._get_jni_hooking_table())
+        (self.address_ptr, self.address) = hooker.write_function_table(
+            self._get_jni_hooking_table())
 
     def _get_jni_hooking_table(self):
         JNI_CALLBACKS = {
@@ -277,8 +278,7 @@ class JNIEnv:
             "NewDirectByteBuffer": self.new_direct_byte_buffer,
             "GetDirectBufferAddress": self.get_direct_buffer_address,
             "GetDirectBufferCapacity": self.get_direct_buffer_capacity,
-            "GetObjectRefType": self.get_object_ref_type
-        }
+            "GetObjectRefType": self.get_object_ref_type}
 
         def map_var_type(var, var_type):
             if var_type == 'JNIEnv*':
@@ -286,12 +286,14 @@ class JNIEnv:
 
             if var_type == 'jclass':
                 return f'ref<{var},{repr(self.get_reference(var))}>'
-            
+
             if var_type == 'jstring':
-                return '\'' + self.get_reference(var).value.get_py_string() + '\''
+                return '\'' + \
+                    self.get_reference(var).value.get_py_string() + '\''
 
             if var_type in 'char*':
-                return '\'' + memory_helpers.read_utf8(self._emu.mu, var) + '\''
+                return '\'' + \
+                    memory_helpers.read_utf8(self._emu.mu, var) + '\''
 
             return var
 
@@ -301,7 +303,8 @@ class JNIEnv:
                 for arg, func_arg in zip(args, func_args)
             ]
 
-            args_filtered_none = filter(lambda x: x[1] is not None, mapped_to_text)
+            args_filtered_none = filter(
+                lambda x: x[1] is not None, mapped_to_text)
 
             args_with_names = [
                 f"{name}:{mapped_text}"

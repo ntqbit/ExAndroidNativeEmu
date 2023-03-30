@@ -132,6 +132,7 @@ class ELFReader:
 # define ELF_ST_BIND(x)	((x) >> 4)
 # define ELF_ST_TYPE(x)	(((unsigned int) x) & 0xf)
 
+
     @staticmethod
     def __elf_st_bind(x):
         return x >> 4
@@ -652,7 +653,7 @@ class ELFReader:
         # plt_rel_count
         mu.mem_write(info_base + 204,
                      int(self._pltrel_count).to_bytes(4,
-                                                       byteorder='little'))
+                                                      byteorder='little'))
 
         # rel
         mu.mem_write(info_base + 208, int(load_base +
@@ -660,7 +661,7 @@ class ELFReader:
         # rel_count
         mu.mem_write(info_base + 212,
                      int(self._rel_count).to_bytes(4,
-                                                    byteorder='little'))
+                                                   byteorder='little'))
 
         # preinit_array
         mu.mem_write(info_base + 216, int(0).to_bytes(4, byteorder='little'))
@@ -810,7 +811,7 @@ class ELFReader:
         # plt_rela_count
         mu.mem_write(info_base + off,
                      int(self._pltrel_count).to_bytes(8,
-                                                       byteorder='little'))
+                                                      byteorder='little'))
         off += 8
 
         # rela
@@ -821,7 +822,7 @@ class ELFReader:
         # rela_count
         mu.mem_write(info_base + off,
                      int(self._rel_count).to_bytes(8,
-                                                    byteorder='little'))
+                                                   byteorder='little'))
         off += 8
 
         # preinit_array
