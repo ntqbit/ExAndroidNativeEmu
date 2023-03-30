@@ -102,36 +102,36 @@ class ContextImpl(
     def __init__(self, pyPkgName):
         Context.__init__(self)
 
-        self.__pkgName = String(pyPkgName)
-        self.__pkg_mgr = PackageManager(pyPkgName)
-        self.__resolver = ContentResolver()
-        self.__asset_mgr = None
-        self.__sp_map = {}
+        self._pkgName = String(pyPkgName)
+        self._pkg_mgr = PackageManager(pyPkgName)
+        self._resolver = ContentResolver()
+        self._asset_mgr = None
+        self._sp_map = {}
 
     @java_method_def(name='getPackageManager',
                      signature='()Landroid/content/pm/PackageManager;',
                      native=False)
     def getPackageManager(self, emu):
-        return self.__pkg_mgr
+        return self._pkg_mgr
 
     @java_method_def(name='getAssets',
                      signature='()Landroid/content/res/AssetManager;',
                      native=False)
     def getAssets(self, emu):
-        if (not self.__asset_mgr):
+        if (not self._asset_mgr):
             # 调用getAssets才初始化assert_manager
             # 因为不是每个so模拟执行都需要打开apk
-            pyapk_path = self.__pkg_mgr.getPackageInfo(
-                emu, self.__pkgName, 0).applicationInfo.sourceDir.get_py_string()
-            self.__asset_mgr = AssetManager(emu, pyapk_path)
+            pyapk_path = self._pkg_mgr.getPackageInfo(
+                emu, self._pkgName, 0).applicationInfo.sourceDir.get_py_string()
+            self._asset_mgr = AssetManager(emu, pyapk_path)
 
-        return self.__asset_mgr
+        return self._asset_mgr
 
     @java_method_def(name='getContentResolver',
                      signature='()Landroid/content/ContentResolver;',
                      native=False)
     def getContentResolver(self, emu):
-        return self.__resolver
+        return self._resolver
 
     @java_method_def(name='getSystemService',
                      args_list=["jstring"],
@@ -155,15 +155,15 @@ class ContextImpl(
                      signature='()Landroid/content/pm/ApplicationInfo;',
                      native=False)
     def getApplicationInfo(self, emu):
-        pkgMgr = self.__pkg_mgr
-        pkgInfo = pkgMgr.getPackageInfo(emu, self.__pkgName, 0)
+        pkgMgr = self._pkg_mgr
+        pkgInfo = pkgMgr.getPackageInfo(emu, self._pkgName, 0)
         return pkgInfo.applicationInfo
 
     @java_method_def(name='getPackageName',
                      signature='()Ljava/lang/String;',
                      native=False)
     def getPackageName(self, emu):
-        return self.__pkgName
+        return self._pkgName
 
     @java_method_def(name='checkSelfPermission',
                      signature='(Ljava/lang/String;)I', native=False)
@@ -198,13 +198,13 @@ class ContextImpl(
     def getSharedPreferences(self, emu, name, mode):
         pkgName = emu.config.get("pkg_name")
         pyName = name.get_py_string()
-        if (pyName in self.__sp_map):
-            return self.__sp_map[pyName]
+        if (pyName in self._sp_map):
+            return self._sp_map[pyName]
 
         else:
             path = "/data/data/%s/shared_prefs/%s.xml" % (pkgName, pyName)
             sp = SharedPreferences(emu, path)
-            self.__sp_map[pyName] = sp
+            self._sp_map[pyName] = sp
             return sp
 
 
@@ -216,68 +216,68 @@ class ContextWrapper(
 
     def __init__(self):
         Context.__init__(self)
-        self.__impl = None
+        self._impl = None
 
     def attachBaseContext(self, ctx_impl):
-        self.__impl = ctx_impl
+        self._impl = ctx_impl
 
     @java_method_def(name='getPackageManager',
                      signature='()Landroid/content/pm/PackageManager;',
                      native=False)
     def getPackageManager(self, emu):
-        return self.__impl.getPackageManager(emu)
+        return self._impl.getPackageManager(emu)
 
     @java_method_def(name='getAssets',
                      signature='()Landroid/content/res/AssetManager;',
                      native=False)
     def getAssets(self, emu):
-        return self.__impl.getAssets(emu)
+        return self._impl.getAssets(emu)
 
     @java_method_def(name='getContentResolver',
                      signature='()Landroid/content/ContentResolver;',
                      native=False)
     def getContentResolver(self, emu):
-        return self.__impl.getContentResolver(emu)
+        return self._impl.getContentResolver(emu)
 
     @java_method_def(name='getSystemService',
                      args_list=["jstring"],
                      signature='(Ljava/lang/String;)Ljava/lang/Object;',
                      native=False)
     def getSystemService(self, emu, s1):
-        return self.__impl.getSystemService(emu, s1)
+        return self._impl.getSystemService(emu, s1)
 
     @java_method_def(name='getApplicationInfo',
                      signature='()Landroid/content/pm/ApplicationInfo;',
                      native=False)
     def getApplicationInfo(self, emu):
-        return self.__impl.getApplicationInfo(emu)
+        return self._impl.getApplicationInfo(emu)
 
     @java_method_def(name='getPackageName',
                      signature='()Ljava/lang/String;',
                      native=False)
     def getPackageName(self, emu):
-        return self.__impl.getPackageName(emu)
+        return self._impl.getPackageName(emu)
 
     @java_method_def(name='checkSelfPermission',
                      signature='(Ljava/lang/String;)I', native=False)
     def checkSelfPermission(self, emu):
-        return self.__impl.checkSelfPermission(emu)
+        return self._impl.checkSelfPermission(emu)
 
     @java_method_def(name='checkCallingOrSelfPermission',
                      signature='(Ljava/lang/String;)I', native=False)
     def checkCallingOrSelfPermission(self, emu):
-        return self.__impl.checkCallingOrSelfPermission(emu)
+        return self._impl.checkCallingOrSelfPermission(emu)
 
     @java_method_def(name='getPackageCodePath',
                      signature='()Ljava/lang/String;', native=False)
     def getPackageCodePath(self, emu):
-        return self.__impl.getPackageCodePath(emu)
+        return self._impl.getPackageCodePath(emu)
 
     @java_method_def(name='getFilesDir',
                      signature='()Ljava/io/File;',
                      native=False)
     def getFilesDir(self, emu):
-        return self.__impl.getFilesDir(emu)
+        return self._impl.getFilesDir(emu)
 
     @java_method_def(name='getSharedPreferences',
                      args_list=["jstring",
@@ -285,4 +285,4 @@ class ContextWrapper(
                      signature='(Ljava/lang/String;I)Landroid/content/SharedPreferences;',
                      native=False)
     def getSharedPreferences(self, emu, name, mode):
-        return self.__impl.getSharedPreferences(emu, name, mode)
+        return self._impl.getSharedPreferences(emu, name, mode)

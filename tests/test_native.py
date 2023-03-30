@@ -69,7 +69,7 @@ class TestNative(unittest.TestCase):
             res).value.get_py_string()
         self.assertEqual(pystr, "Hello")
 
-    def __test_tls_common(self, emulator, libcm):
+    def _test_tls_common(self, emulator, libcm):
         env_key_ptr = emulator.call_symbol(libcm, "malloc", 100)
         memory_helpers.write_utf8(emulator.mu, env_key_ptr, "ANDROID_ROOT")
         env_ptr = emulator.call_symbol(libcm, "getenv", env_key_ptr)
@@ -96,7 +96,7 @@ class TestNative(unittest.TestCase):
             )
             # 测试getenv，pthread_getspecific等涉及tls_init的代码是否正常
             libcm = emulator.load_library("vfs/system/lib/libc.so")
-            self.__test_tls_common(emulator, libcm)
+            self._test_tls_common(emulator, libcm)
         except UcError as e:
             print("Exit at 0x%08X" % emulator.mu.reg_read(UC_ARM_REG_PC))
             emulator.memory.dump_maps(sys.stdout)
@@ -110,7 +110,7 @@ class TestNative(unittest.TestCase):
             )
             # 测试getenv，pthread_getspecific等涉及tls_init的代码是否正常
             libcm = emulator.load_library("vfs/system/lib64/libc.so")
-            self.__test_tls_common(emulator, libcm)
+            self._test_tls_common(emulator, libcm)
         except UcError as e:
             print("Exit at 0x%08X" % emulator.mu.reg_read(UC_ARM64_REG_PC))
             emulator.memory.dump_maps(sys.stdout)

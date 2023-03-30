@@ -21,13 +21,13 @@ class SyscallHandlers:
 
     def __init__(self, mu, schduler, arch):
         self._handlers = dict()
-        self.__sch = schduler
-        self.__interrupt_handler = InterruptHandler(mu)
+        self._sch = schduler
+        self._interrupt_handler = InterruptHandler(mu)
         if (arch == emu_const.ARCH_ARM32):
-            self.__interrupt_handler.set_handler(2, self._handle_syscall)
+            self._interrupt_handler.set_handler(2, self._handle_syscall)
         else:
             # arm64
-            self.__interrupt_handler.set_handler(2, self._handle_syscall64)
+            self._interrupt_handler.set_handler(2, self._handle_syscall64)
 
     def set_handler(self, idx, name, arg_count, callback):
         self._handlers[idx] = SyscallHandler(idx, name, arg_count, callback)
@@ -35,7 +35,7 @@ class SyscallHandlers:
     def _handle_syscall(self, mu):
         idx = mu.reg_read(UC_ARM_REG_R7)
         lr = mu.reg_read(UC_ARM_REG_LR)
-        tid = self.__sch.get_current_tid()
+        tid = self._sch.get_current_tid()
         logging.debug("%d syscall %d lr=0x%08X", tid, idx, lr)
         args = [
             mu.reg_read(reg_idx) for reg_idx in range(
@@ -71,7 +71,7 @@ class SyscallHandlers:
     def _handle_syscall64(self, mu):
         idx = mu.reg_read(UC_ARM64_REG_X8)
         lr = mu.reg_read(UC_ARM64_REG_LR)
-        tid = self.__sch.get_current_tid()
+        tid = self._sch.get_current_tid()
 
         logging.debug("%d syscall %d lr=0x%016X", tid, idx, lr)
         args = [

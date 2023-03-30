@@ -28,7 +28,7 @@ class JavaVM:
         })
 
         self.jni_env = JNIEnv(emu, class_loader, hooker)
-        self.__emu = emu
+        self._emu = emu
 
     @native_method
     def destroy_java_vm(self, mu):
@@ -42,7 +42,7 @@ class JavaVM:
         mu.mem_write(
             env_ptr,
             self.jni_env.address_ptr.to_bytes(
-                self.__emu.get_ptr_size(),
+                self._emu.get_ptr_size(),
                 byteorder='little'))
         return JNI_OK
 
@@ -60,7 +60,7 @@ class JavaVM:
         mu.mem_write(
             env_ptr,
             self.jni_env.address_ptr.to_bytes(
-                self.__emu.get_ptr_size(),
+                self._emu.get_ptr_size(),
                 byteorder='little'))
         return JNI_OK
 
@@ -72,6 +72,6 @@ class JavaVM:
         mu.mem_write(
             env_ptr,
             self.jni_env.address_ptr.to_bytes(
-                self.__emu.get_ptr_size(),
+                self._emu.get_ptr_size(),
                 byteorder='little'))
         return JNI_OK

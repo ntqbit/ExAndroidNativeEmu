@@ -6,13 +6,13 @@ from androidemu.java.java_method_def import java_method_def, JavaMethodDef
 class Uri(metaclass=JavaClassDef, jvm_name="android/net/Uri"):
 
     def __init__(self, pystr):
-        self.__uri = pystr
+        self._uri = pystr
 
     def get_py_string(self):
-        return self.__uri
+        return self._uri
 
     def __repr__(self):
-        return "Uri(%s)" % self.__uri
+        return "Uri(%s)" % self._uri
 
     @staticmethod
     @java_method_def(name='parse',

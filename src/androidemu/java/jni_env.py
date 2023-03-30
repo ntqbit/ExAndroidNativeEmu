@@ -37,11 +37,11 @@ class JNIEnv:
         self._globals = ReferenceTable(start=4096, max_entries=512000)
         arch = emu.get_arch()
         if (arch == emu_const.ARCH_ARM32):
-            self.__read_args = self.__read_args32
-            self.__read_args_v = self.__read_args_v32
+            self._read_args = self._read_args32
+            self._read_args_v = self._read_args_v32
         elif (arch == emu_const.ARCH_ARM64):
-            self.__read_args = self.__read_args64
-            self.__read_args_v = self.__read_args_v64
+            self._read_args = self._read_args64
+            self._read_args_v = self._read_args_v64
         else:
             raise NotImplementedError("unsupport arch %d" % arch)
 
@@ -389,7 +389,7 @@ class JNIEnv:
 
     # args is a tuple or list
 
-    def __read_args32(self, mu, args, args_type_list):
+    def _read_args32(self, mu, args, args_type_list):
         # 在这里处理八个字节参数问题，
         # 1.第一个参数为jlong jdouble 直接跳过列表第一个成员，因为第一个成员刚好是call_xxx的第三个参数，根据调用约定，如果这个参数是8个字节，则直接跳过R3寄存器使用栈
         # 2.jlong或者jdouble需要两个arg成一个参数，对应用层透明
@@ -441,7 +441,7 @@ class JNIEnv:
 
         return result
 
-    def __read_args64(self, mu, args, args_type_list):
+    def _read_args64(self, mu, args, args_type_list):
         # 64w位情况简单得多，因为寄存器的大小为8字节，因此jlong，jdouble直接一个寄存器能装下，直接读即可
         if args_type_list is None:
             return []
@@ -479,7 +479,7 @@ class JNIEnv:
 
         return result
 
-    def __read_args_v32(self, mu, args_ptr, args_type_list):
+    def _read_args_v32(self, mu, args_ptr, args_type_list):
         result = []
         if args_type_list is None:
             return result
@@ -518,7 +518,7 @@ class JNIEnv:
 
         return result
 
-    def __read_args_v64(self, mu, args_ptr, args_type_list):
+    def _read_args_v64(self, mu, args_ptr, args_type_list):
         result = []
         if args_type_list is None:
             return result
@@ -560,13 +560,13 @@ class JNIEnv:
 
     # arg_type = 0 tuple or list, 1 arg_v, 2 array
 
-    def __read_args_common(self, mu, args, args_type_list, arg_type):
+    def _read_args_common(self, mu, args, args_type_list, arg_type):
         if (arg_type == 0):
             args_items = args
-            return self.__read_args(mu, args_items, args_type_list)
+            return self._read_args(mu, args_items, args_type_list)
         elif (arg_type == 1):
             args_ptr = args
-            return self.__read_args_v(mu, args_ptr, args_type_list)
+            return self._read_args_v(mu, args_ptr, args_type_list)
         else:
             raise RuntimeError("arg_type %d not support" % arg_type)
 
@@ -818,7 +818,7 @@ class JNIEnv:
     def alloc_object(self, mu, env):
         raise NotImplementedError()
 
-    def __new_object(self, mu, env, clazz_idx, method_id, args, args_type):
+    def _new_object(self, mu, env, clazz_idx, method_id, args, args_type):
         # Get class reference.
         jclazz = self.get_reference(clazz_idx)
         if not isinstance(jclazz, jclass):
@@ -842,7 +842,7 @@ class JNIEnv:
             (pyclazz.jvm_name, method.name, args))
 
         # Parse arguments.
-        constructor_args = self.__read_args_common(
+        constructor_args = self._read_args_common(
             mu, args, method.args_list, args_type)
 
         # Execute function.
@@ -862,11 +862,11 @@ class JNIEnv:
             arg2,
             arg3,
             arg4):
-        return self.__new_object(
+        return self._new_object(
             mu, env, clazz_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
     def new_object_v(self, mu, env, clazz_idx, method_id, args_v):
-        return self.__new_object(mu, env, clazz_idx, method_id, args_v, 1)
+        return self._new_object(mu, env, clazz_idx, method_id, args_v, 1)
 
     def new_object_a(self, mu, env):
         raise NotImplementedError()
@@ -942,7 +942,7 @@ class JNIEnv:
             (clazz_idx, name, sig, method.jvm_id))
         return method.jvm_id
 
-    def __call_xxx_method(
+    def _call_xxx_method(
             self,
             mu,
             env,
@@ -970,7 +970,7 @@ class JNIEnv:
             method.signature, args))
 
         # Parse arguments.
-        constructor_args = self.__read_args_common(
+        constructor_args = self._read_args_common(
             mu, args, method.args_list, args_type)
 
         sig = method.signature
@@ -997,11 +997,11 @@ class JNIEnv:
             arg2,
             arg3,
             arg4):
-        return self.__call_xxx_method(
+        return self._call_xxx_method(
             mu, env, obj_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
     def call_object_method_v(self, mu, env, obj_idx, method_id, args):
-        return self.__call_xxx_method(mu, env, obj_idx, method_id, args, 1)
+        return self._call_xxx_method(mu, env, obj_idx, method_id, args, 1)
 
     def call_object_method_a(self, mu, env):
         raise NotImplementedError()
@@ -1016,11 +1016,11 @@ class JNIEnv:
             arg2,
             arg3,
             arg4):
-        return self.__call_xxx_method(
+        return self._call_xxx_method(
             mu, env, obj_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
     def call_boolean_method_v(self, mu, env, obj_idx, method_id, args):
-        return self.__call_xxx_method(mu, env, obj_idx, method_id, args, 1)
+        return self._call_xxx_method(mu, env, obj_idx, method_id, args, 1)
 
     def call_boolean_method_a(self, mu, env):
         raise NotImplementedError()
@@ -1035,11 +1035,11 @@ class JNIEnv:
             arg2,
             arg3,
             arg4):
-        return self.__call_xxx_method(
+        return self._call_xxx_method(
             mu, env, obj_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
     def call_byte_method_v(self, mu, env, obj_idx, method_id, args):
-        return self.__call_xxx_method(mu, env, obj_idx, method_id, args, 1)
+        return self._call_xxx_method(mu, env, obj_idx, method_id, args, 1)
 
     def call_byte_method_a(self, mu, env):
         raise NotImplementedError()
@@ -1054,11 +1054,11 @@ class JNIEnv:
             arg2,
             arg3,
             arg4):
-        return self.__call_xxx_method(
+        return self._call_xxx_method(
             mu, env, obj_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
     def call_char_method_v(self, mu, env, obj_idx, method_id, args):
-        return self.__call_xxx_method(mu, env, obj_idx, method_id, args, 1)
+        return self._call_xxx_method(mu, env, obj_idx, method_id, args, 1)
 
     def call_char_method_a(self, mu, env):
         raise NotImplementedError()
@@ -1073,11 +1073,11 @@ class JNIEnv:
             arg2,
             arg3,
             arg4):
-        return self.__call_xxx_method(
+        return self._call_xxx_method(
             mu, env, obj_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
     def call_short_method_v(self, mu, env, obj_idx, method_id, args):
-        return self.__call_xxx_method(mu, env, obj_idx, method_id, args, 1)
+        return self._call_xxx_method(mu, env, obj_idx, method_id, args, 1)
 
     def call_short_method_a(self, mu, env):
         raise NotImplementedError()
@@ -1093,11 +1093,11 @@ class JNIEnv:
             arg2,
             arg3,
             arg4):
-        return self.__call_xxx_method(
+        return self._call_xxx_method(
             mu, env, obj_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
     def call_int_method_v(self, mu, env, obj_idx, method_id, args):
-        return self.__call_xxx_method(mu, env, obj_idx, method_id, args, 1)
+        return self._call_xxx_method(mu, env, obj_idx, method_id, args, 1)
 
     def call_int_method_a(self, mu, env):
         raise NotImplementedError()
@@ -1112,11 +1112,11 @@ class JNIEnv:
             arg2,
             arg3,
             arg4):
-        return self.__call_xxx_method(
+        return self._call_xxx_method(
             mu, env, obj_idx, method_id, (arg1, arg2, arg3, arg4), 0, True)
 
     def call_long_method_v(self, mu, env, obj_idx, method_id, args):
-        return self.__call_xxx_method(
+        return self._call_xxx_method(
             mu, env, obj_idx, method_id, args, 1, True)
 
     def call_long_method_a(self, mu, env):
@@ -1132,11 +1132,11 @@ class JNIEnv:
             arg2,
             arg3,
             arg4):
-        return self.__call_xxx_method(
+        return self._call_xxx_method(
             mu, env, obj_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
     def call_float_method_v(self, mu, env, obj_idx, method_id, args):
-        return self.__call_xxx_method(mu, env, obj_idx, method_id, args, 1)
+        return self._call_xxx_method(mu, env, obj_idx, method_id, args, 1)
 
     def call_float_method_a(self, mu, env):
         raise NotImplementedError()
@@ -1152,12 +1152,12 @@ class JNIEnv:
             arg3,
             arg4):
         raise NotImplementedError()
-        # return self.__call_xxx_method(mu, env, obj_idx, method_id, (arg1,
+        # return self._call_xxx_method(mu, env, obj_idx, method_id, (arg1,
         # arg2, arg3, arg4), 0)
 
     def call_double_method_v(self, mu, env, obj_idx, method_id, args):
         raise NotImplementedError()
-        # return self.__call_xxx_method(mu, env, obj_idx, method_id, args, 1)
+        # return self._call_xxx_method(mu, env, obj_idx, method_id, args, 1)
 
     def call_double_method_a(self, mu, env):
         raise NotImplementedError()
@@ -1172,14 +1172,14 @@ class JNIEnv:
             arg2,
             arg3,
             arg4):
-        self.__call_xxx_method(
+        self._call_xxx_method(
             mu, env, obj_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
     def call_void_method_a(self, mu, env):
         raise NotImplementedError()
 
     def call_void_method_v(self, mu, env, obj_idx, method_id, args):
-        self.__call_xxx_method(mu, env, obj_idx, method_id, args, 1)
+        self._call_xxx_method(mu, env, obj_idx, method_id, args, 1)
 
     def call_nonvirtual_object_method(self, mu, env):
         raise NotImplementedError()
@@ -1302,7 +1302,7 @@ class JNIEnv:
 
         return field.jvm_id
 
-    def __get_xxx_field(self, mu, env, obj_idx, field_id, is_wide=False):
+    def _get_xxx_field(self, mu, env, obj_idx, field_id, is_wide=False):
         obj = self.get_reference(obj_idx)
 
         if not isinstance(obj, jobject):
@@ -1328,33 +1328,33 @@ class JNIEnv:
             return (rlow, rhigh)
 
     def get_object_field(self, mu, env, obj_idx, field_id):
-        return self.__get_xxx_field(mu, env, obj_idx, field_id)
+        return self._get_xxx_field(mu, env, obj_idx, field_id)
 
     def get_boolean_field(self, mu, env, obj_idx, field_id):
-        return self.__get_xxx_field(mu, env, obj_idx, field_id)
+        return self._get_xxx_field(mu, env, obj_idx, field_id)
 
     def get_byte_field(self, mu, env, obj_idx, field_id):
-        return self.__get_xxx_field(mu, env, obj_idx, field_id)
+        return self._get_xxx_field(mu, env, obj_idx, field_id)
 
     def get_char_field(self, mu, env, obj_idx, field_id):
-        return self.__get_xxx_field(mu, env, obj_idx, field_id)
+        return self._get_xxx_field(mu, env, obj_idx, field_id)
 
     def get_short_field(self, mu, env, obj_idx, field_id):
-        return self.__get_xxx_field(mu, env, obj_idx, field_id)
+        return self._get_xxx_field(mu, env, obj_idx, field_id)
 
     def get_int_field(self, mu, env, obj_idx, field_id):
-        return self.__get_xxx_field(mu, env, obj_idx, field_id)
+        return self._get_xxx_field(mu, env, obj_idx, field_id)
 
     def get_long_field(self, mu, env, obj_idx, field_id):
-        return self.__get_xxx_field(mu, env, obj_idx, field_id, True)
+        return self._get_xxx_field(mu, env, obj_idx, field_id, True)
 
     def get_float_field(self, mu, env, obj_idx, field_id):
-        return self.__get_xxx_field(mu, env, obj_idx, field_id)
+        return self._get_xxx_field(mu, env, obj_idx, field_id)
 
     def get_double_field(self, mu, env, obj_idx, field_id):
         raise NotImplementedError()
 
-    def __set_xxx_field(
+    def _set_xxx_field(
             self,
             mu,
             env,
@@ -1392,31 +1392,31 @@ class JNIEnv:
         setattr(pyobj, field.name, v)
 
     def set_object_field(self, mu, env, obj_idx, field_id, value):
-        self.__set_xxx_field(mu, env, obj_idx, field_id, value, True)
+        self._set_xxx_field(mu, env, obj_idx, field_id, value, True)
 
     def set_boolean_field(self, mu, env, obj_idx, field_id, value):
-        self.__set_xxx_field(mu, env, obj_idx, field_id, value)
+        self._set_xxx_field(mu, env, obj_idx, field_id, value)
 
     def set_byte_field(self, mu, env, obj_idx, field_id, value):
-        self.__set_xxx_field(mu, env, obj_idx, field_id, value)
+        self._set_xxx_field(mu, env, obj_idx, field_id, value)
 
     def set_char_field(self, mu, env, obj_idx, field_id, value):
-        self.__set_xxx_field(mu, env, obj_idx, field_id, value)
+        self._set_xxx_field(mu, env, obj_idx, field_id, value)
 
     def set_short_field(self, mu, env, obj_idx, field_id, value):
-        self.__set_xxx_field(mu, env, obj_idx, field_id, value)
+        self._set_xxx_field(mu, env, obj_idx, field_id, value)
 
     def set_int_field(self, mu, env, obj_idx, field_id, value):
-        self.__set_xxx_field(mu, env, obj_idx, field_id, value)
+        self._set_xxx_field(mu, env, obj_idx, field_id, value)
 
     def set_long_field(self, mu, env, obj_idx, field_id, value):
-        self.__set_xxx_field(mu, env, obj_idx, field_id, value)
+        self._set_xxx_field(mu, env, obj_idx, field_id, value)
 
     def set_float_field(self, mu, env, obj_idx, field_id, value):
-        self.__set_xxx_field(mu, env, obj_idx, field_id, value)
+        self._set_xxx_field(mu, env, obj_idx, field_id, value)
 
     def set_double_field(self, mu, env, obj_idx, field_id, value):
-        self.__set_xxx_field(mu, env, obj_idx, field_id, value)
+        self._set_xxx_field(mu, env, obj_idx, field_id, value)
 
     def get_static_method_id(self, mu, env, clazz_idx, name_ptr, sig_ptr):
         """
@@ -1452,7 +1452,7 @@ class JNIEnv:
 
         return method.jvm_id
 
-    def __call_static_xxx_method(
+    def _call_static_xxx_method(
             self,
             mu,
             env,
@@ -1483,7 +1483,7 @@ class JNIEnv:
             (pyclazz.jvm_name, method.name, method.signature, args))
 
         # Parse arguments.
-        constructor_args = self.__read_args_common(
+        constructor_args = self._read_args_common(
             mu, args, method.args_list, args_type)
 
         v = method.func(self._emu, *constructor_args)
@@ -1505,11 +1505,11 @@ class JNIEnv:
             arg2,
             arg3,
             arg4):
-        return self.__call_static_xxx_method(
+        return self._call_static_xxx_method(
             mu, env, clazz_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
     def call_static_object_method_v(self, mu, env, clazz_idx, method_id, args):
-        return self.__call_static_xxx_method(
+        return self._call_static_xxx_method(
             mu, env, clazz_idx, method_id, args, 1)
 
     def call_static_object_method_a(self, mu, env):
@@ -1525,12 +1525,12 @@ class JNIEnv:
             arg2,
             arg3,
             arg4):
-        return self.__call_static_xxx_method(
+        return self._call_static_xxx_method(
             mu, env, clazz_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
     def call_static_boolean_method_v(
             self, mu, env, clazz_idx, method_id, args):
-        return self.__call_static_xxx_method(
+        return self._call_static_xxx_method(
             mu, env, clazz_idx, method_id, args, 1)
 
     def call_static_boolean_method_a(self, mu, env):
@@ -1546,11 +1546,11 @@ class JNIEnv:
             arg2,
             arg3,
             arg4):
-        return self.__call_static_xxx_method(
+        return self._call_static_xxx_method(
             mu, env, clazz_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
     def call_static_byte_method_v(self, mu, env, clazz_idx, method_id, args):
-        return self.__call_static_xxx_method(
+        return self._call_static_xxx_method(
             mu, env, clazz_idx, method_id, args, 1)
 
     def call_static_byte_method_a(self, mu, env):
@@ -1566,11 +1566,11 @@ class JNIEnv:
             arg2,
             arg3,
             arg4):
-        return self.__call_static_xxx_method(
+        return self._call_static_xxx_method(
             mu, env, clazz_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
     def call_static_char_method_v(self, mu, env, clazz_idx, method_id, args):
-        return self.__call_static_xxx_method(
+        return self._call_static_xxx_method(
             mu, env, clazz_idx, method_id, args, 1)
 
     def call_static_char_method_a(self, mu, env):
@@ -1586,11 +1586,11 @@ class JNIEnv:
             arg2,
             arg3,
             arg4):
-        return self.__call_static_xxx_method(
+        return self._call_static_xxx_method(
             mu, env, clazz_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
     def call_static_short_method_v(self, mu, env, clazz_idx, method_id, args):
-        return self.__call_static_xxx_method(
+        return self._call_static_xxx_method(
             mu, env, clazz_idx, method_id, args, 1)
 
     def call_static_short_method_a(self, mu, env):
@@ -1606,11 +1606,11 @@ class JNIEnv:
             arg2,
             arg3,
             arg4):
-        return self.__call_static_xxx_method(
+        return self._call_static_xxx_method(
             mu, env, clazz_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
     def call_static_int_method_v(self, mu, env, clazz_idx, method_id, args):
-        return self.__call_static_xxx_method(
+        return self._call_static_xxx_method(
             mu, env, clazz_idx, method_id, args, 1)
 
     def call_static_int_method_a(self, mu, env):
@@ -1627,12 +1627,12 @@ class JNIEnv:
             arg3,
             arg4):
         #raise NotImplementedError()
-        return self.__call_static_xxx_method(
+        return self._call_static_xxx_method(
             mu, env, clazz_idx, method_id, (arg1, arg2, arg3, arg4), 0, True)
 
     def call_static_long_method_v(self, mu, env, clazz_idx, method_id, args):
         #raise NotImplementedError()
-        return self.__call_static_xxx_method(
+        return self._call_static_xxx_method(
             mu, env, clazz_idx, method_id, args, 1, True)
 
     def call_static_long_method_a(self, mu, env):
@@ -1648,11 +1648,11 @@ class JNIEnv:
             arg2,
             arg3,
             arg4):
-        return self.__call_static_xxx_method(
+        return self._call_static_xxx_method(
             mu, env, clazz_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
     def call_static_float_method_v(self, mu, env, clazz_idx, method_id, args):
-        return self.__call_static_xxx_method(
+        return self._call_static_xxx_method(
             mu, env, clazz_idx, method_id, args, 1)
 
     def call_static_float_method_a(self, mu, env):
@@ -1669,12 +1669,12 @@ class JNIEnv:
             arg3,
             arg4):
         raise NotImplementedError()
-        # return self.__call_static_xxx_method(mu, env, clazz_idx, method_id,
+        # return self._call_static_xxx_method(mu, env, clazz_idx, method_id,
         # (arg1, arg2, arg3, arg4), 0)
 
     def call_static_double_method_v(self, mu, env, clazz_idx, method_id, args):
         raise NotImplementedError()
-        # return self.__call_static_xxx_method(mu, env, clazz_idx, method_id,
+        # return self._call_static_xxx_method(mu, env, clazz_idx, method_id,
         # args, 1)
 
     def call_static_double_method_a(self, mu, env):
@@ -1690,11 +1690,11 @@ class JNIEnv:
             arg2,
             arg3,
             arg4):
-        self.__call_static_xxx_method(
+        self._call_static_xxx_method(
             mu, env, clazz_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
     def call_static_void_method_v(self, mu, env, clazz_idx, method_id, args):
-        self.__call_static_xxx_method(mu, env, clazz_idx, method_id, args, 1)
+        self._call_static_xxx_method(mu, env, clazz_idx, method_id, args, 1)
 
     def call_static_void_method_a(self, mu, env):
         raise NotImplementedError()
@@ -1731,7 +1731,7 @@ class JNIEnv:
 
         return field.jvm_id
 
-    def __get_static_xxx_field(
+    def _get_static_xxx_field(
             self,
             mu,
             env,
@@ -1762,31 +1762,31 @@ class JNIEnv:
             return (rlow, rhigh)
 
     def get_static_object_field(self, mu, env, clazz_idx, field_id):
-        return self.__get_static_xxx_field(mu, env, clazz_idx, field_id)
+        return self._get_static_xxx_field(mu, env, clazz_idx, field_id)
 
     def get_static_boolean_field(self, mu, env, clazz_idx, field_id):
-        return self.__get_static_xxx_field(mu, env, clazz_idx, field_id)
+        return self._get_static_xxx_field(mu, env, clazz_idx, field_id)
 
     def get_static_byte_field(self, mu, env, clazz_idx, field_id):
-        return self.__get_static_xxx_field(mu, env, clazz_idx, field_id)
+        return self._get_static_xxx_field(mu, env, clazz_idx, field_id)
 
     def get_static_char_field(self, mu, env, clazz_idx, field_id):
-        return self.__get_static_xxx_field(mu, env, clazz_idx, field_id)
+        return self._get_static_xxx_field(mu, env, clazz_idx, field_id)
 
     def get_static_short_field(self, mu, env, clazz_idx, field_id):
-        return self.__get_static_xxx_field(mu, env, clazz_idx, field_id)
+        return self._get_static_xxx_field(mu, env, clazz_idx, field_id)
 
     def get_static_int_field(self, mu, env, clazz_idx, field_id):
-        return self.__get_static_xxx_field(mu, env, clazz_idx, field_id)
+        return self._get_static_xxx_field(mu, env, clazz_idx, field_id)
 
     def get_static_long_field(self, mu, env, clazz_idx, field_id):
-        return self.__get_static_xxx_field(mu, env, clazz_idx, field_id, True)
+        return self._get_static_xxx_field(mu, env, clazz_idx, field_id, True)
 
     def get_static_float_field(self, mu, env):
-        return self.__get_static_xxx_field(mu, env, clazz_idx, field_id)
+        return self._get_static_xxx_field(mu, env, clazz_idx, field_id)
 
     def get_static_double_field(self, mu, env):
-        return self.__get_static_xxx_field(mu, env, clazz_idx, field_id, True)
+        return self._get_static_xxx_field(mu, env, clazz_idx, field_id, True)
 
     def set_static_object_field(self, mu, env):
         raise NotImplementedError()

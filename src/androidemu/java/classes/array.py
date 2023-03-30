@@ -6,19 +6,19 @@ from androidemu.java.java_method_def import java_method_def, JavaMethodDef
 class Array(metaclass=JavaClassDef, jvm_name='java/lang/reflect/Array'):
 
     def __init__(self, pyitems):
-        self.__pyitems = pyitems
+        self._pyitems = pyitems
 
     def get_py_items(self):
-        return self.__pyitems
+        return self._pyitems
 
     def __len__(self):
-        return len(self.__pyitems)
+        return len(self._pyitems)
 
     def __getitem__(self, index):
-        return self.__pyitems[index]
+        return self._pyitems[index]
 
     def __setitem__(self, index, value):
-        self.__pyitems[index] = value
+        self._pyitems[index] = value
 
     def __repr__(self):
         return "JavaArray(%r)" % self.get_py_items()

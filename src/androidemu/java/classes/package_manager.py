@@ -12,12 +12,12 @@ class Signature(
         jvm_name='android/content/pm/Signature'):
 
     def __init__(self, sign_hex):
-        self.__sign_hex = sign_hex
+        self._sign_hex = sign_hex
 
     @java_method_def(name='toByteArray', signature='()[B', native=False)
     def toByteArray(self, emu):
         #raise NotImplementedError()
-        bs = bytes.fromhex(self.__sign_hex)
+        bs = bytes.fromhex(self._sign_hex)
         #bs = b'abcd'
         return ByteArray(bytearray(bs))
 
@@ -25,7 +25,7 @@ class Signature(
                      signature='()Ljava/lang/String;',
                      native=False)
     def toCharsString(self, emu):
-        return String(self.__sign_hex)
+        return String(self._sign_hex)
 
 
 class ApplicationInfo(
@@ -107,7 +107,7 @@ class PackageManager(
     GET_SIGNATURES = 64
 
     def __init__(self, pyPkgName):
-        self.__pyPkgName = pyPkgName
+        self._pyPkgName = pyPkgName
 
     @java_method_def(name='getPackageInfo',
                      args_list=["jstring",
@@ -131,7 +131,7 @@ class PackageManager(
             version_code = 0
             logging.info("version_code not config default to 0")
 
-        pkg_info = PackageInfo(self.__pyPkgName, sign_hex, version_code)
+        pkg_info = PackageInfo(self._pyPkgName, sign_hex, version_code)
         return pkg_info
 
     @java_method_def(name='checkPermission',

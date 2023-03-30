@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 class Modules:
 
-    def __tls_init(self):
+    def _tls_init(self):
         sp_helpers = StackHelper(self.emu)
 
         pthread_internal_nptr = 0x400
@@ -152,7 +152,7 @@ class Modules:
         memory_helpers.write_ptrs_sz(
             mu, tls_ptr + ptr_sz, thread_internal_ptr, ptr_sz)
         # TLS_SLOT_ERRNO
-        self.__errno_ptr = tls_ptr + 2 * ptr_sz
+        self._errno_ptr = tls_ptr + 2 * ptr_sz
         # TLS_SLOT_BIONIC_PREINIT
         memory_helpers.write_ptrs_sz(
             mu, tls_ptr + 3 * ptr_sz, kernel_args_base, ptr_sz)
@@ -175,14 +175,14 @@ class Modules:
         self.modules = list()
         self.symbol_hooks = dict()
         self.counter_memory = config.BASE_ADDR
-        self.__vfs_root = vfs_root
+        self._vfs_root = vfs_root
         soinfo_area_sz = 0x40000
-        self.__soinfo_area_base = emu.memory.map(
+        self._soinfo_area_base = emu.memory.map(
             0, soinfo_area_sz, UC_PROT_WRITE | UC_PROT_READ)
-        self.__errno_ptr = 0
-        self.__tls_init()
+        self._errno_ptr = 0
+        self._tls_init()
 
-    def __get_ld_library_path(self):
+    def _get_ld_library_path(self):
         if (self.emu.get_arch() == emu_const.ARCH_ARM32):
             return ["/system/lib/"]
         else:
@@ -190,15 +190,15 @@ class Modules:
 
     def find_so_on_disk(self, so_path):
         if os.path.isabs(so_path):
-            path = misc_utils.vfs_path_to_system_path(self.__vfs_root, so_path)
+            path = misc_utils.vfs_path_to_system_path(self._vfs_root, so_path)
             return path
         else:
-            ld_library_path = self.__get_ld_library_path()
+            ld_library_path = self._get_ld_library_path()
             so_name = so_path
             for lib_path in ld_library_path:
                 lib_full_path = "%s/%s" % (lib_path, so_name)
                 vfs_lib_path = misc_utils.vfs_path_to_system_path(
-                    self.__vfs_root, lib_full_path)
+                    self._vfs_root, lib_full_path)
                 if (os.path.exists(vfs_lib_path)):
                     return vfs_lib_path
 
@@ -309,7 +309,7 @@ class Modules:
 
         vf = VirtualFile(
             misc_utils.system_path_to_vfs_path(
-                self.__vfs_root, filename), misc_utils.my_open(
+                self._vfs_root, filename), misc_utils.my_open(
                 filename, os.O_RDONLY), filename)
         for segment in load_segments:
             p_flags = segment["p_flags"]
@@ -359,13 +359,13 @@ class Modules:
         init_addr = reader.get_init()
 
         so_needed = reader.get_so_need()
-        ld_library_path = self.__get_ld_library_path()
+        ld_library_path = self._get_ld_library_path()
         for so_name in so_needed:
             path = self.find_so_on_disk(so_name)
             if (path is None):
                 logger.warning(
                     "%s needed by %s do not exist in vfs %s" %
-                    (so_name, filename, self.__vfs_root))
+                    (so_name, filename, self._vfs_root))
                 continue
 
             libmod = self.load_module(path)
@@ -520,7 +520,7 @@ class Modules:
             self.emu.mu,
             load_base,
             load_bias,
-            self.__soinfo_area_base)
+            self._soinfo_area_base)
 
         # Store information about loaded module.
         module = Module(
@@ -530,10 +530,10 @@ class Modules:
             bound_low,
             symbols_resolved,
             init_array,
-            self.__soinfo_area_base)
+            self._soinfo_area_base)
         self.modules.append(module)
 
-        self.__soinfo_area_base += write_sz
+        self._soinfo_area_base += write_sz
         if do_init:
             '''
             for r in self.emu.mu.mem_regions():

@@ -35,23 +35,23 @@ class SharedPreferences(metaclass=JavaClassDef,
     def __init__(self, emu, path):
         vfs_root = emu.get_vfs_root()
         real_path = misc_utils.vfs_path_to_system_path(vfs_root, path)
-        self.__xml_tree = xml.dom.minidom.parse(real_path)
-        self.__editor = Editor()
-        self.__string_values = {}
-        root = self.__xml_tree.documentElement
+        self._xml_tree = xml.dom.minidom.parse(real_path)
+        self._editor = Editor()
+        self._string_values = {}
+        root = self._xml_tree.documentElement
         string_node = root.getElementsByTagName("string")
 
         for node in string_node:
             if (node.hasAttribute("name")):
                 k = node.getAttribute("name")
                 v = str(node.childNodes[0].data)
-                self.__string_values[k] = String(v)
+                self._string_values[k] = String(v)
 
     @java_method_def(name='edit',
                      signature='()Landroid/content/SharedPreferences$Editor;',
                      native=False)
     def edit(self, emu):
-        return self.__editor
+        return self._editor
 
     @java_method_def(name='getString',
                      args_list=["jstring",
@@ -60,8 +60,8 @@ class SharedPreferences(metaclass=JavaClassDef,
                      native=False)
     def getString(self, emu, skey, sdefault):
         pyKey = skey.get_py_string()
-        if (pyKey in self.__string_values):
-            return self.__string_values[pyKey]
+        if (pyKey in self._string_values):
+            return self._string_values[pyKey]
 
         else:
             return sdefault

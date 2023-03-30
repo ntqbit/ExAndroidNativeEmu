@@ -29,13 +29,13 @@ class AccessibilityInteractionController(
 
 class Window(metaclass=JavaClassDef, jvm_name='android/view/Window'):
     def __init__(self):
-        self.__dec_view = View()
+        self._dec_view = View()
 
     @java_method_def(name='getDecorView',
                      signature='()Landroid/view/View;',
                      native=False)
     def getDecorView(self, emu):
-        return self.__dec_view
+        return self._dec_view
 
 
 class ViewRootImpl(
@@ -75,13 +75,13 @@ class View(metaclass=JavaClassDef, jvm_name='android/view/View',
 
 class Activity(metaclass=JavaClassDef, jvm_name='android/app/Activity'):
     def __init__(self):
-        self.__window = Window()
+        self._window = Window()
 
     @java_method_def(name='getWindow',
                      signature='()Landroid/view/Window;',
                      native=False)
     def getWindow(self, emu):
-        return self.__window
+        return self._window
 
     # 这应该是Context的方法
 
@@ -112,18 +112,18 @@ class ActivityClientRecord(
 
 class ArrayMap(metaclass=JavaClassDef, jvm_name='android/util/ArrayMap'):
     def __init__(self, arr):
-        self.__array = arr
+        self._array = arr
 
     @java_method_def(name='size', signature='()I', native=False)
     def size(self, emu):
-        return len(self.__array)
+        return len(self._array)
 
     @java_method_def(name='valueAt',
                      args_list=["jint"],
                      signature='(I)Ljava/lang/Object;',
                      native=False)
     def valueAt(self, emu, id):
-        return self.__array[id]
+        return self._array[id]
 
 
 class ActivityManager(metaclass=JavaClassDef,
@@ -207,9 +207,9 @@ class ActivityThread(metaclass=JavaClassDef, jvm_name='android/app/ActivityThrea
     s_am = {}
 
     def __init__(self, pyPkgName):
-        self.__ctx_impl = ContextImpl(pyPkgName)
+        self._ctx_impl = ContextImpl(pyPkgName)
         self.app = Application()
-        self.app.attachBaseContext(self.__ctx_impl)
+        self.app.attachBaseContext(self._ctx_impl)
         self.mActivities = ArrayMap([ActivityClientRecord()])
         self.mInstrumentation = Instrumentation()
         #self.mActivities = ArrayMap([])
@@ -236,4 +236,4 @@ class ActivityThread(metaclass=JavaClassDef, jvm_name='android/app/ActivityThrea
                      signature='()Landroid/app/ContextImpl;',
                      native=False)
     def getSystemContext(self, emu):
-        return self.__ctx_impl
+        return self._ctx_impl

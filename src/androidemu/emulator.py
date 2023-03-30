@@ -75,7 +75,7 @@ class Emulator:
     # https://github.com/unicorn-engine/unicorn/blob/8c6cbe3f3cabed57b23b721c29f937dd5baafc90/tests/regress/arm_fp_vfp_disabled.py#L15
     # 关于arm32 64 fp https://www.raspberrypi.org/forums/viewtopic.php?t=259802
     # https://www.cnblogs.com/pengdonglin137/p/3727583.html
-    def __enable_vfp32(self):
+    def _enable_vfp32(self):
         # MRC p15, #0, r1, c1, c0, #2
         # ORR r1, r1, #(0xf << 20)
         # MCR p15, #0, r1, c1, c0, #2
@@ -114,14 +114,14 @@ class Emulator:
     msr    cpacr_el1, x0
     '''
 
-    def __enable_vfp64(self):
+    def _enable_vfp64(self):
         # arm64 enable vfp
         x = 0
         x = self.mu.reg_read(UC_ARM64_REG_CPACR_EL1)
         x |= 0x300000  # set FPEN bit
         self.mu.reg_write(UC_ARM64_REG_CPACR_EL1, x)
 
-    def __add_classes(self):
+    def _add_classes(self):
         defualt_classes = [
             androidemu.java.classes.application.Application,
             androidemu.java.classes.debug.Debug,
@@ -227,38 +227,38 @@ class Emulator:
         # 由于这里的stream只能改一次，为避免与fork之后的子进程写到stdout混合，将这些log写到stderr
         # FIXME:解除这种特殊的依赖
         self.config = config.Config(config_path)
-        self.__arch = arch
-        self.__support_muti_task = muti_task
-        self.__pcb = pcb.Pcb()
+        self._arch = arch
+        self._support_muti_task = muti_task
+        self._pcb = pcb.Pcb()
 
-        logging.info("process pid:%d" % self.__pcb.get_pid())
+        logging.info("process pid:%d" % self._pcb.get_pid())
 
         sp_reg = 0
         if arch == emu_const.ARCH_ARM32:
-            self.__ptr_sz = 4
+            self._ptr_sz = 4
             self.mu = Uc(UC_ARCH_ARM, UC_MODE_ARM)
             if vfp_inst_set:
-                self.__enable_vfp32()
+                self._enable_vfp32()
 
             sp_reg = UC_ARM_REG_SP
-            self.call_native = self.__call_native32
-            self.call_native_return_2reg = self.__call_native_return_2reg32
+            self.call_native = self._call_native32
+            self.call_native_return_2reg = self._call_native_return_2reg32
 
         elif arch == emu_const.ARCH_ARM64:
-            self.__ptr_sz = 8
+            self._ptr_sz = 8
             self.mu = Uc(UC_ARCH_ARM64, UC_MODE_ARM)
             if vfp_inst_set:
-                self.__enable_vfp64()
+                self._enable_vfp64()
 
             sp_reg = UC_ARM64_REG_SP
 
-            self.call_native = self.__call_native64
-            self.call_native_return_2reg = self.__call_native_return_2reg64
+            self.call_native = self._call_native64
+            self.call_native_return_2reg = self._call_native_return_2reg64
 
         else:
             raise RuntimeError("emulator arch=%d not support!!!" % arch)
 
-        self.__vfs_root = vfs_root
+        self._vfs_root = vfs_root
 
         # 注意，原有缺陷，原来linker初始化没有完成init_tls部分，导致libc初始化有访问空指针而无法正常完成
         # 而这里直接将0映射空间，,强行运行过去，因为R1刚好为0,否则会报memory unmap异常
@@ -326,44 +326,44 @@ class Emulator:
         #sp = self.mu.reg_read(sp_reg)
         #print ("stack addr %x"%sp)
 
-        self.__sch = Scheduler(self)
+        self._sch = Scheduler(self)
         # CPU
-        self.__syscall_handler = SyscallHandlers(
-            self.mu, self.__sch, self.get_arch())
+        self._syscall_handler = SyscallHandlers(
+            self.mu, self._sch, self.get_arch())
 
         # Hooker
         self.memory.map(
             config.BRIDGE_MEMORY_BASE,
             config.BRIDGE_MEMORY_SIZE,
             UC_PROT_READ | UC_PROT_WRITE | UC_PROT_EXEC)
-        self.__hooker = Hooker(
+        self._hooker = Hooker(
             self,
             config.BRIDGE_MEMORY_BASE,
             config.BRIDGE_MEMORY_SIZE)
 
         # syscalls
-        self.__mem_handler = MemorySyscallHandler(
-            self, self.memory, self.__syscall_handler)
-        self.__syscall_hooks = SyscallHooks(
-            self, self.config, self.__syscall_handler)
-        self.__vfs = VirtualFileSystem(
+        self._mem_handler = MemorySyscallHandler(
+            self, self.memory, self._syscall_handler)
+        self._syscall_hooks = SyscallHooks(
+            self, self.config, self._syscall_handler)
+        self._vfs = VirtualFileSystem(
             self,
             vfs_root,
             self.config,
-            self.__syscall_handler,
+            self._syscall_handler,
             self.memory)
 
         # JavaVM
         self.java_classloader = JavaClassLoader()
-        self.java_vm = JavaVM(self, self.java_classloader, self.__hooker)
+        self.java_vm = JavaVM(self, self.java_classloader, self._hooker)
 
         # linker
-        self.modules = Modules(self, self.__vfs_root)
+        self.modules = Modules(self, self._vfs_root)
         # Native
-        self.__sym_hooks = SymbolHooks(
-            self, self.modules, self.__hooker, self.__vfs_root)
+        self._sym_hooks = SymbolHooks(
+            self, self.modules, self._hooker, self._vfs_root)
 
-        self.__add_classes()
+        self._add_classes()
 
         # Hack 为jmethod_id指向的内存分配一块空间，抖音会将jmethodID强转，为的是绕过去
         self.memory.map(
@@ -408,7 +408,7 @@ class Emulator:
             self.memory.map(0xab006000, sz, UC_PROT_EXEC | UC_PROT_READ, vf, 0)
 
     def get_vfs_root(self):
-        return self.__vfs_root
+        return self._vfs_root
 
     def load_library(self, filename, do_init=True):
         libmod = self.modules.load_module(filename, True)
@@ -425,26 +425,26 @@ class Emulator:
 
         return self.call_native(symbol_addr, *argv)
 
-    def __call_native32(self, addr, *argv):
+    def _call_native32(self, addr, *argv):
         assert addr is not None, "call addr is None, make sure your jni native function has registered by RegisterNative!"
         native_write_args(self, *argv)
-        self.__sch.exec(addr)
+        self._sch.exec(addr)
         # Read result from locals if jni.
         res = self.mu.reg_read(UC_ARM_REG_R0)
         return res
 
-    def __call_native64(self, addr, *argv):
+    def _call_native64(self, addr, *argv):
         assert addr is not None, "call addr is None, make sure your jni native function has registered by RegisterNative!"
         native_write_args(self, *argv)
-        self.__sch.exec(addr)
+        self._sch.exec(addr)
         # Read result from locals if jni.
         res = self.mu.reg_read(UC_ARM64_REG_X0)
         return res
 
     # 返回值8个字节,用两个寄存器保存
 
-    def __call_native_return_2reg32(self, addr, *argv):
-        res = self.__call_native32(addr, *argv)
+    def _call_native_return_2reg32(self, addr, *argv):
+        res = self._call_native32(addr, *argv)
 
         res_high = self.mu.reg_read(UC_ARM_REG_R1)
 
@@ -452,24 +452,24 @@ class Emulator:
 
     # 返回值16个字节,用两个寄存器保存
 
-    def __call_native_return_2reg64(self, addr, *argv):
-        res = self.__call_native64(addr, *argv)
+    def _call_native_return_2reg64(self, addr, *argv):
+        res = self._call_native64(addr, *argv)
 
         res_high = self.mu.reg_read(UC_ARM64_REG_X1)
 
         return (res_high << 64) | res
 
     def get_arch(self):
-        return self.__arch
+        return self._arch
 
     def get_ptr_size(self):
-        return self.__ptr_sz
+        return self._ptr_sz
 
     def get_pcb(self):
-        return self.__pcb
+        return self._pcb
 
     def get_schduler(self):
-        return self.__sch
+        return self._sch
 
     def get_muti_task_support(self):
-        return self.__support_muti_task
+        return self._support_muti_task

@@ -135,12 +135,12 @@ class Headers(metaclass=JavaClassDef, jvm_name='okhttp3/Headers'):
 
 class Request(metaclass=JavaClassDef, jvm_name='okhttp3/Request'):
     def __init__(self, url_path, headers):
-        self.__url_object = HttpUrl(url_path)
-        self.__headers_object = Headers(headers)
+        self._url_object = HttpUrl(url_path)
+        self._headers_object = Headers(headers)
 
     @java_method_def(name='url', signature='()Lokhttp3/HttpUrl;', native=False)
     def url(self, emu):
-        return self.__url_object
+        return self._url_object
 
     @java_method_def(name='body',
                      signature='()Lokhttp3/RequestBody;',
@@ -152,7 +152,7 @@ class Request(metaclass=JavaClassDef, jvm_name='okhttp3/Request'):
                      signature='()Lokhttp3/Headers;',
                      native=False)
     def headers(self, emu):
-        return self.__headers_object
+        return self._headers_object
 
     @java_method_def(name='newBuilder',
                      signature='()Lokhttp3/Request$Builder;',
@@ -189,23 +189,23 @@ class Response(metaclass=JavaClassDef, jvm_name='okhttp3/Response'):
 
 class Chain(metaclass=JavaClassDef, jvm_name='okhttp3/Interceptor$Chain'):
     def __init__(self, req):
-        self.__req = req
-        self.__req_after_proceed = None
+        self._req = req
+        self._req_after_proceed = None
 
     @java_method_def(name='request',
                      signature='()Lokhttp3/Request;',
                      native=False)
     def request(self, emu):
-        return self.__req
+        return self._req
 
     @java_method_def(name='proceed',
                      args_list=["jobject"],
                      signature='(Lokhttp3/Request;)Lokhttp3/Response;',
                      native=False)
     def proceed(self, emu, req):
-        self.__req_after_proceed = req
+        self._req_after_proceed = req
         # FIXME 暂时不知道这个Resonse返回的含义,暂时返回空Response应该没什么问题
         return Response()
 
     def get_proceed_request():
-        return self.__req_after_proceed
+        return self._req_after_proceed

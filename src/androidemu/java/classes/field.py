@@ -26,7 +26,7 @@ class Field(
 
     def __init__(self, pydeclaringClass: JavaClassDef, fieldName: str):
         super().__init__()
-        self.__fieldName = fieldName
+        self._fieldName = fieldName
         self.declaringClass = pydeclaringClass
 
     @java_method_def(name='get',
@@ -36,5 +36,5 @@ class Field(
     def get(self, emu, obj):
         logging.debug("Field.get(%r)" % obj)
 
-        v = getattr(obj, self.__fieldName)
+        v = getattr(obj, self._fieldName)
         return v

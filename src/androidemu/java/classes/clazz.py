@@ -15,8 +15,8 @@ class Class(metaclass=JavaClassDef, jvm_name='java/lang/Class'):
 
     def __init__(self, pyclazz, class_loader):
         self.class_loader = class_loader
-        self.__pyclazz = pyclazz
-        self.__descriptor_represent = pyclazz.jvm_name
+        self._pyclazz = pyclazz
+        self._descriptor_represent = pyclazz.jvm_name
 
     @java_method_def(name='getClassLoader',
                      signature='()Ljava/lang/ClassLoader;',
@@ -54,7 +54,7 @@ class Class(metaclass=JavaClassDef, jvm_name='java/lang/Class'):
                      signature='()Ljava/lang/String;',
                      native=False)
     def getName(self, emu):
-        name = self.__descriptor_represent
+        name = self._descriptor_represent
         assert name is not None
 
         name = name.replace("/", ".")
@@ -88,10 +88,10 @@ class Class(metaclass=JavaClassDef, jvm_name='java/lang/Class'):
         return String(name)
 
     def get_jni_descriptor(self):
-        return self.__descriptor_represent
+        return self._descriptor_represent
 
     def get_py_clazz(self):
-        return self.__pyclazz
+        return self._pyclazz
 
     @java_method_def(name='getDeclaredField',
                      args_list=["jstring"],
@@ -99,7 +99,7 @@ class Class(metaclass=JavaClassDef, jvm_name='java/lang/Class'):
                      native=False)
     def getDeclaredField(self, emu, name):
         logger.debug("getDeclaredField %s" % name)
-        reflected_field = Field(self.__pyclazz, name.get_py_string())
+        reflected_field = Field(self._pyclazz, name.get_py_string())
         return reflected_field
 
     @java_method_def(
@@ -129,15 +129,16 @@ class Class(metaclass=JavaClassDef, jvm_name='java/lang/Class'):
 
         signature_no_ret = sbuf.getvalue()
         pyname = name.get_py_string()
-        pymethod = self.__pyclazz.find_method_sig_with_no_ret(
+        pymethod = self._pyclazz.find_method_sig_with_no_ret(
             pyname, signature_no_ret)
         if (pymethod is None):
             assert False, "getDeclaredMethod not found..."
             return JAVA_NULL
 
-        reflected_method = Method(self.__pyclazz, pymethod)
+        reflected_method = Method(self._pyclazz, pymethod)
         logger.debug("getDeclaredMethod return %r" % reflected_method)
         return reflected_method
 
     def __repr__(self):
-        return "Class(%s)" % self.__descriptor_represent
+        return "Class(%s)" % self._descriptor_represent
+

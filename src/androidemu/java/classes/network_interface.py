@@ -10,7 +10,7 @@ class NetworkInterface(
         metaclass=JavaClassDef,
         jvm_name='java/net/NetworkInterface'):
     def __init__(self, pyname):
-        self.__name = pyname
+        self._name = pyname
 
     @staticmethod
     @java_method_def(name='getByName',

@@ -21,8 +21,8 @@ class SymbolHooks:
     def __init__(self, emu, modules, hooker, vfs_root):
         self._emu = emu
         self._modules = modules
-        self.__vfs_root = vfs_root
-        self.__thread_id = 32145
+        self._vfs_root = vfs_root
+        self._thread_id = 32145
 
         modules.add_symbol_hook(
             '__system_property_get',
@@ -195,9 +195,9 @@ class SymbolHooks:
         # pthread_t结构体实际上只是一个long
         uc.mem_write(
             pthread_t_ptr, int(
-                self.__thread_id).to_bytes(
+                self._thread_id).to_bytes(
                 self._emu.get_ptr_size(), byteorder='little'))
-        self.__thread_id = self.__thread_id + 1
+        self._thread_id = self._thread_id + 1
         return 0
 
     @native_method

@@ -14,11 +14,11 @@ class MemorySyscallHandler:
     """
 
     def __init__(self, emu, memory, syscall_handler):
-        self.__emu = emu
-        self.__pcb = emu.get_pcb()
+        self._emu = emu
+        self._pcb = emu.get_pcb()
         self._memory = memory
         self._syscall_handler = syscall_handler
-        if (self.__emu.get_arch() == emu_const.ARCH_ARM32):
+        if (self._emu.get_arch() == emu_const.ARCH_ARM32):
             self._syscall_handler.set_handler(0x2d, "brk", 1, self._handle_brk)
             self._syscall_handler.set_handler(
                 0x5B, "munmap", 2, self._handle_munmap)
@@ -71,11 +71,11 @@ class MemorySyscallHandler:
                 raise NotImplementedError(
                     "Unsupported read operation for file descriptor %d." % fd)
 
-            if not self.__pcb.has_fd(fd):
+            if not self._pcb.has_fd(fd):
                 # TODO: Return valid error.
                 raise NotImplementedError()
 
-            vf = self.__pcb.get_fd_detail(fd)
+            vf = self._pcb.get_fd_detail(fd)
             # mmap2 系统调用最后一个参数与mmap不同,注意阅读下面一句话!
             '''
             The mmap2() system call provides the same interface as mmap(2),
@@ -115,11 +115,11 @@ class MemorySyscallHandler:
                 raise NotImplementedError(
                     "Unsupported read operation for file descriptor %d." % fd)
 
-            if not self.__pcb.has_fd(fd):
+            if not self._pcb.has_fd(fd):
                 # TODO: Return valid error.
                 raise NotImplementedError()
 
-            vf = self.__pcb.get_fd_detail(fd)
+            vf = self._pcb.get_fd_detail(fd)
             res = self._memory.map(addr, length, prot, vf, offset)
 
         else:

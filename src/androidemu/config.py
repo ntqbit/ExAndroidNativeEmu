@@ -28,9 +28,9 @@ class Config:
     def __init__(self, cfg_path):
         with open(cfg_path, "r") as f:
             js = f.read()
-            self.__configs = json.loads(js)
+            self._configs = json.loads(js)
 
     def get(self, key, def_val=None):
-        if (key in self.__configs):
-            return self.__configs[key]
+        if (key in self._configs):
+            return self._configs[key]
         return def_val

@@ -92,19 +92,19 @@ class WifiManager(
         metaclass=JavaClassDef,
         jvm_name='android/net/wifi/WifiManager'):
     def __init__(self):
-        self.__list = List([])
-        self.__dhcpInfo = DhcpInfo()
+        self._list = List([])
+        self._dhcpInfo = DhcpInfo()
 
     @java_method_def(name='getConfiguredNetworks',
                      signature='()Ljava/util/List;', native=False)
     def getConfiguredNetworks(self, emu):
-        return self.__list
+        return self._list
 
     @java_method_def(name='getDhcpInfo',
                      signature='()Landroid/net/DhcpInfo;',
                      native=False)
     def getDhcpInfo(self, emu):
-        return self.__dhcpInfo
+        return self._dhcpInfo
 
     @java_method_def(name='getDeviceId',
                      signature='()Ljava/lang/String;',

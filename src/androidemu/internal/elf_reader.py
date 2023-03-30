@@ -113,19 +113,19 @@ class ELFReader:
     } Elf64_Rela;
     '''
     @staticmethod
-    def __elf32_r_sym(x):
+    def _elf32_r_sym(x):
         return x >> 8
 
     @staticmethod
-    def __elf32_r_type(x):
+    def _elf32_r_type(x):
         return x & 0xff
 
     @staticmethod
-    def __elf64_r_sym(x):
+    def _elf64_r_sym(x):
         return x >> 32
 
     @staticmethod
-    def __elf64_r_type(x):
+    def _elf64_r_type(x):
         return x & 0xffffffff
 
 
@@ -147,11 +147,11 @@ class ELFReader:
             buf = f.read(1)
             return buf[0] == 1
 
-    def __st_name_to_name(self, st_name):
-        assert st_name < self.__dyn_str_sz, "__st_name_to_name st_name %d out of range %d" % (
-            st_name, self.__dyn_str_sz)
-        endId = self.__dyn_str_buf.find(b"\x00", st_name)
-        r = self.__dyn_str_buf[st_name:endId]
+    def _st_name_to_name(self, st_name):
+        assert st_name < self._dyn_str_sz, "__st_name_to_name st_name %d out of range %d" % (
+            st_name, self._dyn_str_sz)
+        endId = self._dyn_str_buf.find(b"\x00", st_name)
+        r = self._dyn_str_buf[st_name:endId]
         name = r.decode("utf-8")
         return name
 
@@ -159,9 +159,9 @@ class ELFReader:
 
         with open(filename, 'rb') as f:
             is_elf32 = ELFReader.check_elf32(filename)
-            self.__is_elf32 = is_elf32
-            elf_r_sym = ELFReader.__elf32_r_sym
-            elf_r_type = ELFReader.__elf32_r_type
+            self._is_elf32 = is_elf32
+            elf_r_sym = ELFReader._elf32_r_sym
+            elf_r_type = ELFReader._elf32_r_type
 
             ehdr_sz = 52
             phdr_sz = 32
@@ -182,41 +182,41 @@ class ELFReader:
                 elf_sym_sz = 24
                 # 实际上是rela
                 elf_rel_sz = 24
-                elf_r_sym = ELFReader.__elf64_r_sym
-                elf_r_type = ELFReader.__elf64_r_type
+                elf_r_sym = ELFReader._elf64_r_sym
+                elf_r_type = ELFReader._elf64_r_type
                 edhr_pattern = "<16sHHIQQQIHHHHHH"
                 phdr_pattern = "<IIQQQQQQ"
                 dyn_pattern = "<QQ"
                 sym_pattern = "<IccHQQ"
                 rel_pattern = "<QQq"
 
-            self.__filename = filename
-            self.__init_array_addr = 0
-            self.__init_array_size = 0
-            self.__init_addr = 0
-            self.__nbucket = 0
-            self.__nchain = 0
-            self.__bucket_addr = 0
-            self.__chain_addr = 0
+            self._filename = filename
+            self._init_array_addr = 0
+            self._init_array_size = 0
+            self._init_addr = 0
+            self._nbucket = 0
+            self._nchain = 0
+            self._bucket_addr = 0
+            self._chain_addr = 0
 
-            self.__phdrs = []
-            self.__loads = []
-            self.__dynsymols = []
-            self.__rels = {}
-            self.__file = f
+            self._phdrs = []
+            self._loads = []
+            self._dynsymols = []
+            self._rels = {}
+            self._file = f
             ehdr_bytes = f.read(ehdr_sz)
             _, _, _, _, _, phoff, _, _, _, _, phdr_num, _, _, _ = struct.unpack(
                 edhr_pattern, ehdr_bytes)
 
             # print(phoff)
             # __phdroff same as phdraddr
-            self.__phoff = phoff
-            self.__phdr_num = phdr_num
+            self._phoff = phoff
+            self._phdr_num = phdr_num
             f.seek(phoff, 0)
 
             dyn_off = 0
             dyn_addr = 0
-            self.__sz = 0
+            self._sz = 0
             for i in range(0, phdr_num):
                 phdr_bytes = f.read(phdr_sz)
                 # 32与64的phdr结构体顺序有区别
@@ -236,22 +236,22 @@ class ELFReader:
                     "p_memsz": p_memsz,
                     "p_flags": p_flags,
                     "p_align": p_align}
-                self.__phdrs.append(phdr)
+                self._phdrs.append(phdr)
                 if (p_type == PT_DYNAMIC):
                     dyn_off = p_offset
                     dyn_addr = p_vaddr
 
                 elif (p_type == PT_LOAD):
-                    self.__loads.append(phdr)
+                    self._loads.append(phdr)
 
-                self.__sz += p_memsz
+                self._sz += p_memsz
 
             assert dyn_off > 0, "error no dynamic in this elf."
-            self.__dyn_addr = dyn_addr
+            self._dyn_addr = dyn_addr
             f.seek(dyn_off, 0)
             dyn_str_addr = 0
             dyn_str_sz = 0
-            self.__dyn_str_buf = b""
+            self._dyn_str_buf = b""
             dyn_sym_addr = 0
             nsymbol = -1
             rel_addr = 0
@@ -260,9 +260,7 @@ class ELFReader:
             relplt_count = 0
             dt_needed = []
 
-            # 解析dynamiic的时候,里面所有偏移都是相对于第0个load
-            # 的p_vaddr,所以要得出在文件中的偏移，需要统一减去self.__loads[0]["p_vaddr"]
-            bias = self.__loads[0]["p_vaddr"] - self.__loads[0]["p_offset"]
+            bias = self._loads[0]["p_vaddr"] - self._loads[0]["p_offset"]
             while True:
                 dyn_item_bytes = f.read(elf_dyn_sz)
                 d_tag, d_val_ptr = struct.unpack(dyn_pattern, dyn_item_bytes)
@@ -310,11 +308,11 @@ class ELFReader:
                     f.seek(d_val_ptr - bias, 0)
                     hash_heads = f.read(8)
                     f.seek(n, 0)
-                    self.__nbucket, self.__nchain = struct.unpack(
+                    self._nbucket, self._nchain = struct.unpack(
                         "<II", hash_heads)
-                    self.__bucket_addr = d_val_ptr + 8
-                    self.__chain_addr = d_val_ptr + 8 + self.__nbucket * 4
-                    nsymbol = self.__nchain
+                    self._bucket_addr = d_val_ptr + 8
+                    self._chain_addr = d_val_ptr + 8 + self._nbucket * 4
+                    nsymbol = self._nchain
 
                 elif (d_tag == DT_GNU_HASH):
                     '''
@@ -376,33 +374,33 @@ class ELFReader:
                     f.seek(ori, 0)
 
                 elif (d_tag == DT_INIT):
-                    self.__init_addr = d_val_ptr
+                    self._init_addr = d_val_ptr
                 elif (d_tag == DT_INIT_ARRAY):
-                    self.__init_array_addr = d_val_ptr
+                    self._init_array_addr = d_val_ptr
                 elif (d_tag == DT_INIT_ARRAYSZ):
-                    self.__init_array_size = d_val_ptr
+                    self._init_array_size = d_val_ptr
 
                 elif (d_tag == DT_NEEDED):
                     dt_needed.append(d_val_ptr)
 
                 elif (d_tag == DT_PLTGOT):
-                    self.__plt_got_addr = d_val_ptr
+                    self._plt_got_addr = d_val_ptr
 
             assert nsymbol > - \
                 1, "can not detect nsymbol by DT_HASH or DT_GNU_HASH, make sure their exist in so!!!"
-            self.__dyn_str_addr = dyn_str_addr
-            self.__dyn_str_addr = dyn_sym_addr
+            self._dyn_str_addr = dyn_str_addr
+            self._dyn_str_addr = dyn_sym_addr
 
-            self.__dyn_str_sz = dyn_str_sz
+            self._dyn_str_sz = dyn_str_sz
 
-            self.__pltrel_addr = relplt_addr
-            self.__pltrel_count = relplt_count
+            self._pltrel_addr = relplt_addr
+            self._pltrel_count = relplt_count
 
-            self.__rel_addr = rel_addr
-            self.__rel_count = rel_count
+            self._rel_addr = rel_addr
+            self._rel_count = rel_count
 
             f.seek(dyn_str_addr - bias)
-            self.__dyn_str_buf = f.read(dyn_str_sz)
+            self._dyn_str_buf = f.read(dyn_str_sz)
 
             f.seek(dyn_sym_addr - bias, 0)
             for i in range(0, nsymbol):
@@ -421,7 +419,7 @@ class ELFReader:
                 st_info_type = ELFReader.__elf_st_type(int_st_info)
                 name = ""
                 try:
-                    name = self.__st_name_to_name(st_name)
+                    name = self._st_name_to_name(st_name)
                 except UnicodeDecodeError as e:
                     print(
                         "warning can not decode sym index %d at off 0x%08x skip" %
@@ -437,7 +435,7 @@ class ELFReader:
                     "st_shndx": st_shndx,
                     "st_info_bind": st_info_bind,
                     "st_info_type": st_info_type}
-                self.__dynsymols.append(d)
+                self._dynsymols.append(d)
 
             rel_table = []
             if (rel_count > 0):
@@ -466,8 +464,7 @@ class ELFReader:
                         d["r_addend"] = r_addend
                     rel_table.append(d)
 
-            self.__rels["dynrel"] = rel_table
-            # print(self.__rels["dynrel"])
+            self._rels["dynrel"] = rel_table
             relplt_table = []
             if (relplt_count > 0):
                 f.seek(relplt_addr - bias, 0)
@@ -493,42 +490,42 @@ class ELFReader:
                         d["r_addend"] = r_addend
                     relplt_table.append(d)
 
-                self.__rels["relplt"] = relplt_table
-                self.__so_needed = []
+                self._rels["relplt"] = relplt_table
+                self._so_needed = []
                 for str_off in dt_needed:
                     # 这里存的是相对于字符串表里面的偏移，因此不需要-bias，字符串表地址搞对就行
-                    endId = self.__dyn_str_buf.find(b"\x00", str_off)
-                    so_name = self.__dyn_str_buf[str_off:endId]
-                    self.__so_needed.append(so_name.decode("utf-8"))
+                    endId = self._dyn_str_buf.find(b"\x00", str_off)
+                    so_name = self._dyn_str_buf[str_off:endId]
+                    self._so_needed.append(so_name.decode("utf-8"))
 
     def get_load(self):
-        return self.__loads
+        return self._loads
 
     def get_symbols(self):
-        return self.__dynsymols
+        return self._dynsymols
 
     def get_rels(self):
-        return self.__rels
+        return self._rels
 
     def is_elf32(self):
-        return self.__is_elf32
+        return self._is_elf32
 
     def get_dyn_string_by_rel_sym(self, rel_sym):
-        nsym = len(self.__dynsymols)
+        nsym = len(self._dynsymols)
         assert rel_sym < nsym
-        sym = self.__dynsymols[rel_sym]
+        sym = self._dynsymols[rel_sym]
         st_name = sym["st_name"]
-        r = self.__st_name_to_name(st_name)
+        r = self._st_name_to_name(st_name)
         return r
 
     def get_init_array(self):
-        return self.__init_array_addr, self.__init_array_size
+        return self._init_array_addr, self._init_array_size
 
     def get_init(self):
-        return self.__init_addr
+        return self._init_addr
 
     def get_so_need(self):
-        return self.__so_needed
+        return self._so_needed
 
     # android 4.4.4 soinfo
     '''
@@ -588,19 +585,19 @@ class ELFReader:
     };
     '''
 
-    def __write_soinfo32(self, mu, load_base, load_bias, info_base):
+    def _write_soinfo32(self, mu, load_base, load_bias, info_base):
 
         # 在虚拟机中构造一个soinfo结构
-        assert len(self.__filename) < 128
+        assert len(self._filename) < 128
 
         # name
-        memory_helpers.write_utf8(mu, info_base + 0, self.__filename)
+        memory_helpers.write_utf8(mu, info_base + 0, self._filename)
         # phdr
         mu.mem_write(info_base + 128, int(load_base +
-                     self.__phoff).to_bytes(4, byteorder='little'))
+                     self._phoff).to_bytes(4, byteorder='little'))
         # phnum
         mu.mem_write(info_base +
-                     132, int(self.__phdr_num).to_bytes(4, byteorder='little'))
+                     132, int(self._phdr_num).to_bytes(4, byteorder='little'))
         # entry
         mu.mem_write(info_base + 136, int(0).to_bytes(4, byteorder='little'))
         # base
@@ -611,12 +608,12 @@ class ELFReader:
                 byteorder='little'))
         # size
         mu.mem_write(info_base +
-                     144, int(self.__sz).to_bytes(4, byteorder='little'))
+                     144, int(self._sz).to_bytes(4, byteorder='little'))
         # unused1
         mu.mem_write(info_base + 148, int(0).to_bytes(4, byteorder='little'))
         # dynamic
         mu.mem_write(info_base + 152, int(load_base +
-                     self.__dyn_addr).to_bytes(4, byteorder='little'))
+                     self._dyn_addr).to_bytes(4, byteorder='little'))
         # unused2
         mu.mem_write(info_base + 156, int(0).to_bytes(4, byteorder='little'))
         # unused3
@@ -627,42 +624,42 @@ class ELFReader:
         mu.mem_write(info_base + 168, int(0).to_bytes(4, byteorder='little'))
         # strtab
         mu.mem_write(info_base + 172, int(load_base +
-                     self.__dyn_str_addr).to_bytes(4, byteorder='little'))
+                     self._dyn_str_addr).to_bytes(4, byteorder='little'))
         # symtab
         mu.mem_write(info_base + 176, int(load_base +
-                     self.__dyn_str_addr).to_bytes(4, byteorder='little'))
+                     self._dyn_str_addr).to_bytes(4, byteorder='little'))
         # nbucket
         mu.mem_write(info_base +
-                     180, int(self.__nbucket).to_bytes(4, byteorder='little'))
+                     180, int(self._nbucket).to_bytes(4, byteorder='little'))
         # nchain
         mu.mem_write(info_base +
-                     184, int(self.__nchain).to_bytes(4, byteorder='little'))
+                     184, int(self._nchain).to_bytes(4, byteorder='little'))
 
         # bucket
         mu.mem_write(info_base + 188, int(load_base +
-                     self.__bucket_addr).to_bytes(4, byteorder='little'))
+                     self._bucket_addr).to_bytes(4, byteorder='little'))
         # nchain
         mu.mem_write(info_base + 192, int(load_base +
-                     self.__chain_addr).to_bytes(4, byteorder='little'))
+                     self._chain_addr).to_bytes(4, byteorder='little'))
 
         # plt_got
         mu.mem_write(info_base + 196, int(load_base +
-                     self.__plt_got_addr).to_bytes(4, byteorder='little'))
+                     self._plt_got_addr).to_bytes(4, byteorder='little'))
 
         # plt_rel
         mu.mem_write(info_base + 200, int(load_base +
-                     self.__pltrel_addr).to_bytes(4, byteorder='little'))
+                     self._pltrel_addr).to_bytes(4, byteorder='little'))
         # plt_rel_count
         mu.mem_write(info_base + 204,
-                     int(self.__pltrel_count).to_bytes(4,
+                     int(self._pltrel_count).to_bytes(4,
                                                        byteorder='little'))
 
         # rel
         mu.mem_write(info_base + 208, int(load_base +
-                     self.__rel_addr).to_bytes(4, byteorder='little'))
+                     self._rel_addr).to_bytes(4, byteorder='little'))
         # rel_count
         mu.mem_write(info_base + 212,
-                     int(self.__rel_count).to_bytes(4,
+                     int(self._rel_count).to_bytes(4,
                                                     byteorder='little'))
 
         # preinit_array
@@ -672,10 +669,10 @@ class ELFReader:
 
         # init_array
         mu.mem_write(info_base + 224, int(load_base +
-                     self.__init_array_addr).to_bytes(4, byteorder='little'))
+                     self._init_array_addr).to_bytes(4, byteorder='little'))
         # init_array_count
         mu.mem_write(info_base +
-                     228, int(self.__init_array_size /
+                     228, int(self._init_array_size /
                               4).to_bytes(4, byteorder='little'))
 
         # finit_array
@@ -685,7 +682,7 @@ class ELFReader:
 
         # init_func
         mu.mem_write(info_base + 240, int(load_base +
-                     self.__init_addr).to_bytes(4, byteorder='little'))
+                     self._init_addr).to_bytes(4, byteorder='little'))
         # fini_func
         mu.mem_write(info_base + 244, int(0).to_bytes(4, byteorder='little'))
 
@@ -705,7 +702,7 @@ class ELFReader:
 
         # Elf32_Addr load_bias
         load_bias = load_base - \
-            (self.__loads[0]["p_vaddr"] - self.__loads[0]["p_offset"])
+            (self._loads[0]["p_vaddr"] - self._loads[0]["p_offset"])
         mu.mem_write(
             info_base + 284,
             int(load_bias).to_bytes(
@@ -715,20 +712,20 @@ class ELFReader:
         soinfo_sz = 288
         return soinfo_sz
 
-    def __write_soinfo64(self, mu, load_base, load_bias, info_base):
+    def _write_soinfo64(self, mu, load_base, load_bias, info_base):
         # 在虚拟机中构造一个soinfo结构
-        assert len(self.__filename) < 128
+        assert len(self._filename) < 128
 
         # name
-        memory_helpers.write_utf8(mu, info_base + 0, self.__filename)
+        memory_helpers.write_utf8(mu, info_base + 0, self._filename)
         off = 128
         # phdr
         mu.mem_write(info_base + off, int(load_base +
-                     self.__phoff).to_bytes(8, byteorder='little'))
+                     self._phoff).to_bytes(8, byteorder='little'))
         off += 8
         # phnum
         mu.mem_write(info_base +
-                     off, int(self.__phdr_num).to_bytes(8, byteorder='little'))
+                     off, int(self._phdr_num).to_bytes(8, byteorder='little'))
         off += 8
 
         # entry
@@ -745,7 +742,7 @@ class ELFReader:
 
         # size
         mu.mem_write(info_base +
-                     off, int(self.__sz).to_bytes(8, byteorder='little'))
+                     off, int(self._sz).to_bytes(8, byteorder='little'))
         off += 8
 
         # unused1
@@ -758,7 +755,7 @@ class ELFReader:
 
         # dynamic
         mu.mem_write(info_base + off, int(load_base +
-                     self.__dyn_addr).to_bytes(8, byteorder='little'))
+                     self._dyn_addr).to_bytes(8, byteorder='little'))
         off += 8
 
         # unused2
@@ -780,50 +777,50 @@ class ELFReader:
 
         # strtab
         mu.mem_write(info_base + off, int(load_base +
-                     self.__dyn_str_addr).to_bytes(8, byteorder='little'))
+                     self._dyn_str_addr).to_bytes(8, byteorder='little'))
         off += 8
 
         # symtab
         mu.mem_write(info_base + off, int(load_base +
-                     self.__dyn_str_addr).to_bytes(8, byteorder='little'))
+                     self._dyn_str_addr).to_bytes(8, byteorder='little'))
         off += 8
 
         # nbucket
         mu.mem_write(info_base +
-                     off, int(self.__nbucket).to_bytes(4, byteorder='little'))
+                     off, int(self._nbucket).to_bytes(4, byteorder='little'))
         off += 8
         # nchain
         mu.mem_write(info_base +
-                     off, int(self.__nchain).to_bytes(4, byteorder='little'))
+                     off, int(self._nchain).to_bytes(4, byteorder='little'))
         off += 8
 
         # bucket
         mu.mem_write(info_base + off, int(load_base +
-                     self.__bucket_addr).to_bytes(4, byteorder='little'))
+                     self._bucket_addr).to_bytes(4, byteorder='little'))
         off += 8
         # nchain
         mu.mem_write(info_base + off, int(load_base +
-                     self.__chain_addr).to_bytes(4, byteorder='little'))
+                     self._chain_addr).to_bytes(4, byteorder='little'))
         off += 8
 
         # plt_rela
         mu.mem_write(info_base + off, int(load_base +
-                     self.__pltrel_addr).to_bytes(8, byteorder='little'))
+                     self._pltrel_addr).to_bytes(8, byteorder='little'))
         off += 8
         # plt_rela_count
         mu.mem_write(info_base + off,
-                     int(self.__pltrel_count).to_bytes(8,
+                     int(self._pltrel_count).to_bytes(8,
                                                        byteorder='little'))
         off += 8
 
         # rela
         mu.mem_write(info_base + off, int(load_base +
-                     self.__rel_addr).to_bytes(8, byteorder='little'))
+                     self._rel_addr).to_bytes(8, byteorder='little'))
         off += 8
 
         # rela_count
         mu.mem_write(info_base + off,
-                     int(self.__rel_count).to_bytes(8,
+                     int(self._rel_count).to_bytes(8,
                                                     byteorder='little'))
         off += 8
 
@@ -836,11 +833,11 @@ class ELFReader:
 
         # init_array
         mu.mem_write(info_base + off, int(load_base +
-                     self.__init_array_addr).to_bytes(8, byteorder='little'))
+                     self._init_array_addr).to_bytes(8, byteorder='little'))
         off += 8
         # init_array_count
         mu.mem_write(info_base +
-                     off, int(self.__init_array_size /
+                     off, int(self._init_array_size /
                               8).to_bytes(8, byteorder='little'))
         off += 8
 
@@ -853,7 +850,7 @@ class ELFReader:
 
         # init_func
         mu.mem_write(info_base + off, int(load_base +
-                     self.__init_addr).to_bytes(8, byteorder='little'))
+                     self._init_addr).to_bytes(8, byteorder='little'))
         off += 8
         # fini_func
         mu.mem_write(info_base + off, int(0).to_bytes(8, byteorder='little'))
@@ -895,7 +892,7 @@ class ELFReader:
 
     def write_soinfo(self, mu, load_base, load_bias, info_base):
         if (self.is_elf32()):
-            return self.__write_soinfo32(mu, load_base, load_bias, info_base)
+            return self._write_soinfo32(mu, load_base, load_bias, info_base)
 
         else:
-            return self.__write_soinfo64(mu, load_base, load_bias, info_base)
+            return self._write_soinfo64(mu, load_base, load_bias, info_base)
