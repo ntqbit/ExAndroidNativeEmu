@@ -1,4 +1,4 @@
-from .keystone_in import Ks, KS_ARCH_ARM, KS_MODE_THUMB, KS_ARCH_ARM64, KS_MODE_LITTLE_ENDIAN
+from keystone import Ks, KS_ARCH_ARM, KS_MODE_THUMB, KS_ARCH_ARM64, KS_MODE_LITTLE_ENDIAN
 from unicorn import *
 from unicorn.arm_const import *
 from unicorn.arm64_const import *
