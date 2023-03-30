@@ -46,8 +46,10 @@ class ByteArray(Array, metaclass=JavaClassDef, jvm_name="[B", jvm_super=Array):
 
     def __repr__(self):
         b = self._pyitems
-        if len(b) > 20:
-            b = b[:18] + '..'
+        if len(b) <= 20:
+            b = b.hex()
+        else:
+            b = b[:19].hex() + b'..'
 
         return f'ByteArray({b})'
 
