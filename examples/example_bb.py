@@ -12,12 +12,12 @@ from androidemu.java.java_method_def import java_method_def
 from androidemu.java.java_field_def import JavaFieldDef
 from androidemu.java.classes.string import String
 import androidemu.utils.debug_utils
-from androidemu.utils.chain_log import ChainLogger
+from androidemu.utils.logger import GroupLogger, StdOutLogger, FileLogger
 
 import capstone
 import traceback
 
-g_cfd = ChainLogger(sys.stdout, "./ins-bb.txt")
+g_cfd = GroupLogger([StdOutLogger(), FileLogger(open('./ins-bb.txt', 'a'))])
 
 # Add debugging.
 

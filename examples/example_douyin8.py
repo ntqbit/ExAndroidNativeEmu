@@ -13,7 +13,7 @@ from androidemu.utils import misc_utils
 from androidemu.java.helpers.native_method import native_method
 from androidemu.java.java_class_def import JavaClassDef
 from androidemu.java.java_method_def import java_method_def
-from androidemu.utils.chain_log import ChainLogger
+from androidemu.utils.logger import GroupLogger, StdOutLogger, FileLogger
 from androidemu.java.classes.string import String
 from androidemu.java.classes.list import List
 from androidemu.java.classes.array import Array
@@ -161,7 +161,7 @@ def hook_mem_write(uc, access, address, size, value, user_data):
     mnt.feed_write(pc, address, size)
 
 
-g_cfd = ChainLogger(sys.stdout, "./ins-douyin.txt")
+g_cfd = GroupLogger([StdOutLogger(), FileLogger(open('./ins-douyin.txt', 'a'))])
 
 # Add debugging.
 

@@ -12,7 +12,6 @@ from androidemu.java.classes.context import *
 from androidemu.java.classes.array import *
 from androidemu.java.classes.map import *
 from androidemu.java.classes.activity_thread import *
-from androidemu.utils.chain_log import ChainLogger
 from androidemu.java.constant_values import *
 from androidemu.vfs.virtual_file import VirtualFile
 from androidemu.const import emu_const
