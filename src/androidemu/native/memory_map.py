@@ -106,7 +106,7 @@ class MemoryMap:
 
                 return address
 
-        except unicorn.UcError as e:
+        except UcError as e:
             # impossible
             for r in self._mu.mem_regions():
                 print(
@@ -221,7 +221,7 @@ class MemoryMap:
 
             self._mu.mem_unmap(addr, size)
 
-        except unicorn.UcError as e:
+        except UcError as e:
             # TODO:just for debug
 
             for r in self._mu.mem_regions():
