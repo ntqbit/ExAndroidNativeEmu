@@ -29,38 +29,38 @@ class XGorgen(metaclass=JavaClassDef, jvm_name='com/ss/sys/ces/a'):
     @java_method_def(name='leviathan', signature='(I[B)[B', native=True)
     def leviathan(mu):
         pass
-    #
+
 
     @staticmethod
     @java_method_def(name='meta', signature='(ILandroid/content/Context;Ljava/lang/Object;)Ljava/lang/Object;', native=True)
     def meta(mu, optype, ctx, obj):
         pass
-    #
+
 
     @staticmethod
     @java_method_def(name='Francies', signature='()V', native=False)
     def Francies(mu):
         pass
-    #
+
 
     @staticmethod
     @java_method_def(name='Bill', signature='()V', native=False)
     def Bill(mu):
         pass
-    #
+
 
     
     @staticmethod
     @java_method_def(name='Louis', signature='()V', native=False)
     def Louis(mu):
         pass
-    #
+
 
     @staticmethod
     @java_method_def(name='Zeoy', signature='()V', native=False)
     def Zeoy(mu):
         pass
-    #
+
 
     @staticmethod
     @java_method_def(name='njss', args_list=["jint", "jobject"], signature='(ILjava/lang/Object;)Ljava/lang/Object;', native=False)
@@ -94,7 +94,7 @@ class XGorgen(metaclass=JavaClassDef, jvm_name='com/ss/sys/ces/a'):
             return String('{}')
 
         return JAVA_NULL
-#
+
 
 
 class UserInfo(metaclass=JavaClassDef, jvm_name='com/ss/android/common/applog/UserInfo'):
@@ -136,20 +136,20 @@ class java_lang_Thread(metaclass=JavaClassDef, jvm_name='java/lang/Thread'):
                 java_lang_StackTraceElement(String("com.ttnet.org.chromium.net.impl.CronetUrlRequest")),
                 ]
         return List(l)
-    #
-#
+
+
 
 def hook_mem_read(uc, access, address, size, value, user_data):  
     mnt = user_data
     pc = uc.reg_read(UC_ARM_REG_PC)
     mnt.feed_read(pc, address, size)
-#
+
 
 def hook_mem_write(uc, access, address, size, value, user_data):
     mnt = user_data
     pc = uc.reg_read(UC_ARM_REG_PC)
     mnt.feed_write(pc, address, size)
-#
+
 
 g_cfd = ChainLogger(sys.stdout, "./ins-douyin.txt")
 
@@ -160,15 +160,15 @@ def hook_code(mu, address, size, user_data):
         if (not emu.memory.check_addr(address, UC_PROT_EXEC)):
             logger.error("addr 0x%08X out of range" % (address,))
             sys.exit(-1)
-        #
+
         # androidemu.utils.debug_utils.dump_registers(mu, sys.stdout)
         # androidemu.utils.debug_utils.dump_code(emu, address, size, sys.stdout)
         androidemu.utils.debug_utils.dump_code(emu, address, size, sys.stdout)
     except Exception as e:
         logger.exception("exception in hook_code")
         sys.exit(-1)
-    #
-#
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -237,7 +237,7 @@ try:
 
     with open("./mem-mnt-dy8.txt", "w") as f:
         mnt.dump_read_no_write(f)
-    #
+
 except UcError as e:
     print("Exit at 0x%08X" % emulator.mu.reg_read(UC_ARM_REG_PC))
     emulator.memory.dump_maps(sys.stdout)

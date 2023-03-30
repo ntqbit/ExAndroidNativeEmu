@@ -87,11 +87,11 @@ class java_lang_Thread(metaclass=JavaClassDef, jvm_name='java/lang/Thread'):
                 java_lang_StackTraceElement(String("com.android.internal.os.ZygoteInit")),
                 java_lang_StackTraceElement(String("dalvik.system.NativeStart"))
                 ]
-            #
-        #
+
+
         r = List(l)
         return r
-    #
+
 
 def hook_mem_read(uc, access, address, size, value, user_data):
     pc = uc.reg_read(UC_ARM_REG_PC)
@@ -100,15 +100,15 @@ def hook_mem_read(uc, access, address, size, value, user_data):
         data = uc.mem_read(address, size)
         v = int.from_bytes(data, byteorder='little', signed=False)
         print("read")
-    #
-#
+
+
 
 def hook_mem_write(uc, access, address, size, value, user_data):
     pc = uc.reg_read(UC_ARM_REG_PC)
     if (address == 3419067861):
         print("write")
-    #
-#
+
+
 g_cfd = ChainLogger(sys.stdout, "./ins-douyin.txt")
 # Add debugging.
 def hook_code(mu, address, size, user_data):
@@ -117,14 +117,14 @@ def hook_code(mu, address, size, user_data):
         if (not emu.memory.check_addr(address, UC_PROT_EXEC)):
             logger.error("addr 0x%08X out of range"%(address,))
             sys.exit(-1)
-        #
+
         #androidemu.utils.debug_utils.dump_registers(mu, sys.stdout)
         androidemu.utils.debug_utils.dump_code(emu, address, size, sys.stdout)
     except Exception as e:
         logger.exception("exception in hook_code")
         sys.exit(-1)
-    #
-#
+
+
 
 
 logger = logging.getLogger(__name__)

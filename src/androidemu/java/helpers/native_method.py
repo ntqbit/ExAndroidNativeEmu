@@ -19,18 +19,18 @@ def native_write_args(emu, *argv):
         max_regs_args = 8
         reg_base = UC_ARM64_REG_X0
         sp_reg = UC_ARM64_REG_SP
-    #
+
     ptr_sz = emu.get_ptr_size()
     amount = len(argv)
     
     nreg = max_regs_args
     if (amount < max_regs_args):
         nreg = amount
-    #
+
     
     for i in range(0, nreg):
         native_write_arg_register(emu, reg_base+i, argv[i])
-    #
+
     if amount > max_regs_args:
         sp_start = emu.mu.reg_read(sp_reg)
         sp_current = sp_start
@@ -42,8 +42,8 @@ def native_write_args(emu, *argv):
             sp_current = sp_current + ptr_sz
 
         emu.mu.reg_write(sp_reg, sp_end)
-    #
-#
+
+
 
 
 def native_read_args_in_hook_code(emu, args_count):
@@ -55,28 +55,28 @@ def native_read_args_in_hook_code(emu, args_count):
         max_regs_args = 8
         reg_base = UC_ARM64_REG_X0
         sp_reg = UC_ARM64_REG_SP
-    #
+
     ptr_sz = emu.get_ptr_size()
 
     nreg = max_regs_args
     if (args_count < max_regs_args):
         nreg = args_count
-    #
+
     native_args = []
     mu = emu.mu
 
     for i in range(0, nreg):
         native_args.append(mu.reg_read(reg_base+i))
-    #
+
     if args_count > max_regs_args:
         sp = mu.reg_read(sp_reg)
 
         for x in range(0, args_count - max_regs_args):
             native_args.append(int.from_bytes(mu.mem_read(sp + (x * ptr_sz), ptr_sz), byteorder='little'))
-        #
-    #
+
+
     return native_args
-#
+
 
 
 def native_translate_arg(emu, val):
@@ -121,13 +121,13 @@ def native_method(func):
         else:
             le = len(native_args)
             result = func(argv[0], mu, *native_args)
-        #
+
         ret_reg0 = UC_ARM_REG_R0
         ret_reg1 = UC_ARM_REG_R1
         if (emu.get_arch() == emu_const.ARCH_ARM64):
             ret_reg0 = UC_ARM64_REG_X0
             ret_reg1 = UC_ARM64_REG_X1
-        #
+
         if result is not None:
             if(isinstance(result, tuple)):
                 #tuple作为特殊返回8字节数据约定
@@ -139,8 +139,8 @@ def native_method(func):
                 #FIXME handle python基本类型str int float,处理返回值逻辑略为混乱，
                 #返回值的问题统一在这里处理掉
                 native_write_arg_register(emu, ret_reg0, result)
-            #
-        #
-    #
+
+
+
 
     return native_method_wrapper

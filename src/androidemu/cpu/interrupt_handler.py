@@ -32,7 +32,7 @@ class InterruptHandler:
                     pc = self._mu.reg_read(UC_ARM_REG_PC)
                 elif arch == UC_ARCH_ARM64:
                     pc = self._mu.reg_read(UC_ARM64_REG_PC)
-                #
+
                 logger.error("Unhandled interrupt %d at %x, stopping emulation" % (intno, pc))
                 traceback.print_stack()
                 frame = inspect.currentframe()
@@ -44,8 +44,8 @@ class InterruptHandler:
         except Exception as e:
             logger.exception("exception in _hook_interrupt intno:[%d]"%intno)
             sys.exit(-1)
-        #
-    #
+
+
 
     def set_handler(self, intno, handler):
         self._handlers[intno] = handler

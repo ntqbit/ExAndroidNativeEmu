@@ -114,21 +114,21 @@ class ELFReader:
     @staticmethod
     def __elf32_r_sym(x):
         return x>>8
-    #
+
     @staticmethod
     def __elf32_r_type(x):
         return x & 0xff
-    #
+
 
 
     @staticmethod
     def __elf64_r_sym(x):
         return x>>32
-    #
+
     @staticmethod
     def __elf64_r_type(x):
         return x & 0xffffffff
-    #
+
 
 
 #define ELF_ST_BIND(x)	((x) >> 4)
@@ -136,12 +136,12 @@ class ELFReader:
     @staticmethod
     def __elf_st_bind(x):
         return x >> 4
-    #
+
 
     @staticmethod
     def __elf_st_type(x):
         return x & 0xf
-    #
+
 
     @staticmethod
     def check_elf32(filename):
@@ -149,15 +149,15 @@ class ELFReader:
             f.seek(0x4, os.SEEK_SET)
             buf = f.read(1)
             return buf[0] == 1
-        #
-    #
+
+
     def __st_name_to_name(self, st_name):
         assert st_name < self.__dyn_str_sz, "__st_name_to_name st_name %d out of range %d"%(st_name, self.__dyn_str_sz)
         endId=self.__dyn_str_buf.find(b"\x00", st_name)
         r = self.__dyn_str_buf[st_name:endId]
         name = r.decode("utf-8")
         return name
-    #
+
 
     def __init__(self, filename):
 
@@ -193,7 +193,7 @@ class ELFReader:
                 dyn_pattern = "<QQ"
                 sym_pattern = "<IccHQQ"
                 rel_pattern = "<QQq"
-            #
+
 
             self.__filename = filename
             self.__init_array_addr = 0
@@ -229,7 +229,7 @@ class ELFReader:
                     p_type, p_offset, p_vaddr, p_paddr, p_filesz, p_memsz, p_flags, p_align = struct.unpack(phdr_pattern, phdr_bytes)
                 else:   #64
                     p_type, p_flags, p_offset, p_vaddr, p_paddr, p_filesz, p_memsz, p_align = struct.unpack(phdr_pattern, phdr_bytes)
-                #
+
 
                 phdr = {"p_type":p_type, "p_offset":p_offset, "p_vaddr":p_vaddr, "p_paddr":p_paddr, \
                                                 "p_filesz":p_filesz, "p_memsz":p_memsz, "p_flags":p_flags, "p_align":p_align}
@@ -237,12 +237,12 @@ class ELFReader:
                 if (p_type == PT_DYNAMIC):
                     dyn_off = p_offset
                     dyn_addr = p_vaddr
-                #
+
                 elif(p_type == PT_LOAD):
                     self.__loads.append(phdr)
-                #
+
                 self.__sz += p_memsz
-            #
+
             
             assert dyn_off > 0, "error no dynamic in this elf."
             self.__dyn_addr = dyn_addr
@@ -272,30 +272,30 @@ class ELFReader:
                     rel_addr = d_val_ptr
                 elif (d_tag == DT_RELASZ):
                     rel_count = int(d_val_ptr / elf_rel_sz)
-                #
+
                 elif (d_tag == DT_REL):
                     #rel只出现在arm中
                     assert is_elf32 == True, "get DT_REL when parsing elf32 impossible in android!!!"
                     rel_addr = d_val_ptr
-                #
+
                 elif (d_tag == DT_RELSZ):
                     rel_count = int(d_val_ptr / elf_rel_sz)
-                #
+
                 elif (d_tag == DT_JMPREL):
                     relplt_addr = d_val_ptr
-                #
+
                 elif(d_tag == DT_PLTRELSZ):
                     relplt_count = int(d_val_ptr / elf_rel_sz)
-                #
+
                 elif (d_tag == DT_SYMTAB):
                     dyn_sym_addr = d_val_ptr
-                #
+
                 elif(d_tag == DT_STRTAB):
                     dyn_str_addr = d_val_ptr
-                #
+
                 elif(d_tag == DT_STRSZ):
                     dyn_str_sz = d_val_ptr
-                #
+
                 elif(d_tag == DT_HASH):
                     '''
                     nbucket_ = reinterpret_cast<uint32_t*>(load_bias + d->d_un.d_ptr)[0];
@@ -311,7 +311,7 @@ class ELFReader:
                     self.__bucket_addr = d_val_ptr + 8
                     self.__chain_addr = d_val_ptr + 8 + self.__nbucket * 4
                     nsymbol = self.__nchain
-                #
+
                 elif(d_tag == DT_GNU_HASH):
                     '''
                     struct gnu_hash_table {
@@ -337,7 +337,7 @@ class ELFReader:
                         gnu_bucket_ = gnu_bloom_filter_ + 4*gnu_maskwords_
                     else:
                         gnu_bucket_ = gnu_bloom_filter_ + 8*gnu_maskwords_
-                    #
+
                     gnu_chain_ = gnu_bucket_ + 4*gnu_nbucket_ - 4*symoffset
 
                     #遍历bucket列表，找最大的symbolid
@@ -350,8 +350,8 @@ class ELFReader:
                         symidx = int.from_bytes(nbytes, 'little')
                         if (symidx > maxbucket_symidx):
                             maxbucket_symidx = symidx
-                        #
-                    #
+
+
                     #实际上bucket存的是chain里面第一个symbolId
                     #沿着bucket找到最大的symid，并不是最大的id，最大的id需要从这个id开始
                     #在chain里面继续顺序找下去，直到chain结束，就是symbol的个数
@@ -364,26 +364,26 @@ class ELFReader:
                         #Chain ends with an element with the lowest bit set to 1.
                         if ((c & 1) == 1):
                             break
-                        #
+
                         max_symid = max_symid + 1
-                    #
+
                     nsymbol = max_symid + 1
                     f.seek(ori, 0)
-                #
+
                 elif (d_tag == DT_INIT):
                     self.__init_addr = d_val_ptr
                 elif(d_tag == DT_INIT_ARRAY):
                     self.__init_array_addr = d_val_ptr
                 elif(d_tag == DT_INIT_ARRAYSZ):
                     self.__init_array_size = d_val_ptr
-                #
+
                 elif (d_tag == DT_NEEDED):
                     dt_needed.append(d_val_ptr)
-                #
+
                 elif (d_tag == DT_PLTGOT):
                     self.__plt_got_addr = d_val_ptr
-                #
-            #
+
+
             assert nsymbol > -1, "can not detect nsymbol by DT_HASH or DT_GNU_HASH, make sure their exist in so!!!"
             self.__dyn_str_addr = dyn_str_addr
             self.__dyn_str_addr = dyn_sym_addr
@@ -407,7 +407,7 @@ class ELFReader:
                 else:
                     #64排布有改变
                     st_name, st_info, st_other, st_shndx, st_value, st_size = struct.unpack(sym_pattern, sym_bytes)
-                #
+
                 int_st_info = int.from_bytes(st_info, byteorder='little', signed = False)
                 st_info_bind = ELFReader.__elf_st_bind(int_st_info)
                 st_info_type = ELFReader.__elf_st_type(int_st_info)
@@ -416,11 +416,11 @@ class ELFReader:
                     name = self.__st_name_to_name(st_name)
                 except UnicodeDecodeError as e:
                     print("warning can not decode sym index %d at off 0x%08x skip"%(i, st_name))
-                #
+
                 d = {"name":name, "st_name":st_name, "st_value":st_value, "st_size":st_size, "st_info":st_info, "st_other":st_other, 
                 "st_shndx":st_shndx, "st_info_bind":st_info_bind, "st_info_type":st_info_type}
                 self.__dynsymols.append(d)
-            #
+
             rel_table = []
             if (rel_count > 0):
                 #rel不一定有
@@ -434,15 +434,15 @@ class ELFReader:
                     else:
                         #64 rela
                         r_offset, r_info, r_addend = struct.unpack(rel_pattern, rel_item_bytes)
-                    #
+
                     r_info_sym = elf_r_sym(r_info)
                     r_info_type = elf_r_type(r_info)
                     d = {"r_offset":r_offset, "r_info":r_info, "r_info_type":r_info_type, "r_info_sym":r_info_sym}
                     if (not is_elf32):
                         d["r_addend"] = r_addend
                     rel_table.append(d)
-                #
-            #
+
+
             self.__rels["dynrel"] = rel_table
             #print(self.__rels["dynrel"])
             relplt_table = []
@@ -455,7 +455,7 @@ class ELFReader:
                     else:
                         #64 rela
                         r_offset, r_info, r_addend = struct.unpack(rel_pattern, rel_item_bytes)
-                    #
+
                     r_info_sym = elf_r_sym(r_info)
                     r_info_type = elf_r_type(r_info)
                     d = {"r_offset":r_offset, "r_info":r_info, "r_info_type":r_info_type, "r_info_sym":r_info_sym}
@@ -463,7 +463,7 @@ class ELFReader:
                     if (not is_elf32):
                         d["r_addend"] = r_addend
                     relplt_table.append(d)
-                #
+
                 self.__rels["relplt"] = relplt_table
                 self.__so_needed = []
                 for str_off in dt_needed:
@@ -471,26 +471,26 @@ class ELFReader:
                     endId=self.__dyn_str_buf.find(b"\x00", str_off)
                     so_name = self.__dyn_str_buf[str_off:endId]
                     self.__so_needed.append(so_name.decode("utf-8"))
-                #
-            #
-        #
-    #
+
+
+
+
 
     def get_load(self):
         return self.__loads
-    #
+
 
     def get_symbols(self):
         return self.__dynsymols
-    #
+
 
     def get_rels(self):
         return self.__rels
-    #
+
 
     def is_elf32(self):
         return self.__is_elf32
-    #
+
 
     def get_dyn_string_by_rel_sym(self, rel_sym):
         nsym = len(self.__dynsymols)
@@ -499,19 +499,19 @@ class ELFReader:
         st_name = sym["st_name"]
         r = self.__st_name_to_name(st_name)
         return r
-    #
+
 
     def get_init_array(self):
         return self.__init_array_addr, self.__init_array_size
-    #
+
 
     def get_init(self):
         return self.__init_addr
-    #
+
 
     def get_so_need(self):
         return self.__so_needed
-    #
+
 
     #android 4.4.4 soinfo
     '''
@@ -666,7 +666,7 @@ class ELFReader:
         
         soinfo_sz = 288
         return soinfo_sz
-    #
+
 
     def __write_soinfo64(self, mu, load_base, load_bias, info_base):
         #在虚拟机中构造一个soinfo结构
@@ -809,15 +809,14 @@ class ELFReader:
 
         soinfo_sz = off
         return soinfo_sz
-    #
+
 
     def write_soinfo(self, mu, load_base, load_bias, info_base):
         if (self.is_elf32()):
             return self.__write_soinfo32(mu, load_base, load_bias, info_base)
-        #
+
         else:
             return self.__write_soinfo64(mu, load_base, load_bias, info_base)
-        #
-    #
 
-#
+
+

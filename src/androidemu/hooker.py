@@ -23,7 +23,7 @@ class Hooker:
         _hook_start = base_addr + emu.get_ptr_size()
         self._hook_current = _hook_start
         self._emu.mu.hook_add(UC_HOOK_CODE, self._hook, None, _hook_start, _hook_start + size)
-    #
+
 
     def _get_next_id(self):
         idx = self._current_id
@@ -49,10 +49,10 @@ class Hooker:
         else:
             self._emu.mu.mem_write(self._hook_current, b"\xC0\x03\x5F\xD6")  #ret
             self._hook_current += 4 
-        #
+
 
         return hook_addr
-    #
+
 
     def write_function_table(self, table):
         if not isinstance(table, dict):
@@ -73,7 +73,7 @@ class Hooker:
         for index in range(0, index_max):
             address = hook_map[index] if index in hook_map else 0
             table_bytes += int(address).to_bytes(ptr_size, byteorder='little')  #把每个函数指针写到指针表里面
-        #
+
 
         self._emu.mu.mem_write(table_address, table_bytes)
         self._hook_current += len(table_bytes)
@@ -84,7 +84,7 @@ class Hooker:
         self._hook_current += ptr_size
 
         return ptr_address, table_address
-    #
+
 
     def _hook(self, mu, address, size, user_data):
         #通过hook一条特殊的指令回调到python处理
@@ -111,5 +111,5 @@ class Hooker:
             logging.exception("catch error on _hook")
             sys.exit(-1)
             raise
-        #
-    #
+
+

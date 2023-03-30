@@ -25,14 +25,14 @@ def hook_code(mu, address, size, user_data):
         if (not emu.memory.check_addr(address, UC_PROT_EXEC)):
             logger.error("addr 0x%08X out of range"%(address,))
             sys.exit(-1)
-        #
+
         #androidemu.utils.debug_utils.dump_registers(mu, sys.stdout)
         androidemu.utils.debug_utils.dump_code(emu, address, size, g_cfd)
     except Exception as e:
         logger.exception("exception in hook_code")
         sys.exit(-1)
-    #
-#
+
+
 
 
 class HttpUtil(metaclass=JavaClassDef, jvm_name='com/taobao/wireless/security/adapter/common/HttpUtil'):
@@ -43,18 +43,18 @@ class HttpUtil(metaclass=JavaClassDef, jvm_name='com/taobao/wireless/security/ad
     @java_method_def(name='sendSyncHttpGetRequestBridge', signature='(Ljava/lang/String;)Ljava/lang/String;', native=False)
     def sendSyncHttpGetRequestBridge(self, mu, string):
         return JAVA_NULL
-    #
+
 
     @java_method_def(name='sendSyncHttpPostRequestBridge', signature='(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;II)Ljava/lang/String;', native=False)
     def sendSyncHttpPostRequestBridge(self, mu, s1, s2, s3, i1, i2):
         return JAVA_NULL
-    #
+
 
     @java_method_def(name='downloadFileBridge', signature='(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;', native=False)
     def downloadFileBridge(self, mu, s1, s2):
         return JAVA_NULL
-    #
-#
+
+
 
 
 class UmidAdapter(metaclass=JavaClassDef, jvm_name='com/taobao/wireless/security/adapter/umid/UmidAdapter'):
@@ -66,8 +66,8 @@ class UmidAdapter(metaclass=JavaClassDef, jvm_name='com/taobao/wireless/security
     @java_method_def(name='umidInitAdapter', signature='(I)I', native=False)
     def umidInitAdapter(mu, i1):
         return 0
-    #
-#
+
+
 
 
 class JNICLibrary(metaclass=JavaClassDef, jvm_name='com/taobao/wireless/security/adapter/JNICLibrary'):
@@ -79,9 +79,9 @@ class JNICLibrary(metaclass=JavaClassDef, jvm_name='com/taobao/wireless/security
     @java_method_def(name='doCommandNative', signature='(I[Ljava/lang/Object;)Ljava/lang/Object;', native=True)
     def doCommandNative(mu, i1, obj):
         pass
-    #
 
-#
+
+
 
 
 class SPUtility2(metaclass=JavaClassDef, jvm_name='com/taobao/wireless/security/adapter/common/SPUtility2'):
@@ -90,32 +90,32 @@ class SPUtility2(metaclass=JavaClassDef, jvm_name='com/taobao/wireless/security/
     _kv = {}
     def __init__(self):
         pass
-    #
+
 
     @staticmethod
     @java_method_def(name='readFromSPUnified', signature='(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;', native=False)
     def readFromSPUnified(mu, s1, s2, s3):
         return s3
-    #
+
 
     @staticmethod
     @java_method_def(name='saveToFileUnifiedForNative', signature='(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Z)I', native=False)
     def saveToFileUnifiedForNative(mu, s1, s2, s3, b):
         return 0
-    #
+
 
     @staticmethod
     @java_method_def(name='removeFromSPUnified', signature='(Ljava/lang/String;Ljava/lang/String;Z)Z', native=False)
     def removeFromSPUnified(mu, s1, s2, b):
         return True
-    #
+
 
     @staticmethod
     @java_method_def(name='writeSS', signature='(Landroid/content/Context;Ljava/lang/String;Ljava/lang/String;)Z', native=False)
     def writeSS(mu, ctx, s1, s2):
         _kv[s1] = s2
         return True
-    #
+
 
     @staticmethod
     @java_method_def(name='readSS', signature='(Landroid/content/Context;Ljava/lang/String;)Ljava/lang/String;', native=False)
@@ -123,7 +123,7 @@ class SPUtility2(metaclass=JavaClassDef, jvm_name='com/taobao/wireless/security/
         if (s1 in _kv):
             return _kv[s1]
         return String("")
-    #
+
 
     @staticmethod
     @java_method_def(name='read', signature='(Ljava/lang/String;)Ljava/lang/String;', native=False)
@@ -131,7 +131,7 @@ class SPUtility2(metaclass=JavaClassDef, jvm_name='com/taobao/wireless/security/
         if (s1 in _kv):
             return _kv[s1]
         return String("")
-    #
+
 
 
     @staticmethod
@@ -140,8 +140,8 @@ class SPUtility2(metaclass=JavaClassDef, jvm_name='com/taobao/wireless/security/
         if (s1 in _kv):
             return _kv[s1]
         return String("")
-    #
-#
+
+
 
 class DeviceInfoCapturer(metaclass=JavaClassDef, jvm_name='com/taobao/wireless/security/adapter/datacollection/DeviceInfoCapturer'):
 
@@ -152,9 +152,9 @@ class DeviceInfoCapturer(metaclass=JavaClassDef, jvm_name='com/taobao/wireless/s
     @java_method_def(name='doCommandForString', signature='(I)Ljava/lang/String;', native=False)
     def doCommandForString(mu, cmdId):
         return String("0")
-    #
 
-#
+
+
 
 class DataReportJniBridge(metaclass=JavaClassDef, jvm_name='com/taobao/wireless/security/adapter/datareport/DataReportJniBridge'):
 
@@ -165,22 +165,22 @@ class DataReportJniBridge(metaclass=JavaClassDef, jvm_name='com/taobao/wireless/
     @java_method_def(name='sendReportBridge', signature='(Ljava/lang/String;Ljava/lang/String;[B)Ljava/lang/String;', native=False)
     def sendReportBridge(mu, s1, s2, bytes1):
         return String("")
-    #
+
 
 
     @staticmethod
     @java_method_def(name='accsAvaiableBridge', signature='()I', native=False)
     def accsAvaiableBridge(mu):
         return 1
-    #
+
 
 
     @staticmethod
     @java_method_def(name='registerAccsListnerBridge', signature='()I', native=False)
     def registerAccsListnerBridge(mu):
         return 1
-    #
-#
+
+
 
 class ZipUtils(metaclass=JavaClassDef, jvm_name='com/taobao/dp/util/ZipUtils'):
 
@@ -192,41 +192,41 @@ class ZipUtils(metaclass=JavaClassDef, jvm_name='com/taobao/dp/util/ZipUtils'):
     @java_method_def(name='unZip', signature='([B)[B', native=False)
     def unZip(mu, bytes):
         return 0
-    #
-#
+
+
 
 class CallbackHelper(metaclass=JavaClassDef, jvm_name='com/taobao/dp/util/CallbackHelper'):
 
     def __init__(self):
         pass
-    #
 
-#
+
+
 
 class UserTrackMethodJniBridge(metaclass=JavaClassDef, jvm_name='com/alibaba/wireless/security/framework/utils/UserTrackMethodJniBridge'):
 
     def __init__(self):
         pass
-    #
+
 
     @staticmethod
     @java_method_def(name='utAvaiable', signature='()I', native=False)
     def utAvaiable(mu):
         return 0
-    #
+
 
     @staticmethod
     @java_method_def(name='addUtRecord', signature='(Ljava/lang/String;IILjava/lang/String;JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I', native=False)
     def addUtRecord(mu):
         return 0
-    #
+
 
     @staticmethod
     @java_method_def(name='getStackTrace', signature='(II)Ljava/lang/String;', native=False)
     def getStackTrace(mu):
         return 0
-    #
-#
+
+
 
 
 logger = logging.getLogger(__name__)

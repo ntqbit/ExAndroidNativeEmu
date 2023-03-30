@@ -28,12 +28,11 @@ class Config:
         with open(cfg_path, "r") as f:
             js = f.read()
             self.__configs = json.loads(js)
-        #
-    #
+
+
 
     def get(self, key, def_val = None):
         if (key in self.__configs):
             return self.__configs[key]
         return def_val
-    #
-#
+

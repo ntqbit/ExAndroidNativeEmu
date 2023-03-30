@@ -21,7 +21,7 @@ class AssetManagerHooks:
 
         self.__local_asset_ptr_off = 0x87654321
         self.__local_asset_ptr_map = {}
-    #
+
 
     def register(self):
         self._modules.add_symbol_hook('AAssetManager_fromJava', self.__hooker.write_function(self.__AAssetManager_fromJava))
@@ -29,7 +29,7 @@ class AssetManagerHooks:
         self._modules.add_symbol_hook('AAsset_close', self.__hooker.write_function(self.__AAsset_close))
         self._modules.add_symbol_hook('AAsset_read', self.__hooker.write_function(self.__AAsset_read))
         self._modules.add_symbol_hook('AAsset_getLength', self.__hooker.write_function(self.__AAsset_getLength))
-    #
+
 
 
     @native_method
@@ -46,7 +46,7 @@ class AssetManagerHooks:
         r = self.__local_ptr_off
         self.__local_ptr_off = self.__local_ptr_off + 1
         return r
-    #
+
 
     @native_method
     def __AAssetManager_open(self, uc, amgr_ptr, filename_ptr, mode):
@@ -61,7 +61,7 @@ class AssetManagerHooks:
         self.__local_asset_ptr_off = self.__local_asset_ptr_off + 1
         
         return r
-    #
+
 
     @native_method
     def __AAsset_close(self, uc, asset_ptr):
@@ -69,7 +69,7 @@ class AssetManagerHooks:
         asset_sa = self.__local_asset_ptr_map.pop(asset_ptr)
         asset_obj = asset_sa[0]
         asset_obj.close()
-    #
+
 
 
     @native_method
@@ -81,13 +81,13 @@ class AssetManagerHooks:
             #logger.error("AAsset_read return None...")
             raise RuntimeError("AAsset_read return None...")
             return -1
-        #
+
         n = len(b)
         uc.mem_write(buf_ptr, b)
 
         logger.debug("AAsset_read call [0x%08X] [0x%08X] [%d] return [%d]"%(asset_ptr, buf_ptr, count, n))
         return n
-    #
+
 
     @native_method
     def __AAsset_getLength(self, uc, asset_ptr):
@@ -98,6 +98,5 @@ class AssetManagerHooks:
         info = zipf.getinfo(asset_filename)
         n = info.file_size
         return n
-    #
 
-#
+

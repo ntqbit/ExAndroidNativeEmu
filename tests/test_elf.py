@@ -31,7 +31,7 @@ class TestElf(unittest.TestCase):
 
         so_needed = r.get_so_need()
         self.assertTrue("libc.so" in so_needed)
-    #
+
 
 
     def test_readelf64(self):
@@ -60,7 +60,7 @@ class TestElf(unittest.TestCase):
 
         so_needed = r.get_so_need()
         self.assertTrue("libdl.so" in so_needed)
-    #
+
 
     def test_load_bias(self):
         #测试有load_bias情况下是否正确
@@ -79,7 +79,7 @@ class TestElf(unittest.TestCase):
         self.assertTrue("libm.so" in so_needed)
         self.assertTrue("libdl.so" in so_needed)
 
-    #
+
 
 
     def test_libart(self):
@@ -96,4 +96,3 @@ class TestElf(unittest.TestCase):
         self.assertTrue("libc.so" in so_needed)
         self.assertTrue("libc++.so" in so_needed)
 
-#

@@ -22,7 +22,7 @@ class Method(metaclass=JavaClassDef,
         self.slot = pymethod.jvm_id
         self.declaringClass = pydeclaringClass
         self.accessFlags = pymethod.modifier
-    #
+
 
     @staticmethod
     @java_method_def(
@@ -40,7 +40,7 @@ class Method(metaclass=JavaClassDef,
             raise RuntimeError('No modifier was given to class %s method %s' % (clazz.jvm_name, method.name))
 
         return method.modifier
-    #
+
 
     @java_method_def(
         name="invoke",
@@ -53,13 +53,13 @@ class Method(metaclass=JavaClassDef,
         if(obj == JAVA_NULL):
             #static method
             v = self._method.func(emu, *args)
-        #
+
         else:
             v = self._method.func(obj, emu, *args)
-        #
+
         return v
 
-    #
+
 
     @java_method_def(
         name="setAccessible",
@@ -68,9 +68,9 @@ class Method(metaclass=JavaClassDef,
     )
     def setAccessible(self, emu, flag):
         pass
-    #
+
 
     def __repr__(self):
         return "Method(%s, %s)"%(self.declaringClass, self._method)
-    #
-#
+
+

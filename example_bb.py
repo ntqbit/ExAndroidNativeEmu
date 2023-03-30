@@ -26,14 +26,14 @@ def hook_code(mu, address, size, user_data):
         if (not emu.memory.check_addr(address, UC_PROT_EXEC)):
             logger.error("addr 0x%08X out of range"%(address,))
             sys.exit(-1)
-        #
+
         #androidemu.utils.debug_utils.dump_registers(mu, sys.stdout)
         androidemu.utils.debug_utils.dump_code(emu, address, size, g_cfd)
     except Exception as e:
         logger.exception("exception in hook_code")
         sys.exit(-1)
-    #
-#
+
+
 
 class Helper(metaclass=JavaClassDef, jvm_name='com/SecShell/SecShell/Helper',
 jvm_fields=[
@@ -46,31 +46,31 @@ jvm_fields=[
     @java_method_def(name='azbycx', signature='(Ljava/lang/String;)Ljava/lang/String;', native=True)
     def azbycx(self, mu):
         pass
-    #
-#
+
+
 
 class DexInstall(metaclass=JavaClassDef, jvm_name='com/SecShell/SecShell/DexInstall'):
     def __init__(self):
         pass
-    #
+
     @staticmethod
     @java_method_def(name='install', args_list=["jobject", "jstring", "jstring"], signature='(Ljava/lang/ClassLoader;Ljava/lang/String;Ljava/lang/String;)V', native=False)
     def install(mu, obj, s1, s2):
         print("DexInstall install arg %r %s %s"%(obj, s1, s2))
-    #
-#
+
+
 
 class DexInstallV26(metaclass=JavaClassDef, jvm_name='com/SecShell/SecShell/DexInstall$V26'):
     def __init__(self):
         pass
-    #
+
 
     @staticmethod
     @java_method_def(name='install', args_list=["jobject", "jstring"], signature='(Ljava/lang/ClassLoader;Ljava/lang/String;)V', native=False)
     def install(mu, obj, s):
         print("DexInstallV26 install arg %r %s %s"%(obj, s))
-    #
-#
+
+
 
 logger = logging.getLogger(__name__)
 

@@ -14,7 +14,7 @@ class TestThread(unittest.TestCase):
 
         self.__is64_before_call = False
         self.__is64_after_call = False
-    #
+
 
     def __pthread_create32_before_hook(self, emu, *arg):
         start_routine = arg[2]
@@ -22,14 +22,14 @@ class TestThread(unittest.TestCase):
         self.__is32_before_call = True
         self.assertTrue(start_routine != 0)
         return False
-    #
+
 
     def __pthread_create32_after_hook(self, emu, r0, r1):
         logging.warning("pthread_create return 0x%08X"%(r0,))
         self.__is32_after_call = True
         self.assertEqual(r0, 0)
         return False
-    #
+
 
 
     def test_thread32(self):
@@ -46,7 +46,7 @@ class TestThread(unittest.TestCase):
         self.assertEqual(r, 3)
         self.assertTrue(self.__is32_before_call)
         self.assertTrue(self.__is32_after_call)
-    #
+
 
 
     def __pthread_create64_before_hook(self, emu, *arg):
@@ -56,14 +56,14 @@ class TestThread(unittest.TestCase):
 
         self.__is64_before_call = True
         return False
-    #
+
 
     def __pthread_create64_after_hook(self, emu, r0, r1):
         logging.warning("pthread_create 64 return 0x%08X"%(r0,))
         self.__is64_after_call = True
         self.assertEqual(r0, 0)
         return False
-    #
+
 
     def test_thread64(self):
         emulator = Emulator(
@@ -83,5 +83,5 @@ class TestThread(unittest.TestCase):
 
         self.assertTrue(self.__is64_before_call)
         self.assertTrue(self.__is64_after_call)
-    #
-#
+
+

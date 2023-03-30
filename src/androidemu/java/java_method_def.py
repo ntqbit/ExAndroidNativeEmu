@@ -35,7 +35,7 @@ def java_method_def(name, signature, native=False, args_list=None, modifier=None
 
                 #将self转为this object的引用，传入jni第一个参数
                 first_obj = emulator.java_vm.jni_env.add_local_reference(jobject(args[0]))
-            #
+
             else:
                 #否则是static方法
                 emulator = args[0]
@@ -47,19 +47,19 @@ def java_method_def(name, signature, native=False, args_list=None, modifier=None
                 #一层层迭代取类，防止函数在嵌套的类里面
                 for attr in sa[:-1]:
                     vals = vals[attr]
-                #
+
                 pyclazz = vals
                 if (not isinstance(pyclazz, JavaClassDef)):
                     raise RuntimeError("Error class %s is not register as jvm class!!!"%clsname)
-                #
+
                 jvm_clazz = pyclazz.class_object
                 #如果是static的，第一个参数是jclass引用
                 first_obj = emulator.java_vm.jni_env.add_local_reference(jclass(jvm_clazz))
-            #
+
             brace_index = signature.find(")")
             if (brace_index < 0):
                 raise RuntimeError("native_wrapper invalid function signature %s"%signature)
-            #
+
             return_index = brace_index + 1
             return_ch = signature[return_index]
             res = None
@@ -81,7 +81,7 @@ def java_method_def(name, signature, native=False, args_list=None, modifier=None
                             # method has been declared in
                     *extra_args  # Extra args.
                 )
-            #
+
             r = None
             if (return_ch in ('[', 'L')):
                 #返回值是object的话,需要转换jniref到真实object,方便使用
@@ -91,26 +91,25 @@ def java_method_def(name, signature, native=False, args_list=None, modifier=None
                     r = JAVA_NULL
                 else:
                     r = result.value
-                #
-            #
+
+
             else:
                 #基本类型的话直接返回
                 r = res
-            #
+
             #jni规格,从native层退出需要清除所有jni引用
             emulator.java_vm.jni_env.clear_locals()
             return r
-        #
+
         def normal_wrapper(*args, **kwargs):
             result = func(*args, **kwargs)
             return result
-        #
+
         wrapper = native_wrapper if native else normal_wrapper
         wrapper.jvm_method = JavaMethodDef(func.__name__, wrapper, name, signature, native,
                                            args_list=args_list,
                                            modifier=modifier,
                                            ignore=ignore)
         return wrapper
-    #
+
     return java_method_def_real
-#

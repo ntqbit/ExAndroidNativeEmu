@@ -21,9 +21,9 @@ class Module:
             addr = self.symbols[symbol_name]
             if addr != 0:
                 self.symbol_lookup[addr] = symbol_name
-            #
-        #
-    #
+
+
+
 
     def find_symbol(self, name):
         if name in self.symbols:
@@ -43,6 +43,6 @@ class Module:
             fun_addr = fun_ptr
             logging.debug("Calling Init_array %s function: 0x%08X " %(self.filename, fun_addr))
             emu.call_native(fun_addr)
-        #
-    #
+
+
 

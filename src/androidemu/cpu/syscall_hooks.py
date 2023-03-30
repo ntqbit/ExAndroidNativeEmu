@@ -117,7 +117,7 @@ class SyscallHooks:
             self._syscall_handler.set_handler(0x116, "getrandom", 3, self._getrandom)
             #no ARM_cacheflush
             self._syscall_handler.set_handler(0x65, "nanosleep", 2, self._nanosleep)
-        #
+
         self._clock_start = time.time()
         self._clock_offset = randint(50000, 100000)
         self._sig_maps = {}
@@ -125,7 +125,7 @@ class SyscallHooks:
         self.__cfg = cfg
         self._process_name = cfg.get("pkg_name") #"ChromiumNet10"
         self.__tid_2_tid_addr = {}
-    #
+
 
     def __do_fork(self, mu):
         logging.debug("fork called")
@@ -134,12 +134,12 @@ class SyscallHooks:
             pass
             #实测这样改没效果
             #logging.basicConfig(level=logging.DEBUG, format='%(process)d - %(asctime)s - %(levelname)s - %(message)s', stream=sys.stdout)
-        #
+
         else:
             logging.debug("-----here is parent process child pid=%d"%r)
-        #
+
         return r
-    #
+
 
     def __exit(self, mu, err_code):
         sch = self.__emu.get_schduler()
@@ -152,15 +152,15 @@ class SyscallHooks:
             sch.futex_wake(tid_addr_futex)
             mu.mem_write(tid_addr_futex, int(0).to_bytes(4, byteorder='little'))
             self.__tid_2_tid_addr.pop(cur_tid)
-        #
+
         #TODO use err_code
         sch.exit_current_task()
         return 0
-    #
+
 
     def __fork(self, mu):
         return self.__do_fork(mu)
-    #
+
 
     def __execve(self, mu, filename_ptr, argv_ptr, envp_ptr):
         filename =memory_helpers.read_utf8(mu, filename_ptr)
@@ -175,7 +175,7 @@ class SyscallHooks:
                 break
             params.append(param)
             ptr += self.__emu.get_ptr_size()
-        #
+
         logging.warning("execve %s %r"%(filename, params))
         cmd = " ".join(params)
 
@@ -186,7 +186,7 @@ class SyscallHooks:
             logging.debug("write to stdout [%s]"%output)
             os.write(1, output.encode("utf-8"))
             sys.exit(0)
-        #
+
         elif(cmd.find('wm density') > -1):
             output = "Physical density: 420"
             logging.info("write to stdout [%s]" % output)
@@ -205,25 +205,25 @@ class SyscallHooks:
 
         else:
             raise NotImplementedError()
-        #
-    #
+
+
 
     def _getpid(self, mu):
         return self.__pcb.get_pid()
-    #
+
 
     def __ptrace(self, mu, request, pid, addr, data):
         logging.warning("skip syscall ptrace request [%d] pid [0x%x] addr [0x%08X] data [0x%08X]"%(request, pid, addr, data))
         return 0
-    #
+
 
     def __kill(self, mu, pid, sig):
         logging.warning("kill is call pid=0x%x sig=%d"%(pid, sig))
         if (pid == self._getpid(mu)):
             logging.error("process 0x%x is killing self!!! maybe encounter anti-debug!!!"%pid)
             sys.exit(-10)
-        #
-    #
+
+
 
     def __pipe_common(self, mu, files_ptr, flags):
         #logging.warning("skip syscall pipe files [0x%08X]"%files_ptr)
@@ -232,7 +232,7 @@ class SyscallHooks:
         else:
             logging.warning("pipe2 not support use pipe")
             ps = os.pipe()
-        #
+
         logging.debug("pipe return %r"%(ps,))
         self.__pcb.add_fd("[pipe_r]", "[pipe_r]", ps[0])
         self.__pcb.add_fd("[pipe_w]", "[pipe_w]", ps[1])
@@ -240,11 +240,11 @@ class SyscallHooks:
         mu.mem_write(files_ptr, int(ps[0]).to_bytes(4, byteorder='little'))
         mu.mem_write(files_ptr+4, int(ps[1]).to_bytes(4, byteorder='little'))
         return 0
-    #
+
 
     def __pipe(self, mu, files_ptr):
         return self.__pipe_common(mu, files_ptr, 0)
-    #
+
     
     def _handle_sigaction(self, mu, sig, act, oact):
         '''
@@ -270,7 +270,7 @@ class SyscallHooks:
         logging.debug("sa_handler [0x%08X] sa_mask [0x%08X] sa_flag [0x%08X] sa_restorer [0x%08X]"%(sa_handler, sa_mask, sa_flag, sa_restorer))
         self._sig_maps[sig] = (sa_handler, sa_mask, sa_flag, sa_restorer)
         return 0
-    #
+
 
 
     def _rt_sigaction(self, mu, sig, act, oact, sigsetsize):
@@ -298,17 +298,17 @@ class SyscallHooks:
         logging.debug("sa_handler [0x%08X] sa_mask [0x%08X] sa_flag [0x%08X] sa_restorer [0x%08X]"%(sa_handler, sa_mask, sa_flag, sa_restorer))
         self._sig_maps[sig] = (sa_handler, sa_mask, sa_flag, sa_restorer)
         return 0
-    #
+
 
     def _gettid(self, mu):
         sch = self.__emu.get_schduler()
         return sch.get_current_tid()
-    #
+
 
     def _setsockopt(self, mu, fd, level, optname, optval, optlen):
         logging.warning("_setsockopt not implement skip")
         return 0
-    #
+
 
     def _getcpu(self, mu, _cpu, node, cache):
         if _cpu != 0:
@@ -340,7 +340,7 @@ class SyscallHooks:
             uc.mem_write(tz + 4, int().to_bytes(4, byteorder='little'))  # dsttime
 
         return 0
-    #
+
 
     def __wait4(self, mu, pid, wstatus, options, ru):
         assert ru==0
@@ -351,7 +351,7 @@ class SyscallHooks:
         #wstatus 只是一个int指针，固定是4
         mu.mem_write(wstatus, int(t[1]).to_bytes(4, "little"))
         return t[0]
-    #
+
     
     def __sysinfo(self, mu, info_ptr):
         '''
@@ -413,10 +413,10 @@ class SyscallHooks:
             mu.mem_write(info_ptr + 104, int(1).to_bytes(4, byteorder='little'))
             mu.mem_write(info_ptr + 108, int(0).to_bytes(4, byteorder='little'))
             #sz 112
-        #
+
         logging.warning("syscall sysinfo buf 0x%08X return fixed value"%(info_ptr))
         return 0
-    #
+
 
     def __clone(self, mu, flags, child_stack, parent_tid, new_tls, child_tid):
         CLONE_FILES = 0x00000400
@@ -445,7 +445,7 @@ class SyscallHooks:
             #clone(0x01200011, 0x00000000, 0x00000000, 0x00000000, 0x00000008)
             logging.warning("syscall clone do fork...")
             return self.__do_fork(mu)
-        #
+
         elif(flags & thread_flags == thread_flags):
             logging.warning("syscall clone do thread clone...")
             #clone一定要成功， 4.4 的libc有bug，当clone失败之后会释放一个锁，而锁的内存在child_stack中，而他逻辑先释放了stack再unlock锁，必蹦，之所以不出问题的原因是在真机上clone不会失败，这里注意
@@ -461,22 +461,22 @@ class SyscallHooks:
             #6.0的libc使用这几个参数设置tid，而不使用返回值，这跟4.4的libc实现不同，两个都要兼容
             if (flags & (CLONE_PARENT_SETTID|CLONE_SETTLS|CLONE_CHILD_SETTID|CLONE_CHILD_CLEARTID) != 0):
                 mu.mem_write(parent_tid, tid.to_bytes(4, byteorder='little'))
-            #
+
             if (flags & (CLONE_CHILD_SETTID|CLONE_CHILD_CLEARTID) != 0):
                 mu.mem_write(child_tid, tid.to_bytes(4, byteorder='little'))
-            #
+
             if (flags & CLONE_CHILD_CLEARTID):
                 #save the child_tid ptr
                 self.__tid_2_tid_addr[tid] = child_tid
-            #
+
             
             return tid
-        #
+
         
         #logging.warning("syscall clone skip.")
         raise NotImplementedError("clone flags 0x%08X no suppport"%flags)
         return -1
-    #
+
 
     def _handle_prctl(self, mu, option, arg2, arg3, arg4, arg5):
         """
@@ -494,7 +494,7 @@ class SyscallHooks:
             #传入非法指针，linux内核不会出发crash而只会返回失败
             logging.warning("prctl getter but buffer is 0")
             return -1
-        #
+
 
         if option == PR_SET_VMA:
             # arg5 contains ptr to a name.
@@ -512,8 +512,8 @@ class SyscallHooks:
             return 0
         else:
             raise NotImplementedError("Unsupported prctl option %d (0x%x)" % (option, option))
-        #
-    #
+
+
     def __uname(self, mu, buf):
         #    uts.sysname = Linux
         #    uts.nodename = localhost
@@ -530,29 +530,29 @@ class SyscallHooks:
         memory_helpers.write_utf8(mu, buf + 325, "localdomain")
 
         return 0
-    #
+
 
     def _handle_sigprocmask(self, mu, how, set, oset):
         return 0
-    #
+
 
     def _handle_rt_sigprocmask(self, mu, how, set, oset, sigsetsize):
         return 0
-    #
+
 
     def __sigaltstack(self, mu, uss, ouss):
         #TODO implment
         return 0
-    #
+
 
     def __vfork(self, mu):
         return self.__do_fork(mu)
-    #
+
 
     def _get_uid(self, mu):
         uid = self.__cfg.get("uid")
         return uid
-    #
+
 
     def __set_tid_address(self, mu, tidptr):
         sch = self.__emu.get_schduler
@@ -562,7 +562,7 @@ class SyscallHooks:
         else:
             self.__tid_2_tid_addr[tid] = tidptr
         return tid
-    #
+
 
     def _handle_futex(self, mu, uaddr, op, val, timeout_ptr, uaddr2, val3):
         #uaddr 是u32指针，所以指向的大小恒为4
@@ -585,9 +585,9 @@ class SyscallHooks:
                     timeout = ms
                     #TODO 这里timeout返回-1和ETIMEOUT，不能在这里返回，需要在调度器判断是否timeout而写r0和set_errno，暂时没实现，写死返回0
                     logging.warning("futex timeout %d ms is set, the return value is 0 not matter if it expired!!!"%ms)
-                #
+
                 sch.futex_wait(uaddr, timeout)
-            #
+
             return 0
         elif cmd == FUTEX_WAKE or cmd == FUTEX_WAKE_BITSET:
             logging.debug("futex_wake call op=0x%08X uaddr=0x%08X val=0x%08X"%(op, uaddr, val))
@@ -597,13 +597,13 @@ class SyscallHooks:
                 wake_ok = sch.futex_wake(uaddr)
                 if not wake_ok:
                     break
-                #
+
                 nwake = nwake+1
-            #
+
             if nwake > 0:
                 #交出执行权，这里只是为了适应某些so例如某dy，死循环等待的问题，这是由于uc对timeout的支持有bug,暂时无法支持时间片调度
                 sch.yield_task()
-            #
+
             return nwake
         elif cmd == FUTEX_FD:
             raise NotImplementedError()
@@ -614,13 +614,13 @@ class SyscallHooks:
         else:
             raise NotImplementedError()
         return 0
-    #
+
 
     def _handle_tgkill(self, mu, tgid, tid, sig):
         if (tgid ==  self._getpid(mu) and sig == 6):
             raise RuntimeError("tgkill abort self....")
             return 0
-        #
+
         return 0
         if (tgid == self._getpid(mu) and tid == self._gettid(mu)):
             if (sig in self._sig_maps):
@@ -629,8 +629,8 @@ class SyscallHooks:
                 addr = sigact[0]
                 #TODO implement signal handling
                 return 0
-            #
-        #
+
+
         raise NotImplementedError()
         return 0
 
@@ -669,17 +669,17 @@ class SyscallHooks:
         if (family == 16):
             logging.warning("family 16 not support")
             return -1
-        #
+
         if (protocol == 0):
             logging.warning("protocol 0 not support")
             return -1
-        #
+
         #print(family)
         s = socket.socket(family, type_in, protocol)
         socket_id = s.fileno()
         self.__pcb.add_fd("[socket]", "[socket]", socket_id)
         return socket_id
-    #
+
 
     def _bind(self, mu, fd, addr, addr_len):
 
@@ -700,7 +700,7 @@ class SyscallHooks:
         # return 0
         return -1
         # raise NotImplementedError()
-    #
+
     
     def __dup3(self, mu, oldfd, newfd, flags):
         assert flags == 0, "dup3 flag not support now"
@@ -708,11 +708,11 @@ class SyscallHooks:
         os.dup2(oldfd, newfd)
         self.__pcb.add_fd(old_detail.name, old_detail.name_in_system, newfd)
         return 0
-    #
+
 
     def __pipe2(self, mu, files_ptr, flags):
         return self.__pipe_common(mu, files_ptr, flags)
-    #
+
 
     def _getrandom(self, mu, buf, count, flags):
         mu.mem_write(buf, b"\x01" * count)
@@ -735,7 +735,7 @@ class SyscallHooks:
             tmp = memory_helpers.read_byte_array(mu, rbase, iov_len)
             b+=tmp
             off_r+=2*self.__ptr_sz
-        #
+
         off_l = local_iov
         has_read = 0
         for j in range(0, liovcnt):
@@ -745,20 +745,20 @@ class SyscallHooks:
             mu.mem_write(lbase, tmp)
             has_read += len(tmp)
             off_l += 2*self.__ptr_sz
-        #
+
         #print(b)
         return has_read
-    #
+
 
     def _ARM_cacheflush(self, mu):
         logging.warning("syscall _ARM_cacheflush skip.")
         return 0
-    #
+
 
     def _ARM_set_tls(self, mu, tls_ptr):
         assert self.__emu.get_arch() == emu_const.ARCH_ARM32, "error only arm32 has _ARM_set_tls syscall!!!"
         self.__emu.mu.reg_write(UC_ARM_REG_C13_C0_3, tls_ptr)
-    #
+
     
     def _nanosleep(self, mu, req, rem):
         '''
@@ -775,5 +775,5 @@ class SyscallHooks:
         sch = self.__emu.get_schduler()
         sch.sleep(ms)
         return 0
-    #
-#
+
+

@@ -8,6 +8,5 @@ class Application(ContextWrapper, metaclass=JavaClassDef, jvm_name='android/app/
 
     def __init__(self):
         pass
-    #
+
     
-#

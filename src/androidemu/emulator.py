@@ -71,9 +71,9 @@ class Emulator:
             self.mu.emu_start(address | 1, address + len(code_bytes))
         finally:
             self.mu.mem_unmap(address, mem_size)
-        #
 
-    #
+
+
     #arm64
     '''
     mrs    x1, cpacr_el1
@@ -87,7 +87,7 @@ class Emulator:
         x = self.mu.reg_read(UC_ARM64_REG_CPACR_EL1)
         x |= 0x300000; # set FPEN bit
         self.mu.reg_write(UC_ARM64_REG_CPACR_EL1, x)
-    #
+
 
     def __add_classes(self):
         cur_file_dir = os.path.dirname(__file__)
@@ -106,17 +106,17 @@ class Emulator:
             for _, clz in clsList:
                 if (type(clz) == JavaClassDef):
                     preload_classes.add(clz)
-                #
-            #
-        #
+
+
+
         for clz in preload_classes:
             self.java_classloader.add_class(clz)
-        #
+
 
         #also add classloader as java class
         self.java_classloader.add_class(JavaClassLoader)
         
-    #
+
 
     """
     :type mu Uc
@@ -141,25 +141,25 @@ class Emulator:
             self.mu = Uc(UC_ARCH_ARM, UC_MODE_ARM)
             if vfp_inst_set:
                 self.__enable_vfp32()
-            #
+
             sp_reg = UC_ARM_REG_SP
             self.call_native = self.__call_native32
             self.call_native_return_2reg = self.__call_native_return_2reg32
-        #
+
         elif arch == emu_const.ARCH_ARM64:
             self.__ptr_sz = 8
             self.mu = Uc(UC_ARCH_ARM64, UC_MODE_ARM)
             if vfp_inst_set:
                 self.__enable_vfp64()
-            # 
+
             sp_reg = UC_ARM64_REG_SP
 
             self.call_native = self.__call_native64
             self.call_native_return_2reg = self.__call_native_return_2reg64
-        #
+
         else:
             raise RuntimeError("emulator arch=%d not support!!!"%arch)
-        #
+
         self.__vfs_root = vfs_root
 
         #注意，原有缺陷，原来linker初始化没有完成init_tls部分，导致libc初始化有访问空指针而无法正常完成
@@ -174,7 +174,7 @@ class Emulator:
                 "ro.build.host":"833d1eed3ea3", "ro.build.type":"user", 
                 "ro.secure":"1", "wifi.interface":"wlan0", "ro.product.brand":"Android",
                 }
-        #
+
         else:
             #FIXME 这里arm64用 6.0，应该arm32也统一使用6.0
             # Android 6.0
@@ -183,7 +183,7 @@ class Emulator:
                 "ro.build.host":"833d1eed3ea3", "ro.build.type":"user", 
                 "ro.secure":"1", "wifi.interface":"wlan0", "ro.product.brand":"Android",
             }
-        #
+
         self.memory = MemoryMap(self.mu, config.MAP_ALLOC_BASE, config.MAP_ALLOC_BASE+config.MAP_ALLOC_SIZE)
 
         # Stack.
@@ -230,24 +230,24 @@ class Emulator:
             sz = os.path.getsize(path)
             vf = VirtualFile("/system/bin/app_process32", misc_utils.my_open(path, os.O_RDONLY), path)
             self.memory.map(0xab006000, sz, UC_PROT_EXEC | UC_PROT_READ, vf, 0)
-        #
+
         else:
             #映射app_process，android系统基本特征
             path = "%s/system/bin/app_process64"%vfs_root
             sz = os.path.getsize(path)
             vf = VirtualFile("/system/bin/app_process64", misc_utils.my_open(path, os.O_RDONLY), path)
             self.memory.map(0xab006000, sz, UC_PROT_EXEC | UC_PROT_READ, vf, 0)
-        #
-    #
+
+
 
     def get_vfs_root(self):
         return self.__vfs_root
-    #
+
 
     def load_library(self, filename, do_init=True):
         libmod = self.modules.load_module(filename, True)
         return libmod
-    #
+
 
     def call_symbol(self, module, symbol_name, *argv):
         symbol_addr = module.find_symbol(symbol_name)
@@ -257,7 +257,7 @@ class Emulator:
             return
 
         return self.call_native(symbol_addr, *argv)
-    #
+
 
     def __call_native32(self, addr, *argv):
         assert addr != None, "call addr is None, make sure your jni native function has registered by RegisterNative!"
@@ -266,7 +266,7 @@ class Emulator:
         # Read result from locals if jni.
         res = self.mu.reg_read(UC_ARM_REG_R0)
         return res
-    #
+
 
     def __call_native64(self, addr, *argv):
         assert addr != None, "call addr is None, make sure your jni native function has registered by RegisterNative!"
@@ -275,7 +275,7 @@ class Emulator:
         # Read result from locals if jni.
         res = self.mu.reg_read(UC_ARM64_REG_X0)
         return res
-    #
+
 
     #返回值8个字节,用两个寄存器保存
     def __call_native_return_2reg32(self, addr, *argv):
@@ -284,7 +284,7 @@ class Emulator:
         res_high = self.mu.reg_read(UC_ARM_REG_R1)
 
         return (res_high << 32) | res
-    #
+
 
     #返回值16个字节,用两个寄存器保存
     def __call_native_return_2reg64(self, addr, *argv):
@@ -293,26 +293,26 @@ class Emulator:
         res_high = self.mu.reg_read(UC_ARM64_REG_X1)
 
         return (res_high << 64) | res
-    #
+
 
     def get_arch(self):
         return self.__arch
-    #
+
 
     def get_ptr_size(self):
         return self.__ptr_sz
-    #
+
 
     def get_pcb(self):
         return self.__pcb
-    #
+
 
     def get_schduler(self):
         return self.__sch
-    #
+
 
     def get_muti_task_support(self):
         return self.__support_muti_task
-    #
-#
+
+
 

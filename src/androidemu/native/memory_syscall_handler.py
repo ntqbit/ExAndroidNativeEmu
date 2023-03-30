@@ -30,19 +30,19 @@ class MemorySyscallHandler:
             #arm64 只有mmap调用，没有mmap2
             self._syscall_handler.set_handler(0xde, "mmap", 6, self._handle_mmap)
             self._syscall_handler.set_handler(0xe9, "madvise", 3, self._handle_madvise)
-        #
-    #
+
+
     
     def _handle_brk(self, uc, brk):
         #TODO: set errno
         #TODO: implement 
         return -1
-    #
+
 
     def _handle_munmap(self, uc, addr, len_in):
         #TODO: set errno
         return self._memory.unmap(addr, len_in)
-    #
+
 
     def _handle_mmap2(self, mu, addr, length, prot, flags, fd, pgoffset):
         """
@@ -63,7 +63,7 @@ class MemorySyscallHandler:
         elif fd != 0xffffffff: # 如果有fd
             if fd <= 2:
                 raise NotImplementedError("Unsupported read operation for file descriptor %d." % fd)
-            #
+
             if not self.__pcb.has_fd(fd):
                 # TODO: Return valid error.
                 raise NotImplementedError()
@@ -79,13 +79,13 @@ class MemorySyscallHandler:
             '''
             offset = pgoffset * 4096
             res = self._memory.map(addr, length, prot, vf, offset)
-        #
+
         else:
             res = self._memory.map(addr, length, prot)
-        #
+
         logging.debug("mmap return 0x%08X"%res)
         return res
-    #
+
 
     def _handle_mmap(self, mu, addr, length, prot, flags, fd, offset):
         """
@@ -107,20 +107,20 @@ class MemorySyscallHandler:
         elif fd != 0xffffffff: # 如果有fd
             if fd <= 2:
                 raise NotImplementedError("Unsupported read operation for file descriptor %d." % fd)
-            #
+
             if not self.__pcb.has_fd(fd):
                 # TODO: Return valid error.
                 raise NotImplementedError()
 
             vf = self.__pcb.get_fd_detail(fd)
             res = self._memory.map(addr, length, prot, vf, offset)
-        #
+
         else:
             res = self._memory.map(addr, length, prot)
-        #
+
         logging.debug("mmap return 0x%016X"%res)
         return res
-    #
+
 
     def _handle_madvise(self, mu, start, len_in, behavior):
         """
@@ -139,4 +139,4 @@ class MemorySyscallHandler:
         range in the interval [addr, addr+len-1]. addr must be aligned to a page boundary.
         """
         return self._memory.protect(addr, len_in, prot)
-    #
+

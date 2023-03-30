@@ -24,20 +24,20 @@ def stat_to_memory2(uc, buf_ptr, stat, uid, st_mode):
     st_rdev = 0
     if (hasattr(stat, "st_rdev")):
         st_rdev = stat.st_rdev
-    #
+
     st_blksize = 0
     if (hasattr(stat, "st_blksize")):
         st_blksize = stat.st_blksize
-    #
+
     st_blocks = 0
     if (hasattr(stat, "st_blocks")):
         st_blocks = stat.st_blocks
-    #
+
     stdev = stat.st_dev
     if (stdev < 0):
         #随便给个数值就行了
         stdev = stdev * -1
-    #
+
     st_ino = 0
     if(stat.st_ino <= 0xFFFFFFFF):
         st_ino = stat.st_ino
@@ -58,27 +58,27 @@ def stat_to_memory2(uc, buf_ptr, stat, uid, st_mode):
     uc.mem_write(buf_ptr + 80, int(stat.st_mtime).to_bytes(8, byteorder='little'))
     uc.mem_write(buf_ptr + 88, int(stat.st_ctime).to_bytes(8, byteorder='little'))
     uc.mem_write(buf_ptr + 96, int(st_ino).to_bytes(8, byteorder='little'))
-#
+
 
 
 def stat_to_memory64(uc, buf_ptr, stat, uid, st_mode):
     st_rdev = 0
     if (hasattr(stat, "st_rdev")):
         st_rdev = stat.st_rdev
-    #
+
     st_blksize = 0
     if (hasattr(stat, "st_blksize")):
         st_blksize = stat.st_blksize
-    #
+
     st_blocks = 0
     if (hasattr(stat, "st_blocks")):
         st_blocks = stat.st_blocks
-    #
+
     stdev = stat.st_dev
     if (stdev < 0):
         #随便给个数值就行了
         stdev = stdev * -1
-    #
+
     st_ino = stat.st_ino
     
     uc.mem_write(buf_ptr, int(stdev).to_bytes(8, byteorder='little'))
@@ -97,4 +97,3 @@ def stat_to_memory64(uc, buf_ptr, stat, uid, st_mode):
     uc.mem_write(buf_ptr + 104, int(stat.st_ctime).to_bytes(16, byteorder='little'))
     uc.mem_write(buf_ptr + 120, int(0).to_bytes(8, byteorder='little'))    #two unused
     #128
-#

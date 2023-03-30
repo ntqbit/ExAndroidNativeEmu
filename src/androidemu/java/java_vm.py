@@ -28,38 +28,38 @@ class JavaVM:
 
         self.jni_env = JNIEnv(emu, class_loader, hooker)
         self.__emu = emu
-    #
+
 
     @native_method
     def destroy_java_vm(self, mu):
         raise NotImplementedError()
-    #
+
     
     @native_method
     def attach_current_thread(self, mu, java_vm, env_ptr, thr_args):
         logger.debug("JavaVM->AttachCurrentThread(0x%08x, 0x%08x, 0x%08x)" %(java_vm, env_ptr, thr_args))
         mu.mem_write(env_ptr, self.jni_env.address_ptr.to_bytes(self.__emu.get_ptr_size(), byteorder='little'))
         return JNI_OK
-    #
+
 
     @native_method
     def detach_current_thread(self, mu, java_vm):
         # TODO: NooOO idea.
         logger.debug("JavaVM->DetachCurrentThread(0x%08x)" %(java_vm,))
         return JNI_OK
-    #
+
 
     @native_method
     def get_env(self, mu, java_vm, env_ptr, version):
         logger.debug("JavaVM->GetEnv(0x%08x, 0x%08x, 0x%08x)" %(java_vm, env_ptr, version))
         mu.mem_write(env_ptr, self.jni_env.address_ptr.to_bytes(self.__emu.get_ptr_size(), byteorder='little'))
         return JNI_OK
-    #
+
 
     @native_method
     def attach_current_thread_as_daemon(self, mu, java_vm, env_ptr, thr_args):
         logger.debug("JavaVM->AttachCurrentThreadAsDaemon(0x%08x, 0x%08x, 0x%08x)" %(java_vm, env_ptr, thr_args))
         mu.mem_write(env_ptr, self.jni_env.address_ptr.to_bytes(self.__emu.get_ptr_size(), byteorder='little'))
         return JNI_OK
-    #
+
 

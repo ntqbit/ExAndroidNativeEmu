@@ -26,19 +26,19 @@ class TestClass(metaclass=JavaClassDef, jvm_name='com/dingxiang/demo/TestClass')
 
     def __init__(self):
         pass
-    #
+
 
     @java_method_def(name='testJni1', signature='(Landroid/content/Context;)Ljava/lang/String;', native=True)
     def testJni1(self, mu, ctx):
         pass
-    #
+
 
     @java_method_def(name='testJni2', signature='(J)J', native=True)
     def testJni2(self, mu, n):
         pass
-    #
 
-#
+
+
 
 
 
@@ -59,7 +59,7 @@ class TestNative(unittest.TestCase):
         res = emulator.call_symbol(module, 'Java_com_aeonlucid_nativetesting_MainActivity_testOneArg', emulator.java_vm.jni_env.address_ptr, 0x00, String('Hello'))
         pystr = emulator.java_vm.jni_env.get_local_reference(res).value.get_py_string()
         self.assertEqual(pystr, "Hello")
-    #
+
 
     def __test_tls_common(self, emulator, libcm):
         env_key_ptr = emulator.call_symbol(libcm, "malloc", 100)
@@ -79,7 +79,7 @@ class TestNative(unittest.TestCase):
         r = emulator.call_symbol(libcm, "pthread_getspecific", key)
         emulator.call_symbol(libcm, "free", key_buf_ptr)
         self.assertEqual(r, target_int)
-    #
+
 
     def test_tls32(self):
         try:
@@ -93,8 +93,8 @@ class TestNative(unittest.TestCase):
             print("Exit at 0x%08X" % emulator.mu.reg_read(UC_ARM_REG_PC))
             emulator.memory.dump_maps(sys.stdout)
             raise
-        #
-    #
+
+
 
     def test_tls64(self):
         try:
@@ -109,8 +109,8 @@ class TestNative(unittest.TestCase):
             print("Exit at 0x%08X" % emulator.mu.reg_read(UC_ARM64_REG_PC))
             emulator.memory.dump_maps(sys.stdout)
             raise
-        #
-    #
+
+
 
     def test_64_elf(self):
 
@@ -138,8 +138,8 @@ class TestNative(unittest.TestCase):
             print("Exit at 0x%08X" % emulator.mu.reg_read(UC_ARM64_REG_PC))
             emulator.memory.dump_maps(sys.stdout)
             raise
-        #
-    #
+
+
 
     def test_load_bias_new_delete(self):
         emulator = Emulator(
@@ -152,11 +152,11 @@ class TestNative(unittest.TestCase):
             emulator.mu.mem_write(new_ptr, b'hello world...')
             self.assertTrue(new_ptr!=0)
             emulator.call_symbol(libcpp, "_ZdlPv", new_ptr)
-        #
+
         except UcError as e:
             print("Exit at 0x%08X" % emulator.mu.reg_read(UC_ARM64_REG_PC))
             emulator.memory.dump_maps(sys.stdout)
             raise
-        #
-    #
-#
+
+
+

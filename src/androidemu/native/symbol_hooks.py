@@ -33,7 +33,7 @@ class SymbolHooks:
             modules.add_symbol_hook('pthread_create', hooker.write_function(self.pthread_create))
             modules.add_symbol_hook('pthread_join', hooker.write_function(self.pthread_join))
             modules.add_symbol_hook('pthread_detach', hooker.write_function(self.pthread_detach))
-        #
+
         modules.add_symbol_hook('rand', hooker.write_function(self.rand))
         modules.add_symbol_hook('newlocale', hooker.write_function(self.newlocale))
 
@@ -43,7 +43,7 @@ class SymbolHooks:
 
         asset_hooks = AssetManagerHooks(emu, modules, hooker, vfs_root)
         asset_hooks.register()
-    #
+
 
 
 
@@ -60,7 +60,7 @@ class SymbolHooks:
             return nread
         else:
             print ('%s was not found in system_properties dictionary.' % name)
-        #
+
         return 0
 
     @native_method
@@ -77,9 +77,9 @@ class SymbolHooks:
                     r = mod.soinfo_ptr
                     logger.debug("Called dlopen(%s) return 0x%08x" %(path, r))
                     return r
-                #
-            #
-        #
+
+
+
         #redirect path on matter what path in vm runing
         fullpath = self._modules.find_so_on_disk(path)
         if (fullpath != None):
@@ -89,10 +89,10 @@ class SymbolHooks:
             #raise RuntimeError("dlopen %s not found!!!"%path)
             logger.debug("dlopen %s not found!!!"%path)
             r = 0
-        #
+
         logger.debug("Called dlopen(%s) return 0x%08x" %(path, r))
         return r
-    #
+
 
 
     @native_method
@@ -103,7 +103,7 @@ class SymbolHooks:
         """
         logger.debug("Called dlclose(0x%x)" % handle)
         return 0
-    #
+
 
     @native_method
     def dladdr(self, uc, addr, info_ptr):
@@ -118,11 +118,11 @@ class SymbolHooks:
                 logger.debug("Called dladdr ok return path=%s base=0x%08x" % (mod.filename, mod.base))
                 logger.warning("dladdr has memory leak, dli_fname can not free!!!")
                 return 1
-            #
-        #
+
+
         logger.debug("Called dladdr not found" % (mod.filename, mod.base))
         return 0
-    #
+
 
     @native_method
     def dlsym(self, uc, handle, symbol):
@@ -131,7 +131,7 @@ class SymbolHooks:
         global_handle = 0xffffffff
         if (self._emu.get_arch() == emu_const.ARCH_ARM64):
             global_handle = 0
-        #
+
 
         if handle == global_handle:
             sym = self._modules.find_symbol_str(symbol_str)
@@ -144,32 +144,32 @@ class SymbolHooks:
             else:
                 #soinfo+140 offset of load base in soinfo on android 4.4
                 base = memory_helpers.read_ptr_sz(uc, soinfo+140, self._emu.get_ptr_size())
-            #
+
             module = self._modules.find_module(base)
 
             if module is None:
                 raise Exception('Module not found for address 0x%x' % symbol)
-            #
+
             sym = module.find_symbol(symbol_str)
-        #
+
         r = 0
         if sym is not None:
             r = sym
-        #
+
         logger.debug("Called dlsym(0x%x, %s) return 0x%08X" % (handle, symbol_str, r))
         return r
-    #
+
 
     @native_method
     def abort(self, uc):
         raise RuntimeError("abort called!!!")
         sys.exit(-1)
-    #
+
 
     @native_method
     def dl_unwind_find_exidx(self, uc, pc, pcount_ptr):
         return 0
-    #
+
 
     
     @native_method
@@ -179,17 +179,17 @@ class SymbolHooks:
         uc.mem_write(pthread_t_ptr, int(self.__thread_id).to_bytes(self._emu.get_ptr_size(), byteorder='little'))
         self.__thread_id = self.__thread_id + 1
         return 0
-    #
+
 
     @native_method
     def pthread_join(self, uc, pthread_t, retval):
         return 0
-    #
+
 
     @native_method
     def pthread_detach(self, uc, pthread_t):
         return 0
-    #
+
 
     @native_method
     def rand(self, uc):
@@ -197,18 +197,18 @@ class SymbolHooks:
         logging.info("rand call")
         r = random.randint(0, 0xFFFFFFFF)
         return r
-    #
+
 
     @native_method
     def newlocale(self, uc):
         #4.4的libc太旧没有这个函数，先这样绕过
         logging.info("newlocale call return 0 skip")
         return 0
-    #
+
 
     def nop(self, name):
         @native_method
         def nop_inside(emu):
             raise NotImplementedError('Symbol hook not implemented %s' % name)
         return nop_inside
-    #
+

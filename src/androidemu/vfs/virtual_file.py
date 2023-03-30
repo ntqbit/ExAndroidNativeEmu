@@ -4,5 +4,4 @@ class VirtualFile:
         self.name = name
         self.name_in_system = name_in_system
         self.descriptor = file_descriptor
-    #
-#
+

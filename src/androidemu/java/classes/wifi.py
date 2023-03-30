@@ -17,7 +17,7 @@ class WifiInfo(metaclass=JavaClassDef, jvm_name='android/net/wifi/WifiInfo'):
         mac = emu.config.get("mac")
         s = "%02x:%02x:%02x:%02x:%02x:%02x"%(mac[0], mac[1], mac[2], mac[3], mac[4], mac[5])
         return String(s)
-    #
+
 
     @java_method_def(name='getBSSID', signature='()Ljava/lang/String;'
         , native=False)
@@ -25,14 +25,14 @@ class WifiInfo(metaclass=JavaClassDef, jvm_name='android/net/wifi/WifiInfo'):
         #TODO 从WifiConfiguration 获取
         return String("")
 
-    #
+
 
     @java_method_def(name='getSSID', signature='()Ljava/lang/String;'
         , native=False)
     def getSSID(self, *args, **kwargs):
         #TODO 从WifiConfiguration 获取
         return String("")
-    #
+
 
 
 class NetworkInfo(metaclass=JavaClassDef, jvm_name='android/net/NetworkInfo'):
@@ -60,9 +60,9 @@ class WifiConfiguration(metaclass=JavaClassDef, jvm_name='android/net/wifi/WifiC
         self.networkId = 0
         self.priority = 0
         self.providerFriendlyName = String("hello")
-    #
 
-#
+
+
 
 class DhcpInfo(metaclass=JavaClassDef, jvm_name='android/net/DhcpInfo',
                   jvm_fields=[
@@ -71,24 +71,24 @@ class DhcpInfo(metaclass=JavaClassDef, jvm_name='android/net/DhcpInfo',
                       ):
     def __init__(self):
         self.gateway = 0
-    #
-#
+
+
 
 class WifiManager(metaclass=JavaClassDef, jvm_name='android/net/wifi/WifiManager'):
     def __init__(self):
         self.__list = List([])
         self.__dhcpInfo = DhcpInfo()
-    #
+
 
     @java_method_def(name='getConfiguredNetworks', signature='()Ljava/util/List;', native=False)
     def getConfiguredNetworks(self, emu):
         return self.__list
-    #
+
 
     @java_method_def(name='getDhcpInfo', signature='()Landroid/net/DhcpInfo;', native=False)
     def getDhcpInfo(self, emu):
         return self.__dhcpInfo
-    #
+
 
     @java_method_def(name='getDeviceId', signature='()Ljava/lang/String;'
         , native=False)
@@ -96,7 +96,7 @@ class WifiManager(metaclass=JavaClassDef, jvm_name='android/net/wifi/WifiManager
         #TODO read from config
         return String("12345678")
 
-    #
+
 
     @java_method_def(name='getSubscriberId', signature='()Ljava/lang/String;'
         , native=False)
@@ -104,7 +104,7 @@ class WifiManager(metaclass=JavaClassDef, jvm_name='android/net/wifi/WifiManager
         #TODO read from config
         return String("12345678")
 
-    #
+
 
     @java_method_def(name='getConnectionInfo', signature='()Landroid/net/wifi/WifiInfo;'
         , native=False)
@@ -112,22 +112,22 @@ class WifiManager(metaclass=JavaClassDef, jvm_name='android/net/wifi/WifiManager
         #TODO read from config
         return WifiInfo()
 
-    #
+
 
     @java_method_def(name='getActiveNetworkInfo', signature='()Landroid/net/NetworkInfo;'
         , native=False)
     def getActiveNetworkInfo(self, *args, **kwargs):
         #TODO read from config
         return NetworkInfo()
-    #
 
-#
+
+
 
 
 class TelephonyManager(metaclass=JavaClassDef, jvm_name='android/telephony/TelephonyManager'):
     def __init__(self):
         pass
-    #
+
 
     @java_method_def(name='getDeviceId', signature='()Ljava/lang/String;', native=False)
     def getDeviceId(self, *args, **kwargs):
@@ -135,7 +135,7 @@ class TelephonyManager(metaclass=JavaClassDef, jvm_name='android/telephony/Telep
         #FIXME 读配置文件
         imei = "353627071193539"
         return String(imei)
-    #
+
 
 
     @java_method_def(name='getSubscriberId', signature='()Ljava/lang/String;', native=False)
@@ -144,20 +144,20 @@ class TelephonyManager(metaclass=JavaClassDef, jvm_name='android/telephony/Telep
         #FIXME 读配置文件
         imsi = "00000000000000"
         return String(imsi)
-    #
-#
+
+
 
 
 class RequestBuilder(metaclass=JavaClassDef, jvm_name='android/net/NetworkRequest$Builder'):
     def __init__(self):
         pass
-    #
+
     
     @java_method_def(name='<init>', signature='()V'
         , native=False)
     def init(self, *args, **kwargs):
         return RequestBuilder()
-    #
+
 
 
     @java_method_def(name='addTransportType', signature='(I)Landroid/net/NetworkRequest$Builder;', native=False)
@@ -166,20 +166,20 @@ class RequestBuilder(metaclass=JavaClassDef, jvm_name='android/net/NetworkReques
         #FIXME 读配置文件
         print(i)
         return RequestBuilder()
-    #
-#
+
+
 
 
 class NetworkInfo(metaclass=JavaClassDef, jvm_name='android/net/NetworkInfo'):
     def __init__(self):
         pass
-    #
-#
+
+
 
 class ConnectivityManager(metaclass=JavaClassDef, jvm_name='android/net/ConnectivityManager'):
     def __init__(self):
         pass
-    #
+
 
 
     @java_method_def(name='getActiveNetworkInfo', signature='()Landroid/net/NetworkInfo;', native=False)
@@ -187,5 +187,5 @@ class ConnectivityManager(metaclass=JavaClassDef, jvm_name='android/net/Connecti
         #IMEI
         #FIXME 读配置文件
         return NetworkInfo()
-    #
-#
+
+

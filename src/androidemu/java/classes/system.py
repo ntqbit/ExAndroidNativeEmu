@@ -8,7 +8,7 @@ class System(metaclass=JavaClassDef, jvm_name='java/lang/System'):
 
     def __init__(self):
         pass
-    #
+
 
     @staticmethod
     @java_method_def(name='getProperty', args_list=["jstring"], signature='(Ljava/lang/String;)Ljava/lang/String;', native=False)
@@ -19,9 +19,9 @@ class System(metaclass=JavaClassDef, jvm_name='java/lang/System'):
             #1.6.0 for 4.4
             #2.1.0 for 6.0
             return String("1.6.0")
-        #
+
         return String("")
         raise NotImplementedError()
-    #
-#
+
+
 

@@ -7,7 +7,7 @@ def read_ptr_sz(mu, address, sz):
 def read_ptr(mu, address):
     #FIXME 写死了ptr大小，所有调用这个函数都要改成read_ptr_sz
     return int.from_bytes(mu.mem_read(address, 4), byteorder='little')
-#
+
 
 
 def read_byte_array(mu, address, size):
@@ -40,7 +40,7 @@ def write_utf8(mu, address, value):
     value_utf8 = value.encode(encoding="utf-8")
     mu.mem_write(address, value_utf8 + b"\x00")
     return len(value_utf8)+1
-#
+
 
 
 def write_uints(mu, address, num):
@@ -54,8 +54,8 @@ def write_uints(mu, address, num):
     for v in l:
         mu.mem_write(address, int(v).to_bytes(4, byteorder='little'))
         address += 4
-    #
-#
+
+
 
 def write_ptrs_sz(mu, address, num, ptr_sz):
     l = []
@@ -68,6 +68,6 @@ def write_ptrs_sz(mu, address, num, ptr_sz):
         mu.mem_write(address, int(v).to_bytes(ptr_sz, byteorder='little'))
         address += ptr_sz
         n += ptr_sz
-    #
+
     return n
-#
+

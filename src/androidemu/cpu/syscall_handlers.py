@@ -27,12 +27,12 @@ class SyscallHandlers:
         else:
             #arm64
             self.__interrupt_handler.set_handler(2, self._handle_syscall64)
-        #
-    #
+
+
 
     def set_handler(self, idx, name, arg_count, callback):
         self._handlers[idx] = SyscallHandler(idx, name, arg_count, callback)
-    #
+
 
     def _handle_syscall(self, mu):
         idx = mu.reg_read(UC_ARM_REG_R7)
@@ -62,8 +62,8 @@ class SyscallHandlers:
             logging.exception(error)
             mu.emu_stop()
             raise RuntimeError(error)
-        #
-    #
+
+
     def _handle_syscall64(self, mu):
         idx = mu.reg_read(UC_ARM64_REG_X8)
         lr = mu.reg_read(UC_ARM64_REG_LR)
@@ -94,6 +94,6 @@ class SyscallHandlers:
             logging.exception(error)
             mu.emu_stop()
             raise RuntimeError(error)
-        #
-    #
-#
+
+
+
