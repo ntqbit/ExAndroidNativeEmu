@@ -1,4 +1,5 @@
-# From http://infocenter.arm.com/help/topic/com.arm.doc.ihi0044f/IHI0044F_aaelf.pdf
+# From
+# http://infocenter.arm.com/help/topic/com.arm.doc.ihi0044f/IHI0044F_aaelf.pdf
 
 R_ARM_ABS32 = 2
 R_AARCH64_ABS64 = 257

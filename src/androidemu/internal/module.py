@@ -1,5 +1,6 @@
 import logging
 
+
 class Module:
 
     """
@@ -7,7 +8,15 @@ class Module:
     :type base int
     :type size int
     """
-    def __init__(self, filename, address, size, symbols_resolved, init_array, soinfo_ptr):
+
+    def __init__(
+            self,
+            filename,
+            address,
+            size,
+            symbols_resolved,
+            init_array,
+            soinfo_ptr):
         self.filename = filename
         self.base = address
         self.size = size
@@ -22,9 +31,6 @@ class Module:
             if addr != 0:
                 self.symbol_lookup[addr] = symbol_name
 
-
-
-
     def find_symbol(self, name):
         if name in self.symbols:
             return self.symbols[name]
@@ -32,17 +38,16 @@ class Module:
 
     def is_symbol_addr(self, addr):
         if addr in self.symbol_lookup:
-            return  self.symbol_lookup[addr]
-        elif addr+1 in self.symbol_lookup:
-            return  self.symbol_lookup[addr+1]
+            return self.symbol_lookup[addr]
+        elif addr + 1 in self.symbol_lookup:
+            return self.symbol_lookup[addr + 1]
         else:
             return None
 
     def call_init(self, emu):
         for fun_ptr in self.init_array:
             fun_addr = fun_ptr
-            logging.debug("Calling Init_array %s function: 0x%08X " %(self.filename, fun_addr))
+            logging.debug(
+                "Calling Init_array %s function: 0x%08X " %
+                (self.filename, fun_addr))
             emu.call_native(fun_addr)
-
-
-

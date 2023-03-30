@@ -1,6 +1,6 @@
 from ..java_class_def import JavaClassDef
 from ..java_field_def import JavaFieldDef
-from ..java_method_def import java_method_def,JavaMethodDef
+from ..java_method_def import java_method_def, JavaMethodDef
 from ..constant_values import *
 from .array import *
 
@@ -9,19 +9,15 @@ class Set(metaclass=JavaClassDef, jvm_name='java/util/Set'):
     def __init__(self, pyset):
         self.__pyset = pyset
 
-
     @java_method_def(name='<init>', signature='()V', native=False)
     def ctor(self, emu):
         self.__pyset = set()
 
-
     def __len__(self):
         return len(self.__pyset)
 
-
-    def __getitem__(self,key):
+    def __getitem__(self, key):
         return self.__pyset[key]
-
 
     '''
     @java_method_def(name='get', args_list=["jobject"], signature='(Ljava/lang/Object;)Ljava/lang/Object;', native=False)
@@ -43,13 +39,12 @@ class Set(metaclass=JavaClassDef, jvm_name='java/util/Set'):
 
     '''
 
-    @java_method_def(name='toArray', signature='()[Ljava/lang/Object;', native=False)
+    @java_method_def(name='toArray',
+                     signature='()[Ljava/lang/Object;',
+                     native=False)
     def toArray(self, emu):
         return Array(list(self.__pyset))
-
-
 
     @java_method_def(name='size', signature='()I', native=False)
     def size(self, emu):
         return len(self.__pyset)
-

@@ -35,26 +35,34 @@ class secuni_b(metaclass=JavaClassDef, jvm_name='com/ss/sys/secuni/b/c'):
     def __init__(self):
         pass
 
-    @java_method_def(name='n0', signature='(Landroid/content/Context;)[B', native=True)
+    @java_method_def(name='n0',
+                     signature='(Landroid/content/Context;)[B',
+                     native=True)
     def n0(self, mu):
         pass
 
-    @java_method_def(name='n1', signature='(Landroid/content/Context;Ljava/lang/String;)I', native=True)
+    @java_method_def(name='n1',
+                     signature='(Landroid/content/Context;Ljava/lang/String;)I',
+                     native=True)
     def n1(self, mu):
         pass
 
 
-class UserInfo(metaclass=JavaClassDef, jvm_name='com/ss/android/common/applog/UserInfo'):
+class UserInfo(
+        metaclass=JavaClassDef,
+        jvm_name='com/ss/android/common/applog/UserInfo'):
     def __init__(self):
         pass
 
 
-
-class java_lang_StackTraceElement(metaclass=JavaClassDef, jvm_name='java/lang/StackTraceElement'):
+class java_lang_StackTraceElement(
+        metaclass=JavaClassDef,
+        jvm_name='java/lang/StackTraceElement'):
     def __init__(self, _name):
         self.name = _name
 
-    @java_method_def(native=False, name='getClassName', signature="()Ljava/lang/String;")
+    @java_method_def(native=False, name='getClassName',
+                     signature="()Ljava/lang/String;")
     def getClassName(self, *args, **kwargs):
         return self.name
 
@@ -63,31 +71,34 @@ class java_lang_Thread(metaclass=JavaClassDef, jvm_name='java/lang/Thread'):
     def __init__(self):
         pass
 
-    @java_method_def(name="currentThread", signature='()Ljava/lang/Thread;', native=False)
+    @java_method_def(name="currentThread",
+                     signature='()Ljava/lang/Thread;',
+                     native=False)
     def currentThread(self, *args, **kwargs):
         return java_lang_Thread()
 
-    @java_method_def(name="getStackTrace", signature='()[Ljava/lang/StackTraceElement;', native=False)
+    @java_method_def(name="getStackTrace",
+                     signature='()[Ljava/lang/StackTraceElement;',
+                     native=False)
     def getStackTrace(self, *args, **kwargs):
         l = [java_lang_StackTraceElement(String("dalvik.system.VMStack")),
-                java_lang_StackTraceElement(String("java.lang.Thread")),
-                java_lang_StackTraceElement(String("com.ss.sys.ces.a")),
-                java_lang_StackTraceElement(String("com.yf.douyintool.MainActivity")),
-                java_lang_StackTraceElement(String("java.lang.reflect.Method")),
-                java_lang_StackTraceElement(String("java.lang.reflect.Method")),
-                java_lang_StackTraceElement(String("android.support.v7.app.AppCompatViewInflater$DeclaredOnClickListener")),
-                java_lang_StackTraceElement(String("android.view.View")),
-                java_lang_StackTraceElement(String("android.os.Handler")),
-                java_lang_StackTraceElement(String("android.os.Handler")),
-                java_lang_StackTraceElement(String("android.os.Looper")),
-                java_lang_StackTraceElement(String("android.app.ActivityThread")),
-                java_lang_StackTraceElement(String("java.lang.reflect.Method")),
-                java_lang_StackTraceElement(String("java.lang.reflect.Method")),
-                java_lang_StackTraceElement(String("com.android.internal.os.ZygoteInit$MethodAndArgsCaller")),
-                java_lang_StackTraceElement(String("com.android.internal.os.ZygoteInit")),
-                java_lang_StackTraceElement(String("dalvik.system.NativeStart"))
-                ]
-
+             java_lang_StackTraceElement(String("java.lang.Thread")),
+             java_lang_StackTraceElement(String("com.ss.sys.ces.a")),
+             java_lang_StackTraceElement(String("com.yf.douyintool.MainActivity")),
+             java_lang_StackTraceElement(String("java.lang.reflect.Method")),
+             java_lang_StackTraceElement(String("java.lang.reflect.Method")),
+             java_lang_StackTraceElement(String("android.support.v7.app.AppCompatViewInflater$DeclaredOnClickListener")),
+             java_lang_StackTraceElement(String("android.view.View")),
+             java_lang_StackTraceElement(String("android.os.Handler")),
+             java_lang_StackTraceElement(String("android.os.Handler")),
+             java_lang_StackTraceElement(String("android.os.Looper")),
+             java_lang_StackTraceElement(String("android.app.ActivityThread")),
+             java_lang_StackTraceElement(String("java.lang.reflect.Method")),
+             java_lang_StackTraceElement(String("java.lang.reflect.Method")),
+             java_lang_StackTraceElement(String("com.android.internal.os.ZygoteInit$MethodAndArgsCaller")),
+             java_lang_StackTraceElement(String("com.android.internal.os.ZygoteInit")),
+             java_lang_StackTraceElement(String("dalvik.system.NativeStart"))
+             ]
 
         r = List(l)
         return r
@@ -95,12 +106,11 @@ class java_lang_Thread(metaclass=JavaClassDef, jvm_name='java/lang/Thread'):
 
 def hook_mem_read(uc, access, address, size, value, user_data):
     pc = uc.reg_read(UC_ARM_REG_PC)
-    
+
     if (address == 3419067861):
         data = uc.mem_read(address, size)
         v = int.from_bytes(data, byteorder='little', signed=False)
         print("read")
-
 
 
 def hook_mem_write(uc, access, address, size, value, user_data):
@@ -111,11 +121,13 @@ def hook_mem_write(uc, access, address, size, value, user_data):
 
 g_cfd = ChainLogger(sys.stdout, "./ins-douyin.txt")
 # Add debugging.
+
+
 def hook_code(mu, address, size, user_data):
     try:
         emu = user_data
         if (not emu.memory.check_addr(address, UC_PROT_EXEC)):
-            logger.error("addr 0x%08X out of range"%(address,))
+            logger.error("addr 0x%08X out of range" % (address,))
             sys.exit(-1)
 
         #androidemu.utils.debug_utils.dump_registers(mu, sys.stdout)
@@ -123,8 +135,6 @@ def hook_code(mu, address, size, user_data):
     except Exception as e:
         logger.exception("exception in hook_code")
         sys.exit(-1)
-
-
 
 
 logger = logging.getLogger(__name__)
@@ -161,8 +171,12 @@ for module in emulator.modules:
 try:
     # Run JNI_OnLoad.
     #   JNI_OnLoad will call 'RegisterNatives'.
-    emulator.call_symbol(lib_module, 'JNI_OnLoad', emulator.java_vm.address_ptr, 0x00)
-    
+    emulator.call_symbol(
+        lib_module,
+        'JNI_OnLoad',
+        emulator.java_vm.address_ptr,
+        0x00)
+
     x = XGorgen()
     data = 'acde74a94e6b493a3399fac83c7c08b35D58B21D9582AF77647FC9902E36AE70f9c001e9334e6e94916682224fbe4e5f00000000000000000000000000000000'
     data = bytearray(bytes.fromhex(data))
@@ -170,7 +184,7 @@ try:
     result = x.leviathan(emulator, 1562848170, arr)
 
     print(''.join(['%02x' % b for b in result]))
-    
+
     # 037d560d0000903e34fb093f1d21e78f3bdf3fbebe00b124becc
     # 036d2a7b000010f4d05395b7df8b0ec2b5ec085b938a473a6a51
     # 036d2a7b000010f4d05395b7df8b0ec2b5ec085b938a473a6a51

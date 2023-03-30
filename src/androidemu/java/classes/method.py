@@ -8,6 +8,7 @@ from ..constant_values import *
 
 logger = logging.getLogger(__name__)
 
+
 class Method(metaclass=JavaClassDef,
              jvm_name='java/lang/reflect/Method',
              jvm_fields=[
@@ -16,13 +17,15 @@ class Method(metaclass=JavaClassDef,
              ],
              jvm_super=Executable):
 
-    def __init__(self, pydeclaringClass: JavaClassDef, pymethod: JavaMethodDef):
+    def __init__(
+            self,
+            pydeclaringClass: JavaClassDef,
+            pymethod: JavaMethodDef):
         super().__init__()
         self._method = pymethod
         self.slot = pymethod.jvm_id
         self.declaringClass = pydeclaringClass
         self.accessFlags = pymethod.modifier
-
 
     @staticmethod
     @java_method_def(
@@ -34,13 +37,16 @@ class Method(metaclass=JavaClassDef,
         clazz = clazz_obj.value
         method = clazz.find_method_by_id(jvm_method_id)
 
-        logger.debug('Method.getMethodModifiers(%s, %s)' % (clazz.jvm_name, method.name))
+        logger.debug(
+            'Method.getMethodModifiers(%s, %s)' %
+            (clazz.jvm_name, method.name))
 
         if method.modifier is None:
-            raise RuntimeError('No modifier was given to class %s method %s' % (clazz.jvm_name, method.name))
+            raise RuntimeError(
+                'No modifier was given to class %s method %s' %
+                (clazz.jvm_name, method.name))
 
         return method.modifier
-
 
     @java_method_def(
         name="invoke",
@@ -50,16 +56,14 @@ class Method(metaclass=JavaClassDef,
     def invoke(self, emu, obj, args):
         logger.debug('Method.invoke(%r, %r)' % (obj, args))
 
-        if(obj == JAVA_NULL):
-            #static method
+        if (obj == JAVA_NULL):
+            # static method
             v = self._method.func(emu, *args)
 
         else:
             v = self._method.func(obj, emu, *args)
 
         return v
-
-
 
     @java_method_def(
         name="setAccessible",
@@ -69,8 +73,5 @@ class Method(metaclass=JavaClassDef,
     def setAccessible(self, emu, flag):
         pass
 
-
     def __repr__(self):
-        return "Method(%s, %s)"%(self.declaringClass, self._method)
-
-
+        return "Method(%s, %s)" % (self.declaringClass, self._method)

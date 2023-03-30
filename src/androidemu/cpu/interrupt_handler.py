@@ -16,6 +16,7 @@ class InterruptHandler:
     """
     :type mu Uc
     """
+
     def __init__(self, mu):
         self._mu = mu
         self._mu.hook_add(UC_HOOK_INTR, self._hook_interrupt)
@@ -33,7 +34,9 @@ class InterruptHandler:
                 elif arch == UC_ARCH_ARM64:
                     pc = self._mu.reg_read(UC_ARM64_REG_PC)
 
-                logger.error("Unhandled interrupt %d at %x, stopping emulation" % (intno, pc))
+                logger.error(
+                    "Unhandled interrupt %d at %x, stopping emulation" %
+                    (intno, pc))
                 traceback.print_stack()
                 frame = inspect.currentframe()
                 stack_trace = traceback.format_stack(frame)
@@ -42,10 +45,8 @@ class InterruptHandler:
                 self._mu.emu_stop()
                 sys.exit(-1)
         except Exception as e:
-            logger.exception("exception in _hook_interrupt intno:[%d]"%intno)
+            logger.exception("exception in _hook_interrupt intno:[%d]" % intno)
             sys.exit(-1)
-
-
 
     def set_handler(self, intno, handler):
         self._handlers[intno] = handler
