@@ -33,9 +33,43 @@ from .scheduler import Scheduler
 from .java.java_class_def import JavaClassDef
 from .java.constant_values import JAVA_NULL
 
+import androidemu.java.classes.application
+import androidemu.java.classes.debug
+import androidemu.java.classes.array
+import androidemu.java.classes.okhttp
+import androidemu.java.classes.asset_manager
+import androidemu.java.classes.uri
+import androidemu.java.classes.constructor
+import androidemu.java.classes.proxy
+import androidemu.java.classes.contentresolver
+import androidemu.java.classes.system
+import androidemu.java.classes.package_manager
+import androidemu.java.classes.clazz
+import androidemu.java.classes.list
+import androidemu.java.classes.environment
+import androidemu.java.classes.intent
+import androidemu.java.classes.java_set
+import androidemu.java.classes.file
+import androidemu.java.classes.object
+import androidemu.java.classes.executable
+import androidemu.java.classes.types
+import androidemu.java.classes.share_preference
+import androidemu.java.classes.dexfile
+import androidemu.java.classes.context
+import androidemu.java.classes.network_interface
+import androidemu.java.classes.method
+import androidemu.java.classes.map
+import androidemu.java.classes.wifi
+import androidemu.java.classes.field
+import androidemu.java.classes.string
+import androidemu.java.classes.activity_thread
+import androidemu.java.classes.settings
+import androidemu.java.classes.bundle
 
 #logger = logging.getLogger(__name__)
 # logging.getLogger().setLevel(logging.DEBUG)
+
+
 class Emulator:
 
     # https://github.com/unicorn-engine/unicorn/blob/8c6cbe3f3cabed57b23b721c29f937dd5baafc90/tests/regress/arm_fp_vfp_disabled.py#L15
@@ -88,24 +122,87 @@ class Emulator:
         self.mu.reg_write(UC_ARM64_REG_CPACR_EL1, x)
 
     def __add_classes(self):
-        cur_file_dir = os.path.dirname(__file__)
-        entry_file_dir = os.path.dirname(os.path.realpath(sys.argv[0]))
-        # python 约定 package_name总是相对于入口脚本目录
-        package_name = os.path.relpath(
-            cur_file_dir, entry_file_dir).replace(
-            "/", ".")
-
-        full_dirname = "%s/java/classes" % (cur_file_dir, )
-
-        preload_classes = set()
-        for importer, mod_name, c in pkgutil.iter_modules([full_dirname]):
-            import_name = ".java.classes.%s" % mod_name
-            m = importlib.import_module(import_name, package_name)
-            # print(dir(m))
-            clsList = inspect.getmembers(m, inspect.isclass)
-            for _, clz in clsList:
-                if (type(clz) == JavaClassDef):
-                    preload_classes.add(clz)
+        clz = [
+            androidemu.java.classes.application.Application,
+            androidemu.java.classes.debug.Debug,
+            androidemu.java.classes.array.Array,
+            androidemu.java.classes.array.ByteArray,
+            androidemu.java.classes.array.ObjectArray,
+            androidemu.java.classes.array.ClassArray,
+            androidemu.java.classes.array.StringArray,
+            androidemu.java.classes.okhttp.Buffer,
+            androidemu.java.classes.okhttp.ResponseBody,
+            androidemu.java.classes.okhttp.Builder,
+            androidemu.java.classes.okhttp.HttpUrl,
+            androidemu.java.classes.okhttp.RequestBody,
+            androidemu.java.classes.okhttp.Headers,
+            androidemu.java.classes.okhttp.Request,
+            androidemu.java.classes.okhttp.Response,
+            androidemu.java.classes.okhttp.Chain,
+            androidemu.java.classes.asset_manager.AssetManager,
+            androidemu.java.classes.uri.Uri,
+            androidemu.java.classes.constructor.Constructor,
+            androidemu.java.classes.proxy.Proxy,
+            androidemu.java.classes.contentresolver.ContentResolver,
+            androidemu.java.classes.system.System,
+            androidemu.java.classes.package_manager.Signature,
+            androidemu.java.classes.package_manager.ApplicationInfo,
+            androidemu.java.classes.package_manager.PackageInfo,
+            androidemu.java.classes.package_manager.PackageManager,
+            androidemu.java.classes.clazz.Class,
+            androidemu.java.classes.list.List,
+            androidemu.java.classes.environment.Environment,
+            androidemu.java.classes.intent.IntentFilter,
+            androidemu.java.classes.intent.Intent,
+            androidemu.java.classes.java_set.Set,
+            androidemu.java.classes.file.File,
+            androidemu.java.classes.object.Object,
+            androidemu.java.classes.executable.Executable,
+            androidemu.java.classes.types.Boolean,
+            androidemu.java.classes.types.Integer,
+            androidemu.java.classes.types.Long,
+            androidemu.java.classes.types.Float,
+            androidemu.java.classes.share_preference.Editor,
+            androidemu.java.classes.share_preference.SharedPreferences,
+            androidemu.java.classes.dexfile.DexFile,
+            androidemu.java.classes.context.Context,
+            androidemu.java.classes.context.ContextImpl,
+            androidemu.java.classes.context.ContextWrapper,
+            androidemu.java.classes.network_interface.NetworkInterface,
+            androidemu.java.classes.method.Method,
+            androidemu.java.classes.map.HashMap,
+            androidemu.java.classes.wifi.WifiInfo,
+            androidemu.java.classes.wifi.NetworkInfo,
+            androidemu.java.classes.wifi.WifiConfiguration,
+            androidemu.java.classes.wifi.DhcpInfo,
+            androidemu.java.classes.wifi.WifiManager,
+            androidemu.java.classes.wifi.TelephonyManager,
+            androidemu.java.classes.wifi.RequestBuilder,
+            androidemu.java.classes.wifi.NetworkInfo,
+            androidemu.java.classes.wifi.ConnectivityManager,
+            androidemu.java.classes.field.AccessibleObject,
+            androidemu.java.classes.field.Field,
+            androidemu.java.classes.string.String,
+            androidemu.java.classes.activity_thread.AccessibilityManager,
+            androidemu.java.classes.activity_thread.AccessibilityInteractionController,
+            androidemu.java.classes.activity_thread.Window,
+            androidemu.java.classes.activity_thread.ViewRootImpl,
+            androidemu.java.classes.activity_thread.AttachInfo,
+            androidemu.java.classes.activity_thread.View,
+            androidemu.java.classes.activity_thread.Activity,
+            androidemu.java.classes.activity_thread.ActivityClientRecord,
+            androidemu.java.classes.activity_thread.ArrayMap,
+            androidemu.java.classes.activity_thread.ActivityManager,
+            androidemu.java.classes.activity_thread.IActivityManager,
+            androidemu.java.classes.activity_thread.ActivityManagerNative,
+            androidemu.java.classes.activity_thread.Instrumentation,
+            androidemu.java.classes.activity_thread.IInterface,
+            androidemu.java.classes.activity_thread.IPackageManager,
+            androidemu.java.classes.activity_thread.ActivityThread,
+            androidemu.java.classes.settings.Secure,
+            androidemu.java.classes.settings.Settings,
+            androidemu.java.classes.bundle.Bundle
+        ]
 
         for clz in preload_classes:
             self.java_classloader.add_class(clz)
