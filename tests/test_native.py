@@ -106,7 +106,7 @@ class TestNative(unittest.TestCase):
         try:
             emulator = Emulator(
                 vfs_root="vfs",
-                arch=emu_const.ARCH_ARM64
+                arch=emu_const.Arch.ARM64
             )
             # 测试getenv，pthread_getspecific等涉及tls_init的代码是否正常
             libcm = emulator.load_library("vfs/system/lib64/libc.so")
@@ -121,7 +121,7 @@ class TestNative(unittest.TestCase):
         # Initialize emulator
         emulator = Emulator(
             vfs_root="vfs",
-            arch=emu_const.ARCH_ARM64
+            arch=emu_const.Arch.ARM64
         )
         emulator.java_classloader.add_class(TestClass)
 
@@ -150,7 +150,7 @@ class TestNative(unittest.TestCase):
     def test_load_bias_new_delete(self):
         emulator = Emulator(
             vfs_root="vfs",
-            arch=emu_const.ARCH_ARM64
+            arch=emu_const.Arch.ARM64
         )
         try:
             libcpp = emulator.load_library("vfs/system/lib64/libc++.so")

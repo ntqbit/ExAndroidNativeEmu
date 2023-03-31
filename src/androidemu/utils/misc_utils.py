@@ -1,11 +1,9 @@
-import os.path
 import os
 import platform
 
-import platform
 from androidemu.const import emu_const
 
-from unicorn import *
+from unicorn.unicorn_const import UC_PROT_NONE, UC_PROT_READ, UC_PROT_WRITE, UC_PROT_EXEC, UC_PROT_ALL
 from unicorn.arm_const import *
 from unicorn.arm64_const import *
 
@@ -24,32 +22,25 @@ def system_path_to_vfs_path(vfs_root, path):
     return "/" + os.path.relpath(path, vfs_root)
 
 
-PF_X = 0x1  # Executable
-PF_W = 0x2  # Writable
 PF_R = 0x4  # Readable
-
-PAGE_SIZE = 0x1000
-
-
-def page_start(addr):
-    return addr & (~(PAGE_SIZE - 1))
-
-
-def page_end(addr):
-    return page_start(addr + (PAGE_SIZE - 1))
+PF_W = 0x2  # Writable
+PF_X = 0x1  # Executable
 
 
 def get_segment_protection(prot_in):
-    prot = 0
+    prot = UC_PROT_NONE
 
     if prot_in & PF_R != 0:
-        prot |= 1
+        prot |= UC_PROT_READ
 
     if prot_in & PF_W != 0:
-        prot |= 2
+        prot |= UC_PROT_WRITE
 
     if prot_in & PF_X != 0:
-        prot |= 4
+        prot |= UC_PROT_EXEC
+
+    if prot == UC_PROT_NONE:
+        return UC_PROT_ALL
 
     return prot
 
@@ -64,7 +55,7 @@ def platform_open(fd, flag):
 
 def set_errno(emu, errno):
     mu = emu.mu
-    if emu.get_arch() == emu_const.ARCH_ARM32:
+    if emu.get_arch() == emu_const.Arch.ARM32:
         err_ptr = mu.reg_reg(UC_ARM_REG_C13_C0_3) + 8
         mu.mem_write(err_ptr, int(errno).to_bytes(4, byteorder='little'))
 

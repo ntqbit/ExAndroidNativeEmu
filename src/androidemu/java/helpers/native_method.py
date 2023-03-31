@@ -15,7 +15,7 @@ def native_write_args(emu, *argv):
     reg_base = UC_ARM_REG_R0
     sp_reg = UC_ARM_REG_SP
 
-    if emu.get_arch() == emu_const.ARCH_ARM64:
+    if emu.get_arch() == emu_const.Arch.ARM64:
         max_regs_args = 8
         reg_base = UC_ARM64_REG_X0
         sp_reg = UC_ARM64_REG_SP
@@ -52,7 +52,7 @@ def native_read_args_in_hook_code(emu, args_count):
     reg_base = UC_ARM_REG_R0
     sp_reg = UC_ARM_REG_SP
 
-    if emu.get_arch() == emu_const.ARCH_ARM64:
+    if emu.get_arch() == emu_const.Arch.ARM64:
         max_regs_args = 8
         reg_base = UC_ARM64_REG_X0
         sp_reg = UC_ARM64_REG_SP
@@ -121,7 +121,7 @@ def create_native_method_wrapper(func, args_count):
 
         ret_reg0 = UC_ARM_REG_R0
         ret_reg1 = UC_ARM_REG_R1
-        if emu.get_arch() == emu_const.ARCH_ARM64:
+        if emu.get_arch() == emu_const.Arch.ARM64:
             ret_reg0 = UC_ARM64_REG_X0
             ret_reg1 = UC_ARM64_REG_X1
 

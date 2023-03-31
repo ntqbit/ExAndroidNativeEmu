@@ -37,7 +37,7 @@ def dump_memory(emu, fd, min_addr=0, max_addr=0xFFFFFFFF):
 def dump_registers(emu, fd):
     regs = ""
     mu = emu.mu
-    if emu.get_arch() == emu_const.ARCH_ARM32:
+    if emu.get_arch() == emu_const.Arch.ARM32:
         r0 = mu.reg_read(UC_ARM_REG_R0)
         r1 = mu.reg_read(UC_ARM_REG_R1)
         r2 = mu.reg_read(UC_ARM_REG_R2)
@@ -116,7 +116,7 @@ DUMP_REG_WRITE = 2
 
 def dump_code(emu, address, size, fd, dump_reg_type=DUMP_REG_READ):
     mu = emu.mu
-    if emu.get_arch() == emu_const.ARCH_ARM32:
+    if emu.get_arch() == emu_const.Arch.ARM32:
         # 判断是否arm，用不同的decoder
         cpsr = mu.reg_read(UC_ARM_REG_CPSR)
         if cpsr & (1 << 5):
@@ -181,7 +181,7 @@ def dump_code(emu, address, size, fd, dump_reg_type=DUMP_REG_READ):
 def dump_stack(emu, fd, max_deep=512):
     mu = emu.mu
     sp = 0
-    if emu.get_arch() == emu_const.ARCH_ARM32():
+    if emu.get_arch() == emu_const.Arch.ARM32():
         sp = mu.reg_read(UC_ARM_REG_SP)
     else:
         sp = mu.reg_read(UC_ARM64_REG_SP)

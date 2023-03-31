@@ -1,3 +1,5 @@
+from enum import Enum
 
-ARCH_ARM32 = 1
-ARCH_ARM64 = 2
+class Arch(Enum):
+    ARM32 = 1
+    ARM64 = 2

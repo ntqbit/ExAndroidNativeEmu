@@ -9,10 +9,10 @@ class StackHelper:
     def __init__(self, emu):
         self._emu = emu
         arch = emu.get_arch()
-        if arch == emu_const.ARCH_ARM32:
+        if arch == emu_const.Arch.ARM32:
             sp_reg = UC_ARM_REG_SP
 
-        elif arch == emu_const.ARCH_ARM64:
+        elif arch == emu_const.Arch.ARM64:
             sp_reg = UC_ARM64_REG_SP
 
         sp = emu.mu.reg_read(sp_reg)
@@ -38,9 +38,9 @@ class StackHelper:
 
     def commit(self):
         # 对齐sp
-        if self._emu.get_arch() == emu_const.ARCH_ARM32:
+        if self._emu.get_arch() == emu_const.Arch.ARM32:
             self._sp = self._sp & (~7)
-        elif self._emu.get_arch() == emu_const.ARCH_ARM64:
+        elif self._emu.get_arch() == emu_const.Arch.ARM64:
             self._sp = self._sp & (~15)
 
         self._emu.mu.reg_write(self._sp_reg, self._sp)

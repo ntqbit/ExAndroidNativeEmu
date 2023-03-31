@@ -144,7 +144,7 @@ class SymbolHooks:
         symbol_str = memory_helpers.read_utf8(uc, symbol)
         logger.debug("Called dlsym(0x%x, %s)" % (handle, symbol_str))
         global_handle = 0xffffffff
-        if self._emu.get_arch() == emu_const.ARCH_ARM64:
+        if self._emu.get_arch() == emu_const.Arch.ARM64:
             global_handle = 0
 
         if handle == global_handle:
@@ -153,7 +153,7 @@ class SymbolHooks:
             soinfo = handle
             base = -1
             # FIXME 这里写死偏移不好，需要修复
-            if self._emu.get_arch() == emu_const.ARCH_ARM64:
+            if self._emu.get_arch() == emu_const.Arch.ARM64:
                 base = memory_helpers.read_ptr_sz(
                     uc, soinfo + 152, self._emu.get_ptr_size())
             else:

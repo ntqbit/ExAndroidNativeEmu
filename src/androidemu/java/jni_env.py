@@ -38,10 +38,10 @@ class JNIEnv:
         self._globals = ReferenceTable(start=4096, max_entries=512000)
 
         arch = emu.get_arch()
-        if arch == emu_const.ARCH_ARM32:
+        if arch == emu_const.Arch.ARM32:
             self._read_args = self._read_args32
             self._read_args_v = self._read_args_v32
-        elif arch == emu_const.ARCH_ARM64:
+        elif arch == emu_const.Arch.ARM64:
             self._read_args = self._read_args64
             self._read_args_v = self._read_args_v64
         else:

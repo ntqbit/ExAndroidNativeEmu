@@ -68,7 +68,7 @@ class TestThread(unittest.TestCase):
     def test_thread64(self):
         emulator = Emulator(
             vfs_root="vfs",
-            arch=emu_const.ARCH_ARM64,
+            arch=emu_const.Arch.ARM64,
             muti_task=True
         )
         libcm = emulator.load_library("vfs/system/lib64/libc.so")

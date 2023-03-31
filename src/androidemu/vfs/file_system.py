@@ -93,7 +93,7 @@ class VirtualFileSystem:
         self._pcb = emu.get_pcb()
         self._clear_proc_dir()
         self._root_list = set(["/dev/__properties__"])
-        if self._emu.get_arch() == emu_const.ARCH_ARM32:
+        if self._emu.get_arch() == emu_const.Arch.ARM32:
             syscall_handler.set_handler(0x3, "read", 3, self._handle_read)
             syscall_handler.set_handler(0x4, "write", 3, self._handle_write)
             syscall_handler.set_handler(0x5, "open", 3, self._handle_open)
@@ -587,7 +587,7 @@ class VirtualFileSystem:
         stats = os.fstat(fd)
         uid = self._get_config_uid(detail.name)
         st_mode = self._fix_st_mode(detail.name, stats.st_mode)
-        if self._emu.get_arch() == emu_const.ARCH_ARM32:
+        if self._emu.get_arch() == emu_const.Arch.ARM32:
             file_helpers.stat_to_memory2(mu, stat_ptr, stats, uid, st_mode)
         else:
             # 64
@@ -673,7 +673,7 @@ class VirtualFileSystem:
             print(statv)
             f_fsid = statv.f_fsid
 
-        if self._emu.get_arch() == emu_const.ARCH_ARM32:
+        if self._emu.get_arch() == emu_const.Arch.ARM32:
             mu.mem_write(buf, int(0xef53).to_bytes(4, 'little'))
             mu.mem_write(buf + 4, int(statv.f_bsize).to_bytes(4, 'little'))
             mu.mem_write(buf + 8, int(statv.f_blocks).to_bytes(8, 'little'))
@@ -781,7 +781,7 @@ class VirtualFileSystem:
         st_mode = self._fix_st_mode(pathname_vm, stat.st_mode)
 
         # stat = os.stat(path=file_path, dir_fd=None, follow_symlinks=False)
-        if self._emu.get_arch() == emu_const.ARCH_ARM32:
+        if self._emu.get_arch() == emu_const.Arch.ARM32:
             file_helpers.stat_to_memory2(mu, buf, stat, uid, st_mode)
         else:
             # arm64

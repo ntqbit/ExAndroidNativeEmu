@@ -29,6 +29,7 @@ from androidemu.vfs.file_system import VirtualFileSystem
 from androidemu.vfs.virtual_file import VirtualFile
 from androidemu.utils import misc_utils
 from androidemu.scheduler import Scheduler
+from androidemu.internal.module_loader import ModuleLoader
 
 from androidemu.java.java_class_def import JavaClassDef
 from androidemu.java.constant_values import JAVA_NULL
@@ -218,7 +219,7 @@ class Emulator:
             vfs_root="vfs",
             config_path="emu_cfg/default.json",
             vfp_inst_set=True,
-            arch=emu_const.ARCH_ARM32,
+            arch=emu_const.Arch.ARM32,
             muti_task=False):
         # Unicorn.
         sys.stdout = sys.stderr
@@ -232,7 +233,7 @@ class Emulator:
         logger.info("process pid:%d" % self._pcb.get_pid())
 
         sp_reg = 0
-        if arch == emu_const.ARCH_ARM32:
+        if arch == emu_const.Arch.ARM32:
             self._ptr_sz = 4
             self.mu = Uc(UC_ARCH_ARM, UC_MODE_ARM)
             if vfp_inst_set:
@@ -242,7 +243,7 @@ class Emulator:
             self.call_native = self._call_native32
             self.call_native_return_2reg = self._call_native_return_2reg32
 
-        elif arch == emu_const.ARCH_ARM64:
+        elif arch == emu_const.Arch.ARM64:
             self._ptr_sz = 8
             self.mu = Uc(UC_ARCH_ARM64, UC_MODE_ARM)
             if vfp_inst_set:
@@ -254,7 +255,7 @@ class Emulator:
             self.call_native_return_2reg = self._call_native_return_2reg64
 
         else:
-            raise RuntimeError("emulator arch=%d not support" % arch)
+            raise ValueError("emulator arch=%d not support" % arch)
 
         self._vfs_root = vfs_root
 
@@ -264,7 +265,7 @@ class Emulator:
         #self.mu.mem_map(0x0, 0x00001000, UC_PROT_READ | UC_PROT_WRITE)
 
         # Android 4.4
-        if arch == emu_const.ARCH_ARM32:
+        if arch == emu_const.Arch.ARM32:
             self.system_properties = {
                 "libc.debug.malloc.options": "",
                 "ro.build.version.sdk": "19",
@@ -326,8 +327,7 @@ class Emulator:
 
         self._sch = Scheduler(self)
         # CPU
-        self._syscall_handler = SyscallHandlers(
-            self.mu, self._sch, self.get_arch())
+        self._syscall_handler = SyscallHandlers(self.mu, self._sch, self.get_arch())
 
         # Hooker
         self.memory.map(
@@ -340,10 +340,8 @@ class Emulator:
             config.BRIDGE_MEMORY_SIZE)
 
         # syscalls
-        self._mem_handler = MemorySyscallHandler(
-            self, self.memory, self._syscall_handler)
-        self._syscall_hooks = SyscallHooks(
-            self, self.config, self._syscall_handler)
+        self._mem_handler = MemorySyscallHandler(self, self.memory, self._syscall_handler)
+        self._syscall_hooks = SyscallHooks(self, self.config, self._syscall_handler)
         self._vfs = VirtualFileSystem(
             self,
             vfs_root,
@@ -356,7 +354,7 @@ class Emulator:
         self.java_vm = JavaVM(self, self.java_classloader, self._hooker)
 
         # linker
-        self.modules = Modules(self, self._vfs_root)
+        self.modules = Modules(self, self._vfs_root, ModuleLoader(self, self._vfs_root))
         # Native
         self._sym_hooks = SymbolHooks(
             self, self.modules, self._hooker, self._vfs_root)
@@ -369,7 +367,7 @@ class Emulator:
             0x2000,
             UC_PROT_READ | UC_PROT_WRITE | UC_PROT_EXEC)
 
-        if arch == emu_const.ARCH_ARM32:
+        if arch == emu_const.Arch.ARM32:
             # 映射常用的文件，cpu一些原子操作的函数实现地方
             # path = "%s/system/lib/vectors" % vfs_root
             # vf = VirtualFile(

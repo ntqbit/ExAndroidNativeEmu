@@ -64,7 +64,7 @@ class Scheduler:
         self._blocking_set = set()
 
     def _get_pc(self):
-        if self._emu.get_arch() == emu_const.ARCH_ARM32:
+        if self._emu.get_arch() == emu_const.Arch.ARM32:
             pc = self._emu.mu.reg_read(UC_ARM_REG_PC)
             return pc
         else:
@@ -72,26 +72,26 @@ class Scheduler:
 
     def _clear_reg0(self):
 
-        if self._emu.get_arch() == emu_const.ARCH_ARM32:
+        if self._emu.get_arch() == emu_const.Arch.ARM32:
             self._mu.reg_write(UC_ARM_REG_R0, 0)
         else:
             self._mu.reg_write(UC_ARM64_REG_X0, 0)
 
     def _set_sp(self, sp):
-        if self._emu.get_arch() == emu_const.ARCH_ARM32:
+        if self._emu.get_arch() == emu_const.Arch.ARM32:
             self._emu.mu.reg_write(UC_ARM_REG_SP, sp)
         else:
             self._emu.mu.reg_write(UC_ARM64_REG_SP, sp)
 
     def _set_tls(self, tls_ptr):
-        if self._emu.get_arch() == emu_const.ARCH_ARM32:
+        if self._emu.get_arch() == emu_const.Arch.ARM32:
             self._emu.mu.reg_write(UC_ARM_REG_C13_C0_3, tls_ptr)
         else:
             self._emu.mu.reg_write(UC_ARM64_REG_TPIDR_EL0, tls_ptr)
 
     def _get_interrupted_entry(self):
         pc = self._get_pc()
-        if self._emu.get_arch() == emu_const.ARCH_ARM32:
+        if self._emu.get_arch() == emu_const.Arch.ARM32:
             cpsr = self._emu.mu.reg_read(UC_ARM_REG_CPSR)
             if cpsr & (1 << 5):
                 pc = pc | 1
@@ -194,7 +194,7 @@ class Scheduler:
 
     def exec(self, main_entry, clear_task_when_return=True):
         self._set_main_task()
-        if self._emu.get_arch() == emu_const.ARCH_ARM32:
+        if self._emu.get_arch() == emu_const.Arch.ARM32:
             self._emu.mu.reg_write(UC_ARM_REG_LR, self._stop_pos)
         else:
             self._emu.mu.reg_write(UC_ARM64_REG_X30, self._stop_pos)

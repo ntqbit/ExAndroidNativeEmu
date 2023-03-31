@@ -57,7 +57,7 @@ class FuncHooker:
                 cb_after = hook_param[2]
                 r0 = 0
                 r1 = 0
-                if self._arch == emu_const.ARCH_ARM32:
+                if self._arch == emu_const.Arch.ARM32:
                     r0 = mu.reg_read(UC_ARM_REG_R0)
                     r1 = mu.reg_read(UC_ARM_REG_R1)
 
@@ -103,7 +103,7 @@ class FuncHooker:
                 is_handled = hook_param[1](self._emu, *args)
                 if is_handled:
                     # 如果逻辑已经被处理，则直接返回
-                    if self._arch == emu_const.ARCH_ARM32:
+                    if self._arch == emu_const.Arch.ARM32:
                         cpsr = mu.reg_read(uc, UC_ARM_REG_CPSR)
                         lr = self._emu.reg_read(UC_ARM_REG_LR)
                         # same as BX LR
@@ -123,7 +123,7 @@ class FuncHooker:
             if hook_param[2]:
                 # 因为不知道最后一条指令是什么，需要只能改变返回的地址，再hook从而达到 callback after的效果
                 # 改变lr，返回到跳板，
-                if self._arch == emu_const.ARCH_ARM32:
+                if self._arch == emu_const.Arch.ARM32:
                     mu.mem_write(
                         self._stub_off, address.to_bytes(
                             4, byteorder='little', signed=False))  # 写入函数地址

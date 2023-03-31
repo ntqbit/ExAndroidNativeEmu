@@ -85,7 +85,7 @@ def java_method_def(
             return_ch = signature[return_index]
             res = None
             arch = emulator.get_arch()
-            if return_ch in ('J', 'D') and arch == emu_const.ARCH_ARM32:
+            if return_ch in ('J', 'D') and arch == emu_const.Arch.ARM32:
                 # 返回值是jlong或者jdouble,在32位下需要读取两个寄存器
                 res = emulator.call_native_return_2reg(
                     native_wrapper.jvm_method.native_addr,
