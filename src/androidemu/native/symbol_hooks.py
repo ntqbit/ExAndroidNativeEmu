@@ -101,7 +101,7 @@ class SymbolHooks:
             r = mod.soinfo_ptr
         else:
             #raise RuntimeError("dlopen %s not found"%path)
-            logger.debug("dlopen %s not found" % path)
+            logger.warning("dlopen %s not found" % path)
             r = 0
 
         logger.debug("Called dlopen(%s) return 0x%08x" % (path, r))

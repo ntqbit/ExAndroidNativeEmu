@@ -326,8 +326,12 @@ class Modules:
                 continue
 
             if file_length <= 0:
-                logger.error('File length must be greater than zero. [p_filesz=%d,file_end=%d,file_page_start=%d,file_length=%d]',
-                             p_filesz, file_end, file_page_start, file_length)
+                logger.error(
+                    'File length must be greater than zero. [p_filesz=%d,file_end=%d,file_page_start=%d,file_length=%d]',
+                    p_filesz,
+                    file_end,
+                    file_page_start,
+                    file_length)
                 logger.debug('Segment: %s', segment)
                 logger.debug('Load segments: %s', load_segments)
                 raise RuntimeError(f'File length must be greater than zero.')
@@ -545,6 +549,8 @@ class Modules:
         return module
 
     def _elf_get_symval(self, load_bias, symbol):
+        logger.debug('Getting symbal: %s', symbol)
+
         name = symbol["name"]
         if name in self.symbol_hooks:
             return self.symbol_hooks[name]
@@ -558,7 +564,7 @@ class Modules:
                     # Weak symbol initialized as 0
                     return 0
                 else:
-                    logger.error('=> Undefined external symbol: %s' % name)
+                    logger.error('=> Undefined external symbol: "%s"' % name)
                     return None
             else:
                 return target

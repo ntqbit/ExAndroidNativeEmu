@@ -388,8 +388,7 @@ class ELFReader:
                 elif d_tag == DT_PLTGOT:
                     self._plt_got_addr = d_val_ptr
 
-            assert nsymbol > - \
-                1, "can not detect nsymbol by DT_HASH or DT_GNU_HASH, make sure their exist in so"
+            assert nsymbol > -1, "can not detect nsymbol by DT_HASH or DT_GNU_HASH, make sure their exist in so"
             self._dyn_str_addr = dyn_str_addr
             self._dyn_str_addr = dyn_sym_addr
 

@@ -286,7 +286,7 @@ class JNIEnv:
                 return None
 
             if var_type == 'jmethodID':
-                return var # TODO: impl
+                return var  # TODO: impl
 
             if var_type in ['jobject', 'jclass']:
                 return f'ref<{var},{repr(self.get_reference(var))}>'
