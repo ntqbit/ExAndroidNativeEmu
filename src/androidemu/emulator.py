@@ -254,7 +254,7 @@ class Emulator:
             self.call_native_return_2reg = self._call_native_return_2reg64
 
         else:
-            raise RuntimeError("emulator arch=%d not support!!!" % arch)
+            raise RuntimeError("emulator arch=%d not support" % arch)
 
         self._vfs_root = vfs_root
 
@@ -371,16 +371,16 @@ class Emulator:
 
         if arch == emu_const.ARCH_ARM32:
             # 映射常用的文件，cpu一些原子操作的函数实现地方
-            path = "%s/system/lib/vectors" % vfs_root
-            vf = VirtualFile(
-                "[vectors]", misc_utils.platform_open(
-                    path, os.O_RDONLY), path)
-            self.memory.map(
-                0xffff0000,
-                0x1000,
-                UC_PROT_EXEC | UC_PROT_READ,
-                vf,
-                0)
+            # path = "%s/system/lib/vectors" % vfs_root
+            # vf = VirtualFile(
+            #     "[vectors]", misc_utils.platform_open(
+            #         path, os.O_RDONLY), path)
+            # self.memory.map(
+            #     0xffff0000,
+            #     0x1000,
+            #     UC_PROT_EXEC | UC_PROT_READ,
+            #     vf,
+            #     0)
 
             # 映射app_process，android系统基本特征
             path = "%s/system/bin/app_process32" % vfs_root

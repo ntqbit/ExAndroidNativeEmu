@@ -37,59 +37,59 @@ class Context(
                      signature='()Landroid/content/pm/PackageManager;',
                      native=False)
     def getPackageManager(self, emu):
-        raise RuntimeError("pure virtual function call!!!")
+        raise RuntimeError("pure virtual function call")
 
     @java_method_def(name='getContentResolver',
                      signature='()Landroid/content/ContentResolver;',
                      native=False)
     def getContentResolver(self, emu):
-        raise RuntimeError("pure virtual function call!!!")
+        raise RuntimeError("pure virtual function call")
 
     @java_method_def(name='getSystemService',
                      args_list=["jstring"],
                      signature='(Ljava/lang/String;)Ljava/lang/Object;',
                      native=False)
     def getSystemService(self, emu, s1):
-        raise RuntimeError("pure virtual function call!!!")
+        raise RuntimeError("pure virtual function call")
 
     @java_method_def(name='getApplicationInfo',
                      signature='()Landroid/content/pm/ApplicationInfo;',
                      native=False)
     def getApplicationInfo(self, emu):
-        raise RuntimeError("pure virtual function call!!!")
+        raise RuntimeError("pure virtual function call")
 
     @java_method_def(name='checkSelfPermission',
                      signature='(Ljava/lang/String;)I', native=False)
     def checkSelfPermission(self, emu):
-        raise RuntimeError("pure virtual function call!!!")
+        raise RuntimeError("pure virtual function call")
 
     @java_method_def(name='checkCallingOrSelfPermission',
                      signature='(Ljava/lang/String;)I', native=False)
     def checkCallingOrSelfPermission(self, emu):
-        raise RuntimeError("pure virtual function call!!!")
+        raise RuntimeError("pure virtual function call")
 
     @java_method_def(name='getPackageCodePath',
                      signature='()Ljava/lang/String;', native=False)
     def getPackageCodePath(self, emu):
-        raise RuntimeError("pure virtual function call!!!")
+        raise RuntimeError("pure virtual function call")
 
     @java_method_def(name='getFilesDir',
                      signature='()Ljava/io/File;',
                      native=False)
     def getFilesDir(self, emu):
-        raise RuntimeError("pure virtual function call!!!")
+        raise RuntimeError("pure virtual function call")
 
     @java_method_def(name='getCacheDir',
                      signature='()Ljava/io/File;',
                      native=False)
     def getCacheDir(self, emu):
-        raise RuntimeError("pure virtual function call!!!")
+        raise RuntimeError("pure virtual function call")
 
     @java_method_def(name='getPackageName',
                      signature='()Ljava/lang/String;',
                      native=False)
     def getPackageName(self, emu):
-        raise RuntimeError("pure virtual function call!!!")
+        raise RuntimeError("pure virtual function call")
 
     @java_method_def(name='getSharedPreferences',
                      args_list=["jstring",
@@ -97,7 +97,7 @@ class Context(
                      signature='(Ljava/lang/String;I)Landroid/content/SharedPreferences;',
                      native=False)
     def getSharedPreferences(self, emu, name, mode):
-        raise RuntimeError("pure virtual function call!!!")
+        raise RuntimeError("pure virtual function call")
 
 
 class ContextImpl(
@@ -201,7 +201,7 @@ class ContextImpl(
                      native=False)
     def getCacheDir(self, emu):
         pkgName = emu.config.get("pkg_name")
-        return File("/data/data/%s/cache" % pkgName)
+        return File("/data/user/0/%s/cache" % pkgName)
 
     @java_method_def(name='getSharedPreferences',
                      args_list=["jstring",

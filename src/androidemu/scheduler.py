@@ -111,7 +111,7 @@ class Scheduler:
         tid = self._emu.get_pcb().get_pid()
         if tid in self._tasks_map:
             raise RuntimeError(
-                "set_main_task fail for main task %d exist!!!" %
+                "set_main_task fail for main task %d exist" %
                 tid)
 
         t = self._create_task(tid, 0, None, True, 0)
@@ -209,7 +209,7 @@ class Scheduler:
                         if task.blocking_timeout < 0:
                             # 只有一个线程且被无限期block，有bug
                             raise RuntimeError(
-                                "only one task %d exists, but blocking infinity dead lock bug!!!!" % tid)
+                                "only one task %d exists, but blocking infinity dead lock bug!" % tid)
                         else:
                             # 优化，如果仅仅只有一个线程block，而且有timeout，直接sleep就行了，因为再继续运行都是没意义的循环
                             logger.debug(

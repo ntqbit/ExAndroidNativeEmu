@@ -6,7 +6,7 @@ from androidemu.java.classes.constructor import Constructor
 from androidemu.java.classes.method import Method
 from androidemu.java.java_class_def import JavaClassDef
 from androidemu.java.constant_values import MODIFIER_STATIC
-from androidemu.java.helpers.native_method import create_native_method_wrapper
+from androidemu.java.helpers.native_method import create_native_method_wrapper, native_translate_arg
 from androidemu.java.jni_const import *
 from androidemu.java.jni_ref import *
 from androidemu.java.reference_table import ReferenceTable
@@ -18,6 +18,7 @@ from unicorn import *
 from androidemu.utils import debug_utils
 from androidemu.const import emu_const
 from androidemu.java.jni_functions import JNI_FUNCTIONS
+from androidemu.utils.repr import short_byte_repr
 
 logger = verboselogs.VerboseLogger(__name__)
 
@@ -284,16 +285,17 @@ class JNIEnv:
             if var_type == 'JNIEnv*':
                 return None
 
-            if var_type == 'jclass':
+            if var_type == 'jmethodID':
+                return var # TODO: impl
+
+            if var_type in ['jobject', 'jclass']:
                 return f'ref<{var},{repr(self.get_reference(var))}>'
 
             if var_type == 'jstring':
-                return '\'' + \
-                    self.get_reference(var).value.get_py_string() + '\''
+                return '\'' + self.get_reference(var).value.get_py_string() + '\''
 
             if var_type in 'char*':
-                return '\'' + \
-                    memory_helpers.read_utf8(self._emu.mu, var) + '\''
+                return '\'' + memory_helpers.read_utf8(self._emu.mu, var) + '\''
 
             return var
 
@@ -322,6 +324,9 @@ class JNIEnv:
                     log_text += f'. Thrown {e.__class__.__name__}({str(e)}).'
                     logger.debug(log_text)
                     raise
+
+                if ret is not None:
+                    ret = native_translate_arg(self._emu, ret)
 
                 if func['ret'] != 'void':
                     log_text += f' = {map_var_type(ret, func["ret"])}'
@@ -661,7 +666,7 @@ class JNIEnv:
         pyclazz_super = pyclass.jvm_super
         if not pyclazz_super:
             raise RuntimeError(
-                "super class for %s is None!!! you should at least inherit Object!!!")
+                "super class for %s is None you should at least inherit Object")
 
         logger.debug("JNIEnv->GetSuperClass (%s) return (%s)" %
                      (pyclass.jvm_name, pyclazz_super.jvm_name))
@@ -2019,7 +2024,7 @@ class JNIEnv:
         buf = self._emu.memory.map(
             0, extra_n + items_len, UC_PROT_READ | UC_PROT_WRITE)
 
-        logger.debug("=> %r" % items)
+        logger.debug(f"=> {short_byte_repr(items)}")
 
         # 协议约定前四个字节必定是长度
         mu.mem_write(buf, items_len.to_bytes(extra_n, 'little'))

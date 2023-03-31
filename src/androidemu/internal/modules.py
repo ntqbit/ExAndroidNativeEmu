@@ -243,17 +243,14 @@ class Modules:
         if m is not None:
             return m
 
-        logger.debug("Loading module '%s'." % filename)
+        logger.verbose("Loading module '%s'." % filename)
+
         # do sth like linker
         reader = elf_reader.ELFReader(filename)
         if self.emu.get_arch() == emu_const.ARCH_ARM32 and not reader.is_elf32():
-            raise RuntimeError(
-                "arch is ARCH_ARM32 but so %s is not elf32!!!" %
-                filename)
+            raise RuntimeError("arch is ARCH_ARM32 but so %s is not elf32" % filename)
         elif self.emu.get_arch() == emu_const.ARCH_ARM64 and reader.is_elf32():
-            raise RuntimeError(
-                "arch is ARCH_ARM64 but so %s is elf32!!!" %
-                filename)
+            raise RuntimeError("arch is ARCH_ARM64 but so %s is elf32" % filename)
 
         # Parse program header (Execution view).
 
@@ -324,14 +321,18 @@ class Modules:
             file_end = file_start + p_filesz
             file_page_start = page_start(file_start)
             file_length = file_end - file_page_start
-            assert (file_length > 0)
-            if file_length > 0:
-                self.emu.memory.map(
-                    seg_page_start,
-                    file_length,
-                    prot,
-                    vf,
-                    file_page_start)
+
+            if file_length == 0:
+                continue
+
+            if file_length <= 0:
+                logger.error('File length must be greater than zero. [p_filesz=%d,file_end=%d,file_page_start=%d,file_length=%d]',
+                             p_filesz, file_end, file_page_start, file_length)
+                logger.debug('Segment: %s', segment)
+                logger.debug('Load segments: %s', load_segments)
+                raise RuntimeError(f'File length must be greater than zero.')
+
+            self.emu.memory.map(seg_page_start, file_length, prot, vf, file_page_start)
 
             p_memsz = segment["p_memsz"]
             seg_end = seg_start + p_memsz
@@ -349,8 +350,7 @@ class Modules:
                         0);
             '''
             if seg_page_end > seg_file_end:
-                self.emu.memory.map(
-                    seg_file_end, seg_page_end - seg_file_end, prot)
+                self.emu.memory.map(seg_file_end, seg_page_end - seg_file_end, prot)
 
         # Find init array.
         init_array_addr, init_array_size = reader.get_init_array()

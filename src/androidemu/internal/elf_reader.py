@@ -202,6 +202,7 @@ class ELFReader:
 
             self._phdrs = []
             self._loads = []
+            self._so_needed = []
             self._dynsymols = []
             self._rels = {}
             self._file = f
@@ -270,14 +271,14 @@ class ELFReader:
                     break
                 if d_tag == DT_RELA:
                     # 根据linker源码 rela只出现在arm64中
-                    assert is_elf32 == False, "get DT_RELA when parsing elf64 impossible in android!!!"
+                    assert is_elf32 == False, "get DT_RELA when parsing elf64 impossible in android"
                     rel_addr = d_val_ptr
                 elif d_tag == DT_RELASZ:
                     rel_count = int(d_val_ptr / elf_rel_sz)
 
                 elif d_tag == DT_REL:
                     # rel只出现在arm中
-                    assert is_elf32, "get DT_REL when parsing elf32 impossible in android!!!"
+                    assert is_elf32, "get DT_REL when parsing elf32 impossible in android"
                     rel_addr = d_val_ptr
 
                 elif d_tag == DT_RELSZ:
@@ -388,7 +389,7 @@ class ELFReader:
                     self._plt_got_addr = d_val_ptr
 
             assert nsymbol > - \
-                1, "can not detect nsymbol by DT_HASH or DT_GNU_HASH, make sure their exist in so!!!"
+                1, "can not detect nsymbol by DT_HASH or DT_GNU_HASH, make sure their exist in so"
             self._dyn_str_addr = dyn_str_addr
             self._dyn_str_addr = dyn_sym_addr
 
@@ -492,7 +493,6 @@ class ELFReader:
                     relplt_table.append(d)
 
                 self._rels["relplt"] = relplt_table
-                self._so_needed = []
                 for str_off in dt_needed:
                     # 这里存的是相对于字符串表里面的偏移，因此不需要-bias，字符串表地址搞对就行
                     endId = self._dyn_str_buf.find(b"\x00", str_off)

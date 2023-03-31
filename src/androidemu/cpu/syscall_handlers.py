@@ -35,6 +35,7 @@ class SyscallHandlers:
         tid = self._sch.get_current_tid()
 
         logger.debug("%d syscall %d lr=0x%08X", tid, idx, lr)
+        
         args = [
             mu.reg_read(reg_idx) for reg_idx in range(
                 UC_ARM_REG_R0,

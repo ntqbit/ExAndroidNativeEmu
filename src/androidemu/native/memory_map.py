@@ -192,7 +192,7 @@ class MemoryMap:
             self._mu.mem_protect(addr, len_in, prot)
         except UcError as e:
             # TODO:just for debug
-            logger.warning("Warning mprotect with addr: 0x%08X len: 0x%08X prot:0x%08X failed!!!" %
+            logger.warning("Warning mprotect with addr: 0x%08X len: 0x%08X prot:0x%08X failed" %
                            (addr, len, prot))
             # self.dump_maps(sys.stdout)
             # raise

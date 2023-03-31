@@ -220,7 +220,7 @@ class VirtualFileSystem:
                 if not OVERRIDE_URANDOM:
                     ran = random.randint(1, 1 << 128)
 
-                b = int(ran).to_bytes(128, byteorder='little')
+                b = random.randbytes(128)
                 f.write(b)
 
         elif filename.startswith("/proc/"):
@@ -319,7 +319,7 @@ class VirtualFileSystem:
             fdesc = self._pcb.get_fd_detail(dirfd)
             if fdesc is None:
                 # fd不存在，可能是bug...要看被模拟的程序逻辑
-                logger.info("dirfd %d is invalid!!!" % dirfd)
+                logger.info("dirfd %d is invalid" % dirfd)
                 return None
 
             dirpath = fdesc.name
@@ -637,7 +637,7 @@ class VirtualFileSystem:
         n = os.lseek(fd, offset_low, whence)
         r = -1
         if n > 0xFFFFFFFF:
-            raise RuntimeError("_llseek return > 32 bits not implemented!!!")
+            raise RuntimeError("_llseek return > 32 bits not implemented")
         if n >= 0:
             r = 0
             rbytes = n.to_bytes(8, 'little')
@@ -821,7 +821,7 @@ class VirtualFileSystem:
                 return 0
 
             else:
-                raise RuntimeError("buffer overflow!!!")
+                raise RuntimeError("buffer overflow")
 
         else:
             raise NotImplementedError()

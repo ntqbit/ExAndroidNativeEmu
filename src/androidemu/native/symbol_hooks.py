@@ -100,8 +100,8 @@ class SymbolHooks:
             mod = self._emu.load_library(fullpath)
             r = mod.soinfo_ptr
         else:
-            #raise RuntimeError("dlopen %s not found!!!"%path)
-            logger.debug("dlopen %s not found!!!" % path)
+            #raise RuntimeError("dlopen %s not found"%path)
+            logger.debug("dlopen %s not found" % path)
             r = 0
 
         logger.debug("Called dlopen(%s) return 0x%08x" % (path, r))
@@ -122,7 +122,7 @@ class SymbolHooks:
 
         for mod in self._modules.modules:
             if mod.base <= addr < mod.base + mod.size:
-                # FIXME: memory leak!!!
+                # FIXME: memory leak
                 dli_fname = self._emu.memory.map(
                     0, len(mod.filename) + 1, UC_PROT_READ | UC_PROT_WRITE)
                 memory_helpers.write_utf8(uc, dli_fname, mod.filename)
@@ -133,7 +133,7 @@ class SymbolHooks:
                     "Called dladdr ok return path=%s base=0x%08x" %
                     (mod.filename, mod.base))
                 logger.warning(
-                    "dladdr has memory leak, dli_fname can not free!!!")
+                    "dladdr has memory leak, dli_fname can not free")
                 return 1
 
         logger.debug("Called dladdr not found" % (mod.filename, mod.base))
@@ -179,7 +179,7 @@ class SymbolHooks:
 
     @native_method
     def abort(self, uc):
-        raise RuntimeError("abort called!!!")
+        raise RuntimeError("abort called")
         sys.exit(-1)
 
     @native_method

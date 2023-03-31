@@ -129,7 +129,7 @@ class PackageManager(
         if flags == PackageManager.GET_SIGNATURES:
             if sign_hex == "0":
                 raise RuntimeError(
-                    "getPackageInfo with PackageManager.GET_SIGNATURES is called but no 'sign_hex' set in config!!!")
+                    "getPackageInfo with PackageManager.GET_SIGNATURES is called but no 'sign_hex' set in config")
 
         version_code = emu.config.get("version_code")
         if version_code is None:

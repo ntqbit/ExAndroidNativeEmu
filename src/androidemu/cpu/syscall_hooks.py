@@ -255,7 +255,7 @@ class SyscallHooks:
         logger.warning("kill is call pid=0x%x sig=%d" % (pid, sig))
         if pid == self._getpid(mu):
             logger.error(
-                "process 0x%x is killing self!!! maybe encounter anti-debug!!!" %
+                "process 0x%x is killing self maybe encounter anti-debug" %
                 pid)
             sys.exit(-10)
 
@@ -640,7 +640,7 @@ class SyscallHooks:
             return -1
 
         if option == PR_SET_VMA:
-            # arg5 contains ptr to a name.
+            logger.debug('prtcl(PR_SET_VMA) called. Name: %s', memory_helpers.read_utf8(mu, arg5))
             return 0
         elif option == PR_SET_DUMPABLE:
             return 0
@@ -732,7 +732,7 @@ class SyscallHooks:
                     # TODO
                     # 这里timeout返回-1和ETIMEOUT，不能在这里返回，需要在调度器判断是否timeout而写r0和set_errno，暂时没实现，写死返回0
                     logger.warning(
-                        "futex timeout %d ms is set, the return value is 0 not matter if it expired!!!" %
+                        "futex timeout %d ms is set, the return value is 0 not matter if it expired" %
                         ms)
 
                 sch.futex_wait(uaddr, timeout)
@@ -742,7 +742,7 @@ class SyscallHooks:
             logger.debug(
                 "futex_wake call op=0x%08X uaddr=0x%08X val=0x%08X" %
                 (op, uaddr, val))
-            assert val <= 0x7fffffff, "futex wake val=0x%08X bigger than int max!!!" % val
+            assert val <= 0x7fffffff, "futex wake val=0x%08X bigger than int max" % val
             nwake = 0
             for i in range(0, val):
                 wake_ok = sch.futex_wake(uaddr)
@@ -935,7 +935,7 @@ class SyscallHooks:
 
     def _ARM_set_tls(self, mu, tls_ptr):
         assert self._emu.get_arch(
-        ) == emu_const.ARCH_ARM32, "error only arm32 has _ARM_set_tls syscall!!!"
+        ) == emu_const.ARCH_ARM32, "error only arm32 has _ARM_set_tls syscall"
         self._emu.mu.reg_write(UC_ARM_REG_C13_C0_3, tls_ptr)
 
     def _nanosleep(self, mu, req, rem):

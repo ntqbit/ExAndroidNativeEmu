@@ -1,6 +1,7 @@
 from androidemu.java.java_class_def import JavaClassDef
 from androidemu.java.java_field_def import JavaFieldDef
 from androidemu.java.java_method_def import java_method_def, JavaMethodDef
+from androidemu.utils.repr import short_byte_repr
 
 
 class Array(metaclass=JavaClassDef, jvm_name='java/lang/reflect/Array'):
@@ -45,13 +46,7 @@ class ByteArray(Array, metaclass=JavaClassDef, jvm_name="[B", jvm_super=Array):
         Array.__init__(self, item_list)
 
     def __repr__(self):
-        b = self._pyitems
-        if len(b) <= 20:
-            b = b.hex()
-        else:
-            b = b[:19].hex() + b'..'
-
-        return f'ByteArray({b})'
+        return f'ByteArray({short_byte_repr(self._pyitems)})'
 
 
 # 外面用到，因为与Array jvm name不同，所以暂时手动定义，与Array作用一样

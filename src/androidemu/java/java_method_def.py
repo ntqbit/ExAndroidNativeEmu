@@ -67,7 +67,7 @@ def java_method_def(
                 pyclazz = vals
                 if not isinstance(pyclazz, JavaClassDef):
                     raise RuntimeError(
-                        "Error class %s is not register as jvm class!!!" %
+                        "Error class %s is not register as jvm class" %
                         clsname)
 
                 jvm_clazz = pyclazz.class_object

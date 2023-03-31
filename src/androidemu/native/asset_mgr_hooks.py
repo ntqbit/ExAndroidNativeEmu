@@ -52,7 +52,7 @@ class AssetManagerHooks:
             "AAssetManager_fromJava call [0x%08X], [%d]" %
             (env_ptr, jobj_mgr_idx))
         env_obj = self._emu.java_vm.jni_env
-        assert env_obj.address_ptr == env_ptr, "ERROR input env_ptr != main_thread ptr, impossible for single thread program!!!"
+        assert env_obj.address_ptr == env_ptr, "ERROR input env_ptr != main_thread ptr, impossible for single thread program"
 
         obj = env_obj.get_reference(jobj_mgr_idx)
 
