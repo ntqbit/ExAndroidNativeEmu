@@ -5,7 +5,8 @@ from unicorn import UC_PROT_ALL, UC_PROT_WRITE, UC_PROT_READ
 from androidemu.internal import arm
 from unicorn.arm_const import *
 from unicorn.arm64_const import *
-from androidemu.utils.misc_utils import get_segment_protection, page_end, page_start
+from androidemu.utils.misc_utils import get_segment_protection
+from androidemu.utils.alignment import page_start, page_end
 from androidemu.utils.stack_helpers import StackHelper
 from androidemu.internal.module import Module
 from androidemu.const import emu_const
@@ -157,7 +158,7 @@ class Modules:
             mu, tls_ptr + 3 * ptr_sz, kernel_args_base, ptr_sz)
         arch = self.emu.get_arch()
 
-        if arch == emu_const.ARCH_ARM32:
+        if arch == emu_const.Arch.ARM32:
             mu.reg_write(UC_ARM_REG_C13_C0_3, tls_ptr)
         else:
             mu.reg_write(UC_ARM64_REG_TPIDR_EL0, tls_ptr)
@@ -182,7 +183,7 @@ class Modules:
         self._tls_init()
 
     def _get_ld_library_path(self):
-        if self.emu.get_arch() == emu_const.ARCH_ARM32:
+        if self.emu.get_arch() == emu_const.Arch.ARM32:
             return ["/system/lib/"]
         else:
             return ["/system/lib64/"]
@@ -247,9 +248,9 @@ class Modules:
 
         # do sth like linker
         reader = elf_reader.ELFReader(filename)
-        if self.emu.get_arch() == emu_const.ARCH_ARM32 and not reader.is_elf32():
+        if self.emu.get_arch() == emu_const.Arch.ARM32 and not reader.is_elf32():
             raise RuntimeError("arch is ARCH_ARM32 but so %s is not elf32" % filename)
-        elif self.emu.get_arch() == emu_const.ARCH_ARM64 and reader.is_elf32():
+        elif self.emu.get_arch() == emu_const.Arch.ARM64 and reader.is_elf32():
             raise RuntimeError("arch is ARCH_ARM64 but so %s is elf32" % filename)
 
         # Parse program header (Execution view).
@@ -336,7 +337,8 @@ class Modules:
                 logger.debug('Load segments: %s', load_segments)
                 raise RuntimeError(f'File length must be greater than zero.')
 
-            self.emu.memory.map(seg_page_start, file_length, prot, vf, file_page_start)
+            self.emu.memory.map(seg_page_start, file_length, prot)
+            self.emu.memory.set_file_map(seg_page_start, file_length, vf, file_page_start)
 
             p_memsz = segment["p_memsz"]
             seg_end = seg_start + p_memsz
@@ -496,13 +498,13 @@ class Modules:
                                 8, byteorder='little'))
                     else:
                         raise NotImplementedError()  # impossible
+                elif rel_info_type == arm.R_ARM_TLS_TPOFF32:
+                    logger.warning('reltype R_ARM_TLS_TPOFF32 skipped: [symname=%s]', sym_name)
+                elif rel_info_type == arm.R_ARM_IRELATIVE:
+                    logger.warning('reltype R_ARM_IRELATIVE skipped: [symname=%s]', sym_name)
                 else:
-                    logger.error(
-                        "Unhandled relocation type %i." %
-                        rel_info_type)
-                    raise NotImplementedError(
-                        "Unhandled relocation type %i." %
-                        rel_info_type)
+                    logger.error("Unhandled relocation type %i. symname=%s", rel_info_type, sym_name)
+                    raise NotImplementedError("Unhandled relocation type %i." % rel_info_type)
 
         if init_addr != 0:
             init_array.append(load_bias + init_addr)
@@ -543,6 +545,7 @@ class Modules:
                 print("region begin :0x%08X end:0x%08X, prot:%d"%(r[0], r[1], r[2]))
 
             '''
+            logger.debug('calling module init: [filename=%s,load_base=0x%X]', filename, load_base)
             module.call_init(self.emu)
 
         logger.info("finish load lib %s base 0x%08X" % (filename, load_base))

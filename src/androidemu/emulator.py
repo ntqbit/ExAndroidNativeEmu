@@ -29,7 +29,6 @@ from androidemu.vfs.file_system import VirtualFileSystem
 from androidemu.vfs.virtual_file import VirtualFile
 from androidemu.utils import misc_utils
 from androidemu.scheduler import Scheduler
-from androidemu.internal.module_loader import ModuleLoader
 
 from androidemu.java.java_class_def import JavaClassDef
 from androidemu.java.constant_values import JAVA_NULL
@@ -354,7 +353,7 @@ class Emulator:
         self.java_vm = JavaVM(self, self.java_classloader, self._hooker)
 
         # linker
-        self.modules = Modules(self, self._vfs_root, ModuleLoader(self, self._vfs_root))
+        self.modules = Modules(self, self._vfs_root)
         # Native
         self._sym_hooks = SymbolHooks(
             self, self.modules, self._hooker, self._vfs_root)
@@ -389,7 +388,8 @@ class Emulator:
                     path,
                     os.O_RDONLY),
                 path)
-            self.memory.map(0xab006000, sz, UC_PROT_EXEC | UC_PROT_READ, vf, 0)
+            self.memory.map(0xab006000, sz, UC_PROT_EXEC | UC_PROT_READ)
+            self.memory.set_file_map(0xab006000, sz, vf, 0)
 
         else:
             # 映射app_process，android系统基本特征
@@ -401,7 +401,8 @@ class Emulator:
                     path,
                     os.O_RDONLY),
                 path)
-            self.memory.map(0xab006000, sz, UC_PROT_EXEC | UC_PROT_READ, vf, 0)
+            self.memory.map(0xab006000, sz, UC_PROT_EXEC | UC_PROT_READ)
+            self.memory.set_file_map(0xab006000, sz, vf, 0)
 
     def get_vfs_root(self):
         return self._vfs_root

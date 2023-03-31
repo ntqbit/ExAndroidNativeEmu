@@ -199,6 +199,7 @@ class ELFReader:
             self._nchain = 0
             self._bucket_addr = 0
             self._chain_addr = 0
+            self._plt_got_addr = 0
 
             self._phdrs = []
             self._loads = []
