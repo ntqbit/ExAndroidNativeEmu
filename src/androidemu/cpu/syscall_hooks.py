@@ -51,54 +51,35 @@ class SyscallHooks:
             self._syscall_handler.set_handler(0x1A, "ptrace", 4, self._ptrace)
             self._syscall_handler.set_handler(0x25, "kill", 2, self._kill)
             self._syscall_handler.set_handler(0x2A, "pipe", 1, self._pipe)
-            self._syscall_handler.set_handler(
-                0x43, "sigaction", 3, self._handle_sigaction)
-            self._syscall_handler.set_handler(
-                0x4E, "gettimeofday", 2, self._handle_gettimeofday)
+            self._syscall_handler.set_handler(0x43, "sigaction", 3, self._handle_sigaction)
+            self._syscall_handler.set_handler(0x4E, "gettimeofday", 2, self._handle_gettimeofday)
             self._syscall_handler.set_handler(0x72, "wait4", 4, self._wait4)
-            self._syscall_handler.set_handler(
-                0x74, "sysinfo", 1, self._sysinfo)
+            self._syscall_handler.set_handler(0x74, "sysinfo", 1, self._sysinfo)
             self._syscall_handler.set_handler(0x78, "clone", 5, self._clone)
             self._syscall_handler.set_handler(0x7A, "uname", 1, self._uname)
-            self._syscall_handler.set_handler(
-                0x7E, "sigprocmask", 3, self._handle_sigprocmask)
-            self._syscall_handler.set_handler(
-                0xAC, "prctl", 5, self._handle_prctl)
-            self._syscall_handler.set_handler(
-                0xAE, "rt_sigaction", 4, self._rt_sigaction)
-            self._syscall_handler.set_handler(
-                0xAF, "rt_sigprocmask", 4, self._handle_rt_sigprocmask)
-            self._syscall_handler.set_handler(
-                0xBA, "sigaltstack", 2, self._sigaltstack)
+            self._syscall_handler.set_handler(0x7E, "sigprocmask", 3, self._handle_sigprocmask)
+            self._syscall_handler.set_handler(0xAC, "prctl", 5, self._handle_prctl)
+            self._syscall_handler.set_handler(0xAE, "rt_sigaction", 4, self._rt_sigaction)
+            self._syscall_handler.set_handler(0xAF, "rt_sigprocmask", 4, self._handle_rt_sigprocmask)
+            self._syscall_handler.set_handler(0xBA, "sigaltstack", 2, self._sigaltstack)
             self._syscall_handler.set_handler(0xBE, "vfork", 0, self._vfork)
-            self._syscall_handler.set_handler(
-                0xC7, "getuid32", 0, self._get_uid)
-            self._syscall_handler.set_handler(
-                0xDA, "set_tid_address", 1, self._set_tid_address)
+            self._syscall_handler.set_handler(0xC7, "getuid32", 0, self._get_uid)
+            self._syscall_handler.set_handler(0xDA, "set_tid_address", 1, self._set_tid_address)
             self._syscall_handler.set_handler(0xE0, "gettid", 0, self._gettid)
-            self._syscall_handler.set_handler(
-                0xF0, "futex", 6, self._handle_futex)
-            self._syscall_handler.set_handler(
-                0x10c, "tgkill", 3, self._handle_tgkill)
-            self._syscall_handler.set_handler(
-                0x107, "clock_gettime", 2, self._handle_clock_gettime)
+            self._syscall_handler.set_handler(0xF0, "futex", 6, self._handle_futex)
+            self._syscall_handler.set_handler(0x10c, "tgkill", 3, self._handle_tgkill)
+            self._syscall_handler.set_handler(0x107, "clock_gettime", 2, self._handle_clock_gettime)
             self._syscall_handler.set_handler(0x119, "socket", 3, self._socket)
             self._syscall_handler.set_handler(0x11a, "bind", 3, self._bind)
-            self._syscall_handler.set_handler(
-                0x11b, "connect", 3, self._connect)
-            self._syscall_handler.set_handler(
-                0x126, "setsockopt", 5, self._setsockopt)
+            self._syscall_handler.set_handler(0x11b, "connect", 3, self._connect)
+            self._syscall_handler.set_handler(0x126, "setsockopt", 5, self._setsockopt)
             self._syscall_handler.set_handler(0x159, "getcpu", 3, self._getcpu)
             self._syscall_handler.set_handler(0x166, "dup3", 3, self._dup3)
             self._syscall_handler.set_handler(0x167, "pipe2", 2, self._pipe2)
-            self._syscall_handler.set_handler(
-                0x178, "process_vm_readv", 6, self._process_vm_readv)
-            self._syscall_handler.set_handler(
-                0x180, "getrandom", 3, self._getrandom)
-            self._syscall_handler.set_handler(
-                0xf0002, "ARM_cacheflush", 0, self._ARM_cacheflush)
-            self._syscall_handler.set_handler(
-                0xf0005, "ARM_set_tls", 1, self._ARM_set_tls)
+            self._syscall_handler.set_handler(0x178, "process_vm_readv", 6, self._process_vm_readv)
+            self._syscall_handler.set_handler(0x180, "getrandom", 3, self._getrandom)
+            self._syscall_handler.set_handler(0xf0002, "ARM_cacheflush", 0, self._ARM_cacheflush)
+            self._syscall_handler.set_handler(0xf0005, "ARM_set_tls", 1, self._ARM_set_tls)
 
             self._syscall_handler.set_handler(
                 0xa2, "nanosleep", 2, self._nanosleep)
@@ -113,47 +94,33 @@ class SyscallHooks:
             self._syscall_handler.set_handler(0x81, "kill", 2, self._kill)
             # arm64没有pipe系统调用
             # arm64没sigaction系统调用
-            self._syscall_handler.set_handler(
-                0xA9, "gettimeofday", 2, self._handle_gettimeofday)
+            self._syscall_handler.set_handler(0xA9, "gettimeofday", 2, self._handle_gettimeofday)
             self._syscall_handler.set_handler(0x104, "wait4", 4, self._wait4)
-            self._syscall_handler.set_handler(
-                0xB3, "sysinfo", 1, self._sysinfo)
+            self._syscall_handler.set_handler(0xB3, "sysinfo", 1, self._sysinfo)
             self._syscall_handler.set_handler(0xDC, "clone", 5, self._clone)
             self._syscall_handler.set_handler(0xA0, "uname", 1, self._uname)
             # no sigprocmask
-            self._syscall_handler.set_handler(
-                0xA7, "prctl", 5, self._handle_prctl)
-            self._syscall_handler.set_handler(
-                0x86, "rt_sigaction", 4, self._rt_sigaction)
-            self._syscall_handler.set_handler(
-                0x87, "rt_sigprocmask", 4, self._handle_rt_sigprocmask)
-            self._syscall_handler.set_handler(
-                0x84, "sigaltstack", 2, self._sigaltstack)
+            self._syscall_handler.set_handler(0xA7, "prctl", 5, self._handle_prctl)
+            self._syscall_handler.set_handler(0x86, "rt_sigaction", 4, self._rt_sigaction)
+            self._syscall_handler.set_handler(0x87, "rt_sigprocmask", 4, self._handle_rt_sigprocmask)
+            self._syscall_handler.set_handler(0x84, "sigaltstack", 2, self._sigaltstack)
             # no vfork
             # no getuid32
             self._syscall_handler.set_handler(0xB2, "gettid", 0, self._gettid)
-            self._syscall_handler.set_handler(
-                0x62, "futex", 6, self._handle_futex)
-            self._syscall_handler.set_handler(
-                0x83, "tgkill", 3, self._handle_tgkill)
-            self._syscall_handler.set_handler(
-                0x71, "clock_gettime", 2, self._handle_clock_gettime)
+            self._syscall_handler.set_handler(0x62, "futex", 6, self._handle_futex)
+            self._syscall_handler.set_handler(0x83, "tgkill", 3, self._handle_tgkill)
+            self._syscall_handler.set_handler(0x71, "clock_gettime", 2, self._handle_clock_gettime)
             self._syscall_handler.set_handler(0xC6, "socket", 3, self._socket)
             self._syscall_handler.set_handler(0xC8, "bind", 3, self._bind)
-            self._syscall_handler.set_handler(
-                0xCB, "connect", 3, self._connect)
-            self._syscall_handler.set_handler(
-                0xD0, "setsockopt", 5, self._setsockopt)
+            self._syscall_handler.set_handler(0xCB, "connect", 3, self._connect)
+            self._syscall_handler.set_handler(0xD0, "setsockopt", 5, self._setsockopt)
             self._syscall_handler.set_handler(0xA8, "getcpu", 3, self._getcpu)
             self._syscall_handler.set_handler(0x18, "dup3", 3, self._dup3)
             self._syscall_handler.set_handler(0x3B, "pipe2", 2, self._pipe2)
-            self._syscall_handler.set_handler(
-                0x10E, "process_vm_readv", 6, self._process_vm_readv)
-            self._syscall_handler.set_handler(
-                0x116, "getrandom", 3, self._getrandom)
+            self._syscall_handler.set_handler(0x10E, "process_vm_readv", 6, self._process_vm_readv)
+            self._syscall_handler.set_handler(0x116, "getrandom", 3, self._getrandom)
             # no ARM_cacheflush
-            self._syscall_handler.set_handler(
-                0x65, "nanosleep", 2, self._nanosleep)
+            self._syscall_handler.set_handler(0x65, "nanosleep", 2, self._nanosleep)
 
         self._clock_start = time.time()
         self._clock_offset = randint(50000, 100000)
@@ -169,7 +136,7 @@ class SyscallHooks:
         if r == 0:
             pass
             # 实测这样改没效果
-            #logging.basicConfig(level=logging.DEBUG, format='%(process)d - %(asctime)s - %(levelname)s - %(message)s', stream=sys.stdout)
+            # logging.basicConfig(level=logging.DEBUG, format='%(process)d - %(asctime)s - %(levelname)s - %(message)s', stream=sys.stdout)
 
         else:
             logger.debug("-----here is parent process child pid=%d" % r)
@@ -260,7 +227,7 @@ class SyscallHooks:
             sys.exit(-10)
 
     def _pipe_common(self, mu, files_ptr, flags):
-        #logger.warning("skip syscall pipe files [0x%08X]"%files_ptr)
+        # logger.warning("skip syscall pipe files [0x%08X]"%files_ptr)
         if hasattr(os, "pipe2"):
             ps = os.pipe2(flags)
         else:
@@ -577,9 +544,9 @@ class SyscallHooks:
         # CLONE_THREAD | CLONE_SYSVSEM | CLONE_SETTLS | CLONE_PARENT_SETTID |
         # CLONE_CHILD_CLEARTID
         if flags & fork_flags == fork_flags or flags & vfork_flags == vfork_flags:
-            #fork or vfork
+            # fork or vfork
             # 0x01200011 is fork flag
-            #clone(0x01200011, 0x00000000, 0x00000000, 0x00000000, 0x00000008)
+            # clone(0x01200011, 0x00000000, 0x00000000, 0x00000000, 0x00000008)
             logger.warning("syscall clone do fork...")
             return self._do_fork(mu)
 
@@ -613,7 +580,7 @@ class SyscallHooks:
 
             return tid
 
-        #logger.warning("syscall clone skip.")
+        # logger.warning("syscall clone skip.")
         raise NotImplementedError("clone flags 0x%08X no suppport" % flags)
         return -1
 
@@ -867,7 +834,7 @@ class SyscallHooks:
         If the connection or binding succeeds, zero is returned.
         On error, -1 is returned, and errno is set appropriately.
         """
-        #hexdump.hexdump(mu.mem_read(addr, addr_len))
+        # hexdump.hexdump(mu.mem_read(addr, addr_len))
 
         # return 0
         return -1

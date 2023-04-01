@@ -2207,9 +2207,7 @@ class JNIEnv:
     def get_java_vm(self, mu, env, vm):
         logger.debug("JNIEnv->GetJavaVM(0x%08x) was called" % vm)
 
-        mu.mem_write(
-            vm, self._emu.java_vm.address_ptr.to_bytes(
-                4, byteorder='little'))
+        mu.mem_write(vm, self._emu.java_vm.address_ptr.to_bytes(4, byteorder='little'))
 
         return JNI_OK
 
