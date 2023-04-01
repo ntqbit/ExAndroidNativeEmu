@@ -552,7 +552,7 @@ class Modules:
         return module
 
     def _elf_get_symval(self, load_bias, symbol):
-        logger.debug('Getting symbal: %s', symbol)
+        #logger.debug('Getting symbal: %s', symbol)
 
         name = symbol["name"]
         if name in self.symbol_hooks:
