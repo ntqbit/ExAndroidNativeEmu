@@ -1,7 +1,7 @@
 import os
 import verboselogs
 from unicorn import *
-from androidemu.utils.misc_utils import page_end, page_start
+from androidemu.utils.alignment import page_end, page_start
 
 logger = verboselogs.VerboseLogger(__name__)
 
@@ -150,8 +150,8 @@ class MemoryMap:
                 'map addr was not multiple of page size (%d, %d).' %
                 (address, PAGE_SIZE))
 
-        logger.debug("map addr:0x%08X, end:0x%08X, sz:0x%08X off=0x%08X" %
-                     (address, address + size, size, offset))
+        logger.debug("map addr:0x%08X, end:0x%08X, sz:0x%08X vf=%s off=0x%08X" %
+                     (address, address + size, size, vf, offset))
         # traceback.print_stack()
         al_address = address
         al_size = page_end(al_address + size) - al_address

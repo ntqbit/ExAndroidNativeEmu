@@ -337,8 +337,7 @@ class Modules:
                 logger.debug('Load segments: %s', load_segments)
                 raise RuntimeError(f'File length must be greater than zero.')
 
-            self.emu.memory.map(seg_page_start, file_length, prot)
-            self.emu.memory.set_file_map(seg_page_start, file_length, vf, file_page_start)
+            self.emu.memory.map(seg_page_start, file_length, prot, vf, file_page_start)
 
             p_memsz = segment["p_memsz"]
             seg_end = seg_start + p_memsz

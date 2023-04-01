@@ -388,9 +388,7 @@ class Emulator:
                     path,
                     os.O_RDONLY),
                 path)
-            self.memory.map(0xab006000, sz, UC_PROT_EXEC | UC_PROT_READ)
-            self.mu.mem_write(0xab006000, vf.descriptor.read())
-            self.memory.set_file_map(0xab006000, sz, vf, 0)
+            self.memory.map(0xab006000, sz, UC_PROT_EXEC | UC_PROT_READ, vf, 0)
 
         else:
             # 映射app_process，android系统基本特征
@@ -402,8 +400,7 @@ class Emulator:
                     path,
                     os.O_RDONLY),
                 path)
-            self.memory.map(0xab006000, sz, UC_PROT_EXEC | UC_PROT_READ)
-            self.memory.set_file_map(0xab006000, sz, vf, 0)
+            self.memory.map(0xab006000, sz, UC_PROT_EXEC | UC_PROT_READ, vf, 0)
 
     def get_vfs_root(self):
         return self._vfs_root
