@@ -19,6 +19,7 @@ from androidemu.utils import debug_utils
 from androidemu.const import emu_const
 from androidemu.java.jni_functions import JNI_FUNCTIONS
 from androidemu.utils.repr import short_byte_repr
+from androidemu.logging import JNICALL
 
 logger = verboselogs.VerboseLogger(__name__)
 
@@ -322,7 +323,7 @@ class JNIEnv:
                     ret = callback(mu, *args)
                 except Exception as e:
                     log_text += f'. Thrown {e.__class__.__name__}({str(e)}).'
-                    logger.debug(log_text)
+                    logger.log(JNICALL, log_text)
                     raise
 
                 if ret is not None:
@@ -331,7 +332,7 @@ class JNIEnv:
                 if func['ret'] != 'void':
                     log_text += f' = {map_var_type(ret, func["ret"])}'
 
-                logger.debug(log_text)
+                logger.log(JNICALL, log_text)
                 return ret
 
             return create_native_method_wrapper(wrapper, len(func['args']))
