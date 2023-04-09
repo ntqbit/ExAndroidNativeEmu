@@ -81,15 +81,15 @@ class Emulator:
         # MCR p15, #0, r1, c7, c5, #4
         # MOV r0,#0x40000000
         # FMXR FPEXC, r0
-        code = '11EE501F'
-        code += '41F47001'
-        code += '01EE501F'
-        code += '4FF00001'
-        code += '07EE951F'
-        code += '4FF08040'
-        code += 'E8EE100A'
+        code = "11EE501F"
+        code += "41F47001"
+        code += "01EE501F"
+        code += "4FF00001"
+        code += "07EE951F"
+        code += "4FF08040"
+        code += "E8EE100A"
         # vpush {d8}
-        code += '2ded028b'
+        code += "2ded028b"
 
         address = 0x1000
         mem_size = 0x1000
@@ -105,12 +105,12 @@ class Emulator:
             self.mu.mem_unmap(address, mem_size)
 
     # arm64
-    '''
+    """
     mrs    x1, cpacr_el1
     mov    x0, #(3 << 20)
     orr    x0, x1, x0
     msr    cpacr_el1, x0
-    '''
+    """
 
     def _enable_vfp64(self):
         # arm64 enable vfp
@@ -198,7 +198,7 @@ class Emulator:
             androidemu.java.classes.activity_thread.ActivityThread,
             androidemu.java.classes.settings.Secure,
             androidemu.java.classes.settings.Settings,
-            androidemu.java.classes.bundle.Bundle
+            androidemu.java.classes.bundle.Bundle,
         ]
 
         for clz in defualt_classes:
@@ -214,12 +214,13 @@ class Emulator:
     """
 
     def __init__(
-            self,
-            vfs_root="vfs",
-            config_path="emu_cfg/default.json",
-            vfp_inst_set=True,
-            arch=emu_const.Arch.ARM32,
-            muti_task=False):
+        self,
+        vfs_root="vfs",
+        config_path="emu_cfg/default.json",
+        vfp_inst_set=True,
+        arch=emu_const.Arch.ARM32,
+        muti_task=False,
+    ):
         # Unicorn.
         sys.stdout = sys.stderr
         # 由于这里的stream只能改一次，为避免与fork之后的子进程写到stdout混合，将这些log写到stderr
@@ -261,7 +262,7 @@ class Emulator:
         # 注意，原有缺陷，原来linker初始化没有完成init_tls部分，导致libc初始化有访问空指针而无法正常完成
         # 而这里直接将0映射空间，,强行运行过去，因为R1刚好为0,否则会报memory unmap异常
         # 最新版本已经解决这个问题，无需再这么映射
-        #self.mu.mem_map(0x0, 0x00001000, UC_PROT_READ | UC_PROT_WRITE)
+        # self.mu.mem_map(0x0, 0x00001000, UC_PROT_READ | UC_PROT_WRITE)
 
         # Android 4.4
         if arch == emu_const.Arch.ARM32:
@@ -312,41 +313,43 @@ class Emulator:
         self.memory = MemoryMap(
             self.mu,
             config.MAP_ALLOC_BASE,
-            config.MAP_ALLOC_BASE +
-            config.MAP_ALLOC_SIZE)
+            config.MAP_ALLOC_BASE + config.MAP_ALLOC_SIZE,
+        )
 
         # Stack.
         addr = self.memory.map(
-            config.STACK_ADDR,
-            config.STACK_SIZE,
-            UC_PROT_READ | UC_PROT_WRITE)
+            config.STACK_ADDR, config.STACK_SIZE, UC_PROT_READ | UC_PROT_WRITE
+        )
         self.mu.reg_write(sp_reg, config.STACK_ADDR + config.STACK_SIZE)
-        #sp = self.mu.reg_read(sp_reg)
-        #print ("stack addr %x"%sp)
+        # sp = self.mu.reg_read(sp_reg)
+        # print ("stack addr %x"%sp)
 
         self._sch = Scheduler(self)
         # CPU
-        self._syscall_handler = SyscallHandlers(self.mu, self._sch, self.get_arch())
+        self._syscall_handler = SyscallHandlers(
+            self.mu, self._sch, self.get_arch()
+        )
 
         # Hooker
         self.memory.map(
             config.BRIDGE_MEMORY_BASE,
             config.BRIDGE_MEMORY_SIZE,
-            UC_PROT_READ | UC_PROT_WRITE | UC_PROT_EXEC)
+            UC_PROT_READ | UC_PROT_WRITE | UC_PROT_EXEC,
+        )
         self._hooker = Hooker(
-            self,
-            config.BRIDGE_MEMORY_BASE,
-            config.BRIDGE_MEMORY_SIZE)
+            self, config.BRIDGE_MEMORY_BASE, config.BRIDGE_MEMORY_SIZE
+        )
 
         # syscalls
-        self._mem_handler = MemorySyscallHandler(self, self.memory, self._syscall_handler)
-        self._syscall_hooks = SyscallHooks(self, self.config, self._syscall_handler)
+        self._mem_handler = MemorySyscallHandler(
+            self, self.memory, self._syscall_handler
+        )
+        self._syscall_hooks = SyscallHooks(
+            self, self.config, self._syscall_handler
+        )
         self._vfs = VirtualFileSystem(
-            self,
-            vfs_root,
-            self.config,
-            self._syscall_handler,
-            self.memory)
+            self, vfs_root, self.config, self._syscall_handler, self.memory
+        )
 
         # JavaVM
         self.java_classloader = JavaClassLoader()
@@ -356,7 +359,8 @@ class Emulator:
         self.modules = Modules(self, self._vfs_root)
         # Native
         self._sym_hooks = SymbolHooks(
-            self, self.modules, self._hooker, self._vfs_root)
+            self, self.modules, self._hooker, self._vfs_root
+        )
 
         self._add_classes()
 
@@ -364,7 +368,8 @@ class Emulator:
         self.memory.map(
             config.JMETHOD_ID_BASE,
             0x2000,
-            UC_PROT_READ | UC_PROT_WRITE | UC_PROT_EXEC)
+            UC_PROT_READ | UC_PROT_WRITE | UC_PROT_EXEC,
+        )
 
         if arch == emu_const.Arch.ARM32:
             # 映射常用的文件，cpu一些原子操作的函数实现地方
@@ -384,11 +389,10 @@ class Emulator:
             sz = os.path.getsize(path)
             vf = VirtualFile(
                 "/system/bin/app_process32",
-                misc_utils.platform_open(
-                    path,
-                    os.O_RDONLY),
-                path)
-            self.memory.map(0xab006000, sz, UC_PROT_EXEC | UC_PROT_READ, vf, 0)
+                misc_utils.platform_open(path, os.O_RDONLY),
+                path,
+            )
+            self.memory.map(0xAB006000, sz, UC_PROT_EXEC | UC_PROT_READ, vf, 0)
 
         else:
             # 映射app_process，android系统基本特征
@@ -396,11 +400,10 @@ class Emulator:
             sz = os.path.getsize(path)
             vf = VirtualFile(
                 "/system/bin/app_process64",
-                misc_utils.platform_open(
-                    path,
-                    os.O_RDONLY),
-                path)
-            self.memory.map(0xab006000, sz, UC_PROT_EXEC | UC_PROT_READ, vf, 0)
+                misc_utils.platform_open(path, os.O_RDONLY),
+                path,
+            )
+            self.memory.map(0xAB006000, sz, UC_PROT_EXEC | UC_PROT_READ, vf, 0)
 
     def get_vfs_root(self):
         return self._vfs_root
@@ -414,14 +417,17 @@ class Emulator:
 
         if symbol_addr is None:
             logger.error(
-                'Unable to find symbol \'%s\' in module \'%s\'.' %
-                (symbol_name, module.filename))
+                "Unable to find symbol '%s' in module '%s'."
+                % (symbol_name, module.filename)
+            )
             return
 
         return self.call_native(symbol_addr, *argv)
 
     def _call_native32(self, addr, *argv):
-        assert addr is not None, "call addr is None, make sure your jni native function has registered by RegisterNative!"
+        assert (
+            addr is not None
+        ), "call addr is None, make sure your jni native function has registered by RegisterNative!"
         native_write_args(self, *argv)
         self._sch.exec(addr)
         # Read result from locals if jni.
@@ -429,7 +435,9 @@ class Emulator:
         return res
 
     def _call_native64(self, addr, *argv):
-        assert addr is not None, "call addr is None, make sure your jni native function has registered by RegisterNative!"
+        assert (
+            addr is not None
+        ), "call addr is None, make sure your jni native function has registered by RegisterNative!"
         native_write_args(self, *argv)
         self._sch.exec(addr)
         # Read result from locals if jni.

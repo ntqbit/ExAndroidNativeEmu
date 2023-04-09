@@ -1,12 +1,10 @@
 import inspect
 
-from unicorn import Uc
 from unicorn.arm_const import *
 from unicorn.arm64_const import *
 from androidemu.const import emu_const
 
 from androidemu.java.java_class_def import JavaClassDef
-from androidemu.java.jni_const import JNI_ERR
 from androidemu.java.jni_ref import jobject
 
 
@@ -39,9 +37,11 @@ def native_write_args(emu, *argv):
 
         for arg in argv[max_regs_args:]:
             emu.mu.mem_write(
-                sp_current, native_translate_arg(
-                    emu, arg).to_bytes(
-                    ptr_sz, byteorder='little'))
+                sp_current,
+                native_translate_arg(emu, arg).to_bytes(
+                    ptr_sz, byteorder="little"
+                ),
+            )
             sp_current = sp_current + ptr_sz
 
         emu.mu.reg_write(sp_reg, sp_end)
@@ -73,8 +73,11 @@ def native_read_args_in_hook_code(emu, args_count):
         sp = mu.reg_read(sp_reg)
 
         for x in range(0, args_count - max_regs_args):
-            native_args.append(int.from_bytes(mu.mem_read(
-                sp + (x * ptr_sz), ptr_sz), byteorder='little'))
+            native_args.append(
+                int.from_bytes(
+                    mu.mem_read(sp + (x * ptr_sz), ptr_sz), byteorder="little"
+                )
+            )
 
     return native_args
 
@@ -87,7 +90,9 @@ def native_translate_arg(emu, val):
     elif isinstance(val, JavaClassDef):
         return emu.java_vm.jni_env.add_local_reference(jobject(val))
     else:
-        raise NotImplementedError(f"Unable to write response '{str(val)}' type '{type(val)}' to emulator.")
+        raise NotImplementedError(
+            f"Unable to write response '{str(val)}' type '{type(val)}' to emulator."
+        )
 
 
 def native_write_arg_register(emu, reg, val):
@@ -137,7 +142,7 @@ def native_method(func):
     args = inspect.getfullargspec(func).args
     args_count = len(args) - 1
 
-    if 'self' in args:
+    if "self" in args:
         args_count -= 1
 
     if args_count < 0:

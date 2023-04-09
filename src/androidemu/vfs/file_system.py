@@ -28,7 +28,7 @@ OVERRIDE_URANDOM = False
 OVERRIDE_URANDOM_INT = 1
 
 # status
-s_status = '''
+s_status = """
 Name:   {pkg_name}
 State:  R (running)
 Tgid:   1434
@@ -66,7 +66,7 @@ Cpus_allowed:   f
 Cpus_allowed_list:      0-3
 voluntary_ctxt_switches:        5225
 nonvoluntary_ctxt_switches:     11520
-'''
+"""
 
 
 class VirtualFileSystem:
@@ -106,35 +106,51 @@ class VirtualFileSystem:
             syscall_handler.set_handler(0x36, "ioctl", 6, self._ioctl)
             syscall_handler.set_handler(0x37, "fcntl", 6, self._fcntl64)
             syscall_handler.set_handler(0x6C, "fstat", 2, self._handle_fstat64)
-            syscall_handler.set_handler(0x8c, "_llseek", 5, self._handle_llseek)
+            syscall_handler.set_handler(
+                0x8C, "_llseek", 5, self._handle_llseek
+            )
             syscall_handler.set_handler(0x92, "writev", 3, self._handle_writev)
             syscall_handler.set_handler(0xA8, "poll", 3, self._handle_poll)
             syscall_handler.set_handler(0xC3, "stat64", 2, self._handle_stat64)
-            syscall_handler.set_handler(0xC4, "lstat64", 2, self._handle_lstat64)
-            syscall_handler.set_handler(0xC5, "fstat64", 2, self._handle_fstat64)
-            syscall_handler.set_handler(0xD9, "getdents64", 3, self._handle_getdents64)
-            syscall_handler.set_handler(0xE4, "fsetxattr", 5, self._handle_fsetxattr)
+            syscall_handler.set_handler(
+                0xC4, "lstat64", 2, self._handle_lstat64
+            )
+            syscall_handler.set_handler(
+                0xC5, "fstat64", 2, self._handle_fstat64
+            )
+            syscall_handler.set_handler(
+                0xD9, "getdents64", 3, self._handle_getdents64
+            )
+            syscall_handler.set_handler(
+                0xE4, "fsetxattr", 5, self._handle_fsetxattr
+            )
             syscall_handler.set_handler(0xDD, "fcntl64", 6, self._fcntl64)
             syscall_handler.set_handler(0x10A, "statfs64", 3, self._statfs64)
-            syscall_handler.set_handler(0x142, "openat", 4, self._handle_openat)
+            syscall_handler.set_handler(
+                0x142, "openat", 4, self._handle_openat
+            )
             syscall_handler.set_handler(0x143, "mkdirat", 3, self._mkdirat)
-            syscall_handler.set_handler(0x147, "fstatat64", 4, self._handle_fstatat64)
+            syscall_handler.set_handler(
+                0x147, "fstatat64", 4, self._handle_fstatat64
+            )
             syscall_handler.set_handler(0x148, "unlinkat", 3, self._unlinkat)
-            syscall_handler.set_handler(0x14c, "readlinkat", 4, self._readlinkat)
-            syscall_handler.set_handler(0x14e, "faccessat", 4, self._faccessat)
+            syscall_handler.set_handler(
+                0x14C, "readlinkat", 4, self._readlinkat
+            )
+            syscall_handler.set_handler(0x14E, "faccessat", 4, self._faccessat)
             syscall_handler.set_handler(0x150, "ppoll", 4, self._ppoll)
 
         else:
             # arm64
-            syscall_handler.set_handler(0x3f, "read", 3, self._handle_read)
+            syscall_handler.set_handler(0x3F, "read", 3, self._handle_read)
             syscall_handler.set_handler(0x40, "write", 3, self._handle_write)
             # no open syscall in arm64
             syscall_handler.set_handler(0x39, "close", 1, self._handle_close)
             # no unlink syscall
-            syscall_handler.set_handler(0x3e, "lseek", 3, self._handle_lseek)
+            syscall_handler.set_handler(0x3E, "lseek", 3, self._handle_lseek)
             # no access syscall
             # no mkdir
-            syscall_handler.set_handler(0x1d, "ioctl", 6, self._ioctl)
+            syscall_handler.set_handler(0x1D, "ioctl", 6, self._ioctl)
             syscall_handler.set_handler(0x19, "fcntl", 6, self._fcntl64)
             syscall_handler.set_handler(0x50, "fstat", 2, self._handle_fstat64)
 
@@ -144,7 +160,9 @@ class VirtualFileSystem:
             # no stat64
             # no lstat64
             # no fstat64 use fstat
-            syscall_handler.set_handler(0x3D, "getdents64", 3, self._handle_getdents64)
+            syscall_handler.set_handler(
+                0x3D, "getdents64", 3, self._handle_getdents64
+            )
             # no fcntl64
             # no statfs64
 
@@ -154,10 +172,14 @@ class VirtualFileSystem:
             # no fstatat64
 
             syscall_handler.set_handler(0x23, "unlinkat", 3, self._unlinkat)
-            syscall_handler.set_handler(0x4E, "readlinkat", 4, self._readlinkat)
+            syscall_handler.set_handler(
+                0x4E, "readlinkat", 4, self._readlinkat
+            )
             syscall_handler.set_handler(0x30, "faccessat", 4, self._faccessat)
             syscall_handler.set_handler(0x49, "ppoll", 4, self._ppoll)
-            syscall_handler.set_handler(0x4F, "newfstatat", 4, self._handle_fstatat64)
+            syscall_handler.set_handler(
+                0x4F, "newfstatat", 4, self._handle_fstatat64
+            )
 
     def _create_fd_link(self, fd, target):
         global g_isWin
@@ -200,7 +222,7 @@ class VirtualFileSystem:
         # Special cases, such as /dev/urandom.
 
         file_path = self._translate_path(filename)
-        if filename == '/dev/urandom':
+        if filename == "/dev/urandom":
             logger.debug("File opened '%s'" % filename)
             parent = os.path.dirname(file_path)
             if not os.path.exists(parent):
@@ -258,7 +280,8 @@ class VirtualFileSystem:
             "/dev/log/events",
             "/dev/log/radio",
             "/dev/log/system",
-            "/dev/input/event0"]
+            "/dev/input/event0",
+        ]
         if filename in virtual_file:
             d = os.path.dirname(file_path)
             if not os.path.exists(d):
@@ -290,8 +313,8 @@ class VirtualFileSystem:
             fd = misc_utils.platform_open(file_path, flags)
             self._pcb.add_fd(filename, file_path, fd)
             logger.info(
-                "open [%s][0x%x] return fd %d" %
-                (file_path, oflag, fd))
+                "open [%s][0x%x] return fd %d" % (file_path, oflag, fd)
+            )
             self._create_fd_link(fd, file_path)
             return fd
         else:
@@ -365,7 +388,7 @@ class VirtualFileSystem:
         if fd <= 2:
             logger.warning("skip read for fd %d" % fd)
             return 0
-            #raise NotImplementedError("Unsupported read operation for file descriptor %d." % fd)
+            # raise NotImplementedError("Unsupported read operation for file descriptor %d." % fd)
 
         file = self._pcb.get_fd_detail(fd)
         logger.debug("Reading %d bytes from '%s'" % (count, file.name))
@@ -426,8 +449,8 @@ class VirtualFileSystem:
             else:
                 # 之前关闭过的直接返回0,与安卓系统行为一致
                 logger.warning(
-                    "fd 0x%08X not in fds maybe has closed, just return 0" %
-                    fd)
+                    "fd 0x%08X not in fds maybe has closed, just return 0" % fd
+                )
                 return 0
         except OSError as e:
             logger.warning("fd %d close error." % fd)
@@ -472,21 +495,22 @@ class VirtualFileSystem:
         for i in range(0, vlen):
             addr = memory_helpers.read_ptr_sz(mu, vec + (i * vec_sz), ptr_sz)
             size = memory_helpers.read_ptr_sz(
-                mu, vec + (i * vec_sz) + ptr_sz, ptr_sz)
+                mu, vec + (i * vec_sz) + ptr_sz, ptr_sz
+            )
             data = bytes(mu.mem_read(addr, size))
-            logger.debug('Writev %r' % data)
+            logger.debug("Writev %r" % data)
             n += os.write(fd, data)
 
         return n
 
     def _do_poll(self, mu, pollfd_ptr, nfds, timeout):
-        '''
+        """
         struct pollfd {
             int    fd;       /* file descriptor */
             short  events;   /* events to look for */
             short  revents;  /* events returned */
         };
-        '''
+        """
         if hasattr(select, "poll"):
             p = select.poll()
             ptr = pollfd_ptr
@@ -494,9 +518,9 @@ class VirtualFileSystem:
                 fd = mu.mem_read(ptr, 4)
                 events = mu.mem_read(ptr + 4, 2)
                 p.register(
-                    int.from_bytes(
-                        fd, byteorder='little', signed=False), int.from_bytes(
-                        events, byteorder='little', signed=False))
+                    int.from_bytes(fd, byteorder="little", signed=False),
+                    int.from_bytes(events, byteorder="little", signed=False),
+                )
                 ptr = ptr + 8
 
             logger.info("poll timeout %d" % timeout)
@@ -506,10 +530,12 @@ class VirtualFileSystem:
             for item in poll_r:
                 for i in range(0, nfds):
                     fd = mu.mem_read(ptr, 4)
-                    ifd = int.from_bytes(fd, byteorder='little', signed=False)
+                    ifd = int.from_bytes(fd, byteorder="little", signed=False)
                     if item[0] == ifd:
                         mu.mem_write(
-                            ptr + 6, int(item[1]).to_bytes(4, byteorder='little'))
+                            ptr + 6,
+                            int(item[1]).to_bytes(4, byteorder="little"),
+                        )
                         break
 
                     ptr = ptr + 8
@@ -524,8 +550,9 @@ class VirtualFileSystem:
                 mu.mem_write(ptr + 6, bytes(events))
 
             logger.warning(
-                "poll not support in this system skip, just return nfds %d" %
-                nfds)
+                "poll not support in this system skip, just return nfds %d"
+                % nfds
+            )
             return nfds
 
     def _handle_poll(self, mu, pollfd_ptr, nfds, timeout):
@@ -537,7 +564,8 @@ class VirtualFileSystem:
             ptr_sz = self._emu.get_ptr_size()
             tv_sec = memory_helpers.read_ptr_sz(mu, timeout_ts_ptr, ptr_sz)
             tv_nsec = memory_helpers.read_ptr_sz(
-                mu, timeout_ts_ptr + ptr_sz, ptr_sz)
+                mu, timeout_ts_ptr + ptr_sz, ptr_sz
+            )
             timeout = int(tv_sec * 1000 + tv_nsec / 1000000)
 
         return self._do_poll(mu, pollfd_ptr, nfds, timeout)
@@ -586,15 +614,24 @@ class VirtualFileSystem:
 
     def _handle_getdents64(self, mu, fd, linux_dirent64_ptr, count):
         logger.warning(
-            "syscall _handle_getdents64 %u %u %u skip..." %
-            (fd, linux_dirent64_ptr, count))
+            "syscall _handle_getdents64 %u %u %u skip..."
+            % (fd, linux_dirent64_ptr, count)
+        )
         return -1
 
     def _handle_fsetxattr(self, mu, fd, name_ptr, value_ptr, size, flags):
         name = memory_helpers.read_utf8(mu, name_ptr)
         # value = memory_helpers.read_utf8(mu, value_ptr)
-        value = '?'
-        logger.log(SYSCALL, 'fsetxattr: [fd=%s,name=%s,value=%s,size=%d,flags=%d]', fd, name, value, size, flags)
+        value = "?"
+        logger.log(
+            SYSCALL,
+            "fsetxattr: [fd=%s,name=%s,value=%s,size=%d,flags=%d]",
+            fd,
+            name,
+            value,
+            size,
+            flags,
+        )
 
     def _ioctl(self, mu, fd, cmd, arg1, arg2, arg3, arg4):
         # http://man7.org/linux/man-pages/man2/ioctl_list.2.html
@@ -605,7 +642,8 @@ class VirtualFileSystem:
         if cmd == SIOCGIFCONF:
             # this is a way to get network address
             logger.info(
-                "warning ioctl SIOCGIFCONF to get net addrs not implemented return -1 and skip")
+                "warning ioctl SIOCGIFCONF to get net addrs not implemented return -1 and skip"
+            )
             return -1
 
         raise NotImplementedError()
@@ -619,17 +657,12 @@ class VirtualFileSystem:
         return r
 
     def _handle_llseek(
-            self,
-            mu,
-            fd,
-            offset_high,
-            offset_low,
-            result_ptr,
-            whence):
+        self, mu, fd, offset_high, offset_low, result_ptr, whence
+    ):
         if offset_high != 0:
             raise RuntimeError(
-                "_llseek offset_high %d>0 not implemented" %
-                offset_high)
+                "_llseek offset_high %d>0 not implemented" % offset_high
+            )
 
         n = os.lseek(fd, offset_low, whence)
         r = -1
@@ -637,7 +670,7 @@ class VirtualFileSystem:
             raise RuntimeError("_llseek return > 32 bits not implemented")
         if n >= 0:
             r = 0
-            rbytes = n.to_bytes(8, 'little')
+            rbytes = n.to_bytes(8, "little")
             mu.mem_write(result_ptr, rbytes)
 
         return r
@@ -650,7 +683,7 @@ class VirtualFileSystem:
             return -1
 
         statv = os.statvfs(path)
-        '''
+        """
         f_type = {uint32_t} 61267
         f_bsize = {uint32_t} 4096
         f_blocks = {uint64_t} 3290543
@@ -664,41 +697,41 @@ class VirtualFileSystem:
         f_frsize = {uint32_t} 4096
         f_flags = {uint32_t} 1062
         f_spare = {uint32_t [4]}
-        '''
+        """
         f_fsid = 0
         if hasattr(statv, "f_fsid"):
             print(statv)
             f_fsid = statv.f_fsid
 
         if self._emu.get_arch() == emu_const.Arch.ARM32:
-            mu.mem_write(buf, int(0xef53).to_bytes(4, 'little'))
-            mu.mem_write(buf + 4, int(statv.f_bsize).to_bytes(4, 'little'))
-            mu.mem_write(buf + 8, int(statv.f_blocks).to_bytes(8, 'little'))
-            mu.mem_write(buf + 16, int(statv.f_bfree).to_bytes(8, 'little'))
-            mu.mem_write(buf + 24, int(statv.f_bavail).to_bytes(8, 'little'))
-            mu.mem_write(buf + 32, int(statv.f_files).to_bytes(8, 'little'))
-            mu.mem_write(buf + 40, int(statv.f_ffree).to_bytes(8, 'little'))
-            mu.mem_write(buf + 48, int(f_fsid).to_bytes(8, 'little'))
-            mu.mem_write(buf + 56, int(statv.f_namemax).to_bytes(4, 'little'))
-            mu.mem_write(buf + 60, int(statv.f_frsize).to_bytes(4, 'little'))
-            mu.mem_write(buf + 64, int(statv.f_flag).to_bytes(4, 'little'))
-            mu.mem_write(buf + 68, int(0).to_bytes(16, 'little'))
+            mu.mem_write(buf, int(0xEF53).to_bytes(4, "little"))
+            mu.mem_write(buf + 4, int(statv.f_bsize).to_bytes(4, "little"))
+            mu.mem_write(buf + 8, int(statv.f_blocks).to_bytes(8, "little"))
+            mu.mem_write(buf + 16, int(statv.f_bfree).to_bytes(8, "little"))
+            mu.mem_write(buf + 24, int(statv.f_bavail).to_bytes(8, "little"))
+            mu.mem_write(buf + 32, int(statv.f_files).to_bytes(8, "little"))
+            mu.mem_write(buf + 40, int(statv.f_ffree).to_bytes(8, "little"))
+            mu.mem_write(buf + 48, int(f_fsid).to_bytes(8, "little"))
+            mu.mem_write(buf + 56, int(statv.f_namemax).to_bytes(4, "little"))
+            mu.mem_write(buf + 60, int(statv.f_frsize).to_bytes(4, "little"))
+            mu.mem_write(buf + 64, int(statv.f_flag).to_bytes(4, "little"))
+            mu.mem_write(buf + 68, int(0).to_bytes(16, "little"))
         else:
             # arm64
-            mu.mem_write(buf, int(0xef53).to_bytes(8, 'little'))
-            mu.mem_write(buf + 8, int(statv.f_bsize).to_bytes(8, 'little'))
-            mu.mem_write(buf + 16, int(statv.f_blocks).to_bytes(8, 'little'))
-            mu.mem_write(buf + 24, int(statv.f_bfree).to_bytes(8, 'little'))
-            mu.mem_write(buf + 32, int(statv.f_bavail).to_bytes(8, 'little'))
-            mu.mem_write(buf + 40, int(statv.f_files).to_bytes(8, 'little'))
-            mu.mem_write(buf + 48, int(statv.f_ffree).to_bytes(8, 'little'))
-            mu.mem_write(buf + 56, int(f_fsid).to_bytes(8, 'little'))
-            mu.mem_write(buf + 64, int(statv.f_namemax).to_bytes(8, 'little'))
-            mu.mem_write(buf + 72, int(statv.f_frsize).to_bytes(8, 'little'))
-            mu.mem_write(buf + 80, int(statv.f_flag).to_bytes(8, 'little'))
-            mu.mem_write(buf + 88, int(0).to_bytes(32, 'little'))
+            mu.mem_write(buf, int(0xEF53).to_bytes(8, "little"))
+            mu.mem_write(buf + 8, int(statv.f_bsize).to_bytes(8, "little"))
+            mu.mem_write(buf + 16, int(statv.f_blocks).to_bytes(8, "little"))
+            mu.mem_write(buf + 24, int(statv.f_bfree).to_bytes(8, "little"))
+            mu.mem_write(buf + 32, int(statv.f_bavail).to_bytes(8, "little"))
+            mu.mem_write(buf + 40, int(statv.f_files).to_bytes(8, "little"))
+            mu.mem_write(buf + 48, int(statv.f_ffree).to_bytes(8, "little"))
+            mu.mem_write(buf + 56, int(f_fsid).to_bytes(8, "little"))
+            mu.mem_write(buf + 64, int(statv.f_namemax).to_bytes(8, "little"))
+            mu.mem_write(buf + 72, int(statv.f_frsize).to_bytes(8, "little"))
+            mu.mem_write(buf + 80, int(statv.f_flag).to_bytes(8, "little"))
+            mu.mem_write(buf + 88, int(0).to_bytes(32, "little"))
 
-        #raise NotImplementedError()
+        # raise NotImplementedError()
         return 0
 
     def _handle_openat(self, mu, dfd, filename_ptr, flags, mode):
@@ -770,7 +803,7 @@ class VirtualFileSystem:
         pathname = self._translate_path(pathname_vm)
 
         if not os.path.exists(pathname):
-            logger.warning('> File was not found.')
+            logger.warning("> File was not found.")
             return -1
 
         stat = os.stat(pathname)

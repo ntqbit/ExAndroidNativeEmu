@@ -1,9 +1,6 @@
-from keystone import Ks, KS_ARCH_ARM, KS_MODE_THUMB, KS_ARCH_ARM64, KS_MODE_LITTLE_ENDIAN
-from unicorn import *
-from unicorn.arm_const import *
-from unicorn.arm64_const import *
+from unicorn import UC_HOOK_CODE
 from androidemu.const import emu_const
-import sys
+
 import verboselogs
 
 logger = verboselogs.VerboseLogger(__name__)
@@ -24,12 +21,7 @@ class Hooker:
         self._hooks = dict()
         _hook_start = base_addr + emu.get_ptr_size()
         self._hook_current = _hook_start
-        self._emu.mu.hook_add(
-            UC_HOOK_CODE,
-            self._hook,
-            None,
-            _hook_start,
-            _hook_start + size)
+        self._emu.mu.hook_add(UC_HOOK_CODE, self._hook, None, _hook_start, _hook_start + size)
 
     def _get_next_id(self):
         idx = self._current_id
@@ -43,8 +35,9 @@ class Hooker:
         self._hooks[hook_id] = func
         # the the hook_id to header
         self._emu.mu.mem_write(
-            self._hook_current, int(hook_id).to_bytes(
-                4, byteorder='little', signed=False))
+            self._hook_current,
+            int(hook_id).to_bytes(4, byteorder="little", signed=False),
+        )
         self._hook_current += 4
 
         hook_addr = self._hook_current
@@ -53,13 +46,13 @@ class Hooker:
             # 注意，这里不要改sp，因为后面hook code会靠sp来定位参数
             # Write assembly code to the emulator.
             self._emu.mu.mem_write(
-                self._hook_current,
-                b"\x1E\xFF\x2F\xE1")  # bx lr
+                self._hook_current, b"\x1E\xFF\x2F\xE1"
+            )  # bx lr
             self._hook_current += 4
         else:
             self._emu.mu.mem_write(
-                self._hook_current,
-                b"\xC0\x03\x5F\xD6")  # ret
+                self._hook_current, b"\xC0\x03\x5F\xD6"
+            )  # ret
             self._hook_current += 4
 
         return hook_addr
@@ -82,8 +75,9 @@ class Hooker:
         ptr_size = self._emu.get_ptr_size()
         for index in range(0, index_max):
             address = hook_map[index] if index in hook_map else 0
-            table_bytes += int(address).to_bytes(ptr_size,
-                                                 byteorder='little')  # 把每个函数指针写到指针表里面
+            table_bytes += int(address).to_bytes(
+                ptr_size, byteorder="little"
+            )  # 把每个函数指针写到指针表里面
 
         self._emu.mu.mem_write(table_address, table_bytes)
         self._hook_current += len(table_bytes)
@@ -91,8 +85,8 @@ class Hooker:
         # Then we write the a pointer to the table.指向table的指针，写在table的后面
         ptr_address = self._hook_current
         self._emu.mu.mem_write(
-            ptr_address, table_address.to_bytes(
-                ptr_size, byteorder='little'))
+            ptr_address, table_address.to_bytes(ptr_size, byteorder="little")
+        )
         self._hook_current += ptr_size
 
         return ptr_address, table_address
@@ -108,12 +102,11 @@ class Hooker:
         hook_id_ptr = address - 4
         hook_id_bytes = mu.mem_read(hook_id_ptr, 4)
         hook_id = int.from_bytes(
-            hook_id_bytes,
-            byteorder='little',
-            signed=False)
+            hook_id_bytes, byteorder="little", signed=False
+        )
 
         hook_func = self._hooks[hook_id]
-        #logger.debug("hook_id:%d, hook_func:%r"%(hook_id, hook_func))
+        # logger.debug("hook_id:%d, hook_func:%r"%(hook_id, hook_func))
 
         # Call hook.
         try:

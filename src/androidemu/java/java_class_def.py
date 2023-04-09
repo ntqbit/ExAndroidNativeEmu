@@ -7,16 +7,16 @@ logger = verboselogs.VerboseLogger(__name__)
 
 
 class JavaClassDef(type):
-
     def __init__(
-            cls,
-            name,
-            base,
-            ns,
-            jvm_name=None,
-            jvm_fields=None,
-            jvm_ignore=False,
-            jvm_super=None):
+        cls,
+        name,
+        base,
+        ns,
+        jvm_name=None,
+        jvm_fields=None,
+        jvm_ignore=False,
+        jvm_super=None,
+    ):
         cls.jvm_id = next_cls_id()
         cls.jvm_name = jvm_name
         cls.jvm_methods = dict()
@@ -27,7 +27,7 @@ class JavaClassDef(type):
 
         # Register all defined Java methods.
         for func in inspect.getmembers(cls, predicate=inspect.isfunction):
-            if hasattr(func[1], 'jvm_method'):
+            if hasattr(func[1], "jvm_method"):
                 method = func[1].jvm_method
                 cls.jvm_methods[method.jvm_id] = method
 
@@ -54,14 +54,17 @@ class JavaClassDef(type):
                 break
 
         if not found:
-            x = "Register native ('%s', '%s', '0x%08X') failed on class %s." % (
-                name, signature, ptr_func, cls.__name__)
+            x = (
+                "Register native ('%s', '%s', '0x%08X') failed on class %s."
+                % (name, signature, ptr_func, cls.__name__)
+            )
             logger.warning(x)
             return
             # raise RuntimeError("Register native ('%s', '%s') failed on class %s." % (name, signature, cls.__name__))
         logger.debug(
-            "Registered native function ('%s', '%s', ''0x%08X'') to %s.%s" %
-            (name, signature, ptr_func, cls.__name__, found_method.func_name))
+            "Registered native function ('%s', '%s', ''0x%08X'') to %s.%s"
+            % (name, signature, ptr_func, cls.__name__, found_method.func_name)
+        )
 
     def find_method(cls, name, signature):
         for method in cls.jvm_methods.values():
@@ -77,16 +80,20 @@ class JavaClassDef(type):
     # @param signature_no_ret something like (ILjava/lang/String;) 注意，没有返回值
 
     def find_method_sig_with_no_ret(cls, name, signature_no_ret):
-        assert signature_no_ret[0] == "(" and signature_no_ret[len(
-            signature_no_ret) - 1] == ")", "signature_no_ret error"
+        assert (
+            signature_no_ret[0] == "("
+            and signature_no_ret[len(signature_no_ret) - 1] == ")"
+        ), "signature_no_ret error"
         for method in cls.jvm_methods.values():
             if method.name == name and method.signature.startswith(
-                    signature_no_ret):
+                signature_no_ret
+            ):
                 return method
 
         if cls.jvm_super is not None:
             return cls.jvm_super.find_method_sig_with_no_ret(
-                name, signature_no_ret)
+                name, signature_no_ret
+            )
 
         return None
 
@@ -100,7 +107,11 @@ class JavaClassDef(type):
 
     def find_field(cls, name, signature, is_static):
         for field in cls.jvm_fields.values():
-            if field.name == name and field.signature == signature and field.is_static == is_static:
+            if (
+                field.name == name
+                and field.signature == signature
+                and field.is_static == is_static
+            ):
                 return field
 
         if cls.jvm_super is not None:

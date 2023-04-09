@@ -1,4 +1,10 @@
-from keystone import Ks, KS_ARCH_ARM, KS_MODE_THUMB, KS_ARCH_ARM64, KS_MODE_LITTLE_ENDIAN
+from keystone import (
+    Ks,
+    KS_ARCH_ARM,
+    KS_MODE_THUMB,
+    KS_ARCH_ARM64,
+    KS_MODE_LITTLE_ENDIAN,
+)
 from unicorn import *
 from unicorn.arm_const import *
 from unicorn.arm64_const import *
@@ -6,7 +12,10 @@ from androidemu.const import emu_const
 from androidemu import config
 import sys
 import verboselogs
-from androidemu.java.helpers.native_method import native_write_args, native_read_args_in_hook_code
+from androidemu.java.helpers.native_method import (
+    native_write_args,
+    native_read_args_in_hook_code,
+)
 
 logger = verboselogs.VerboseLogger(__name__)
 
@@ -30,28 +39,30 @@ def standlize_addr(addr):
 # 函数hook
 class FuncHooker:
     # 32 layout
-    '''
+    """
     funAddr
     ldr lr, [pc, #0x0]
     bx lr
     original lr
-    '''
+    """
     # 64 layout
-    '''
+    """
     funcAddr
     #ldr x30, #0x8
     #br x30
     original lr
-    '''
+    """
 
     def _hook_stub(self, mu, address, size, user_data):
         try:
             address = standlize_addr(address)
             fun_entry_addr = address - self._emu.get_ptr_size()
             fun_entry_bytes = mu.mem_read(
-                fun_entry_addr, self._emu.get_ptr_size())
+                fun_entry_addr, self._emu.get_ptr_size()
+            )
             fun_entry = int.from_bytes(
-                fun_entry_bytes, byteorder='little', signed=False)
+                fun_entry_bytes, byteorder="little", signed=False
+            )
             if fun_entry in self._hook_params:
                 hook_param = self._hook_params[fun_entry]
                 cb_after = hook_param[2]
@@ -80,14 +91,17 @@ class FuncHooker:
         self._hook_params = {}
         HOOK_STUB_MEMORY_SIZE = 0x00100000
         self._stub_off = self._emu.memory.map(
-            0, HOOK_STUB_MEMORY_SIZE, UC_PROT_READ | UC_PROT_WRITE | UC_PROT_EXEC)
+            0,
+            HOOK_STUB_MEMORY_SIZE,
+            UC_PROT_READ | UC_PROT_WRITE | UC_PROT_EXEC,
+        )
         self._emu.mu.hook_add(
             UC_HOOK_CODE,
             self._hook_stub,
             None,
             self._stub_off,
-            self._stub_off +
-            HOOK_STUB_MEMORY_SIZE)
+            self._stub_off + HOOK_STUB_MEMORY_SIZE,
+        )
 
     def _hook_func_head(self, mu, address, size, user_data):
         try:
@@ -125,49 +139,46 @@ class FuncHooker:
                 # 改变lr，返回到跳板，
                 if self._arch == emu_const.Arch.ARM32:
                     mu.mem_write(
-                        self._stub_off, address.to_bytes(
-                            4, byteorder='little', signed=False))  # 写入函数地址
+                        self._stub_off,
+                        address.to_bytes(4, byteorder="little", signed=False),
+                    )  # 写入函数地址
                     self._stub_off += 4
 
                     new_lr = self._stub_off
                     # 跳板跳回原返回地址
-                    mu.mem_write(self._stub_off,
-                                 b"\x00\xE0\x9F\xE5")  # ldr lr, [pc, #0x0]
+                    mu.mem_write(
+                        self._stub_off, b"\x00\xE0\x9F\xE5"
+                    )  # ldr lr, [pc, #0x0]
                     self._stub_off += 4
                     mu.mem_write(self._stub_off, b"\x1E\xFF\x2F\xE1")  # bx lr
                     self._stub_off += 4
                     lr = mu.reg_read(UC_ARM_REG_LR)
                     mu.mem_write(
                         self._stub_off,
-                        lr.to_bytes(
-                            4,
-                            byteorder='little',
-                            signed=False))  # 备份返回地址
+                        lr.to_bytes(4, byteorder="little", signed=False),
+                    )  # 备份返回地址
                     self._stub_off += 4
                     mu.reg_write(UC_ARM_REG_LR, new_lr)
                 else:
                     mu.mem_write(
-                        self._stub_off, address.to_bytes(
-                            8, byteorder='little', signed=False))  # 写入函数地址
+                        self._stub_off,
+                        address.to_bytes(8, byteorder="little", signed=False),
+                    )  # 写入函数地址
                     self._stub_off += 8
 
                     new_lr = self._stub_off
                     mu.mem_write(
-                        self._stub_off,
-                        b"\x5E\x00\x00\x58")  # ldr x30, #0x8
+                        self._stub_off, b"\x5E\x00\x00\x58"
+                    )  # ldr x30, #0x8
                     self._stub_off += 4
-                    mu.mem_write(
-                        self._stub_off,
-                        b"\xC0\x03\x1F\xD6")  # br x30
+                    mu.mem_write(self._stub_off, b"\xC0\x03\x1F\xD6")  # br x30
                     self._stub_off += 4
 
                     lr = mu.reg_read(UC_ARM64_REG_X30)
                     mu.mem_write(
                         self._stub_off,
-                        lr.to_bytes(
-                            8,
-                            byteorder='little',
-                            signed=False))  # 备份返回地址
+                        lr.to_bytes(8, byteorder="little", signed=False),
+                    )  # 备份返回地址
                     self._stub_off += 8
                     mu.reg_write(UC_ARM64_REG_X30, new_lr)
 
@@ -181,9 +192,6 @@ class FuncHooker:
         fun_addr = standlize_addr(fun_addr)
         mu = self._emu.mu
         mu.hook_add(
-            UC_HOOK_CODE,
-            self._hook_func_head,
-            None,
-            fun_addr,
-            fun_addr + 4)
+            UC_HOOK_CODE, self._hook_func_head, None, fun_addr, fun_addr + 4
+        )
         self._hook_params[fun_addr] = (nargs, cb_before, cb_after)

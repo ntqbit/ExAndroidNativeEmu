@@ -17,22 +17,38 @@ class MemorySyscallHandler:
         self._memory = memory
         self._syscall_handler = syscall_handler
         if self._emu.get_arch() == emu_const.Arch.ARM32:
-            self._syscall_handler.set_handler(0x2d, "brk", 1, self._handle_brk)
-            self._syscall_handler.set_handler(0x5B, "munmap", 2, self._handle_munmap)
-            self._syscall_handler.set_handler(0x7D, "mprotect", 3, self._handle_mprotect)
-            self._syscall_handler.set_handler(0xC0, "mmap2", 6, self._handle_mmap2)
-            self._syscall_handler.set_handler(0xDC, "madvise", 3, self._handle_madvise)
+            self._syscall_handler.set_handler(0x2D, "brk", 1, self._handle_brk)
+            self._syscall_handler.set_handler(
+                0x5B, "munmap", 2, self._handle_munmap
+            )
+            self._syscall_handler.set_handler(
+                0x7D, "mprotect", 3, self._handle_mprotect
+            )
+            self._syscall_handler.set_handler(
+                0xC0, "mmap2", 6, self._handle_mmap2
+            )
+            self._syscall_handler.set_handler(
+                0xDC, "madvise", 3, self._handle_madvise
+            )
         else:
             # arm64
-            self._syscall_handler.set_handler(0xd6, "brk", 1, self._handle_brk)
-            self._syscall_handler.set_handler(0xd7, "munmap", 2, self._handle_munmap)
-            self._syscall_handler.set_handler(0xe2, "mprotect", 3, self._handle_mprotect)
-            self._syscall_handler.set_handler(0xde, "mmap", 6, self._handle_mmap)
-            self._syscall_handler.set_handler(0xe9, "madvise", 3, self._handle_madvise)
+            self._syscall_handler.set_handler(0xD6, "brk", 1, self._handle_brk)
+            self._syscall_handler.set_handler(
+                0xD7, "munmap", 2, self._handle_munmap
+            )
+            self._syscall_handler.set_handler(
+                0xE2, "mprotect", 3, self._handle_mprotect
+            )
+            self._syscall_handler.set_handler(
+                0xDE, "mmap", 6, self._handle_mmap
+            )
+            self._syscall_handler.set_handler(
+                0xE9, "madvise", 3, self._handle_madvise
+            )
 
     def _handle_brk(self, uc, brk):
         # TODO: set errno
-        #TODO: implement
+        # TODO: implement
         return -1
 
     def _handle_munmap(self, uc, addr, len_in):
@@ -55,9 +71,11 @@ class MemorySyscallHandler:
         res = None
         if flags & MAP_ANONYMOUS:
             res = self._memory.map(addr, length, prot)
-        elif fd != 0xffffffff:  # 如果有fd
+        elif fd != 0xFFFFFFFF:  # 如果有fd
             if fd <= 2:
-                raise NotImplementedError("Unsupported read operation for file descriptor %d." % fd)
+                raise NotImplementedError(
+                    "Unsupported read operation for file descriptor %d." % fd
+                )
 
             if not self._pcb.has_fd(fd):
                 # TODO: Return valid error.
@@ -65,13 +83,13 @@ class MemorySyscallHandler:
 
             vf = self._pcb.get_fd_detail(fd)
             # mmap2 系统调用最后一个参数与mmap不同,注意阅读下面一句话!
-            '''
+            """
             The mmap2() system call provides the same interface as mmap(2),
             except that the final argument specifies the offset into the file in
             4096-byte units (instead of bytes, as is done by mmap(2)).  This
             enables applications that use a 32-bit off_t to map large files (up
             to 2^44 bytes).
-            '''
+            """
             offset = pgoffset * 4096
             res = self._memory.map(addr, length, prot, vf, offset)
 
@@ -98,9 +116,11 @@ class MemorySyscallHandler:
         res = None
         if flags & MAP_ANONYMOUS:
             res = self._memory.map(addr, length, prot)
-        elif fd != 0xffffffff:  # 如果有fd
+        elif fd != 0xFFFFFFFF:  # 如果有fd
             if fd <= 2:
-                raise NotImplementedError("Unsupported read operation for file descriptor %d." % fd)
+                raise NotImplementedError(
+                    "Unsupported read operation for file descriptor %d." % fd
+                )
 
             if not self._pcb.has_fd(fd):
                 # TODO: Return valid error.

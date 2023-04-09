@@ -18,13 +18,15 @@ class JavaVM:
     """
 
     def __init__(self, emu, class_loader, hooker):
-        (self.address_ptr, self.address) = hooker.write_function_table({
-            3: self.destroy_java_vm,
-            4: self.attach_current_thread,
-            5: self.detach_current_thread,
-            6: self.get_env,
-            7: self.attach_current_thread
-        })
+        (self.address_ptr, self.address) = hooker.write_function_table(
+            {
+                3: self.destroy_java_vm,
+                4: self.attach_current_thread,
+                5: self.detach_current_thread,
+                6: self.get_env,
+                7: self.attach_current_thread,
+            }
+        )
 
         self.jni_env = JNIEnv(emu, class_loader, hooker)
         self._emu = emu
@@ -36,13 +38,15 @@ class JavaVM:
     @native_method
     def attach_current_thread(self, mu, java_vm, env_ptr, thr_args):
         logger.debug(
-            "JavaVM->AttachCurrentThread(0x%08x, 0x%08x, 0x%08x)" %
-            (java_vm, env_ptr, thr_args))
+            "JavaVM->AttachCurrentThread(0x%08x, 0x%08x, 0x%08x)"
+            % (java_vm, env_ptr, thr_args)
+        )
         mu.mem_write(
             env_ptr,
             self.jni_env.address_ptr.to_bytes(
-                self._emu.get_ptr_size(),
-                byteorder='little'))
+                self._emu.get_ptr_size(), byteorder="little"
+            ),
+        )
         return JNI_OK
 
     @native_method
@@ -54,23 +58,27 @@ class JavaVM:
     @native_method
     def get_env(self, mu, java_vm, env_ptr, version):
         logger.debug(
-            "JavaVM->GetEnv(0x%08x, 0x%08x, 0x%08x)" %
-            (java_vm, env_ptr, version))
+            "JavaVM->GetEnv(0x%08x, 0x%08x, 0x%08x)"
+            % (java_vm, env_ptr, version)
+        )
         mu.mem_write(
             env_ptr,
             self.jni_env.address_ptr.to_bytes(
-                self._emu.get_ptr_size(),
-                byteorder='little'))
+                self._emu.get_ptr_size(), byteorder="little"
+            ),
+        )
         return JNI_OK
 
     @native_method
     def attach_current_thread_as_daemon(self, mu, java_vm, env_ptr, thr_args):
         logger.debug(
-            "JavaVM->AttachCurrentThreadAsDaemon(0x%08x, 0x%08x, 0x%08x)" %
-            (java_vm, env_ptr, thr_args))
+            "JavaVM->AttachCurrentThreadAsDaemon(0x%08x, 0x%08x, 0x%08x)"
+            % (java_vm, env_ptr, thr_args)
+        )
         mu.mem_write(
             env_ptr,
             self.jni_env.address_ptr.to_bytes(
-                self._emu.get_ptr_size(),
-                byteorder='little'))
+                self._emu.get_ptr_size(), byteorder="little"
+            ),
+        )
         return JNI_OK

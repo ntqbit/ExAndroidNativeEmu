@@ -74,9 +74,11 @@ class Modules:
             # 填充auvx数组
             auxv_val = auxvs[auxv_key]
             memory_helpers.write_ptrs_sz(
-                self.emu.mu, auxv_offset, auxv_key, ptr_sz)
+                self.emu.mu, auxv_offset, auxv_key, ptr_sz
+            )
             memory_helpers.write_ptrs_sz(
-                self.emu.mu, auxv_offset + ptr_sz, auxv_val, ptr_sz)
+                self.emu.mu, auxv_offset + ptr_sz, auxv_val, ptr_sz
+            )
             auxv_offset += 2 * ptr_sz
 
         # auvx数组0结尾
@@ -87,7 +89,8 @@ class Modules:
         # envp
         for env_ptr in env_ptrs:
             memory_helpers.write_ptrs_sz(
-                self.emu.mu, env_offset, env_ptr, ptr_sz)
+                self.emu.mu, env_offset, env_ptr, ptr_sz
+            )
             env_offset += ptr_sz
 
         # 0结尾
@@ -99,7 +102,8 @@ class Modules:
         # argv
         for argv_ptr in argvs_ptrs:
             memory_helpers.write_ptrs_sz(
-                self.emu.mu, argv_offset, argv_ptr, ptr_sz)
+                self.emu.mu, argv_offset, argv_ptr, ptr_sz
+            )
             argv_offset += ptr_sz
 
         # 0结尾
@@ -109,53 +113,45 @@ class Modules:
 
         # KernelArgumentBlock
         # int argc;
-        #char** argv;
-        #char** envp;
-        #Elf32_auxv_t* auxv;
-        #abort_msg_t** abort_message_ptr;
+        # char** argv;
+        # char** envp;
+        # Elf32_auxv_t* auxv;
+        # abort_msg_t** abort_message_ptr;
         kernel_args_base = sp_helpers.reserve(5)
         memory_helpers.write_ptrs_sz(
-            self.emu.mu, kernel_args_base, nargc, ptr_sz)
+            self.emu.mu, kernel_args_base, nargc, ptr_sz
+        )
         memory_helpers.write_ptrs_sz(
-            self.emu.mu,
-            kernel_args_base +
-            ptr_sz,
-            argv_base,
-            ptr_sz)
+            self.emu.mu, kernel_args_base + ptr_sz, argv_base, ptr_sz
+        )
         memory_helpers.write_ptrs_sz(
-            self.emu.mu,
-            kernel_args_base +
-            2 *
-            ptr_sz,
-            env_base,
-            ptr_sz)
+            self.emu.mu, kernel_args_base + 2 * ptr_sz, env_base, ptr_sz
+        )
         memory_helpers.write_ptrs_sz(
-            self.emu.mu,
-            kernel_args_base +
-            3 *
-            ptr_sz,
-            auxv_base,
-            ptr_sz)
+            self.emu.mu, kernel_args_base + 3 * ptr_sz, auxv_base, ptr_sz
+        )
         memory_helpers.write_ptrs_sz(
-            self.emu.mu, kernel_args_base + 4 * ptr_sz, 0, ptr_sz)
+            self.emu.mu, kernel_args_base + 4 * ptr_sz, 0, ptr_sz
+        )
 
         # tls单独一个区域，不放在stack中
         self.emu.mu.mem_map(
-            config.TLS_BASE,
-            config.TLS_SIZE,
-            UC_PROT_WRITE | UC_PROT_READ)
+            config.TLS_BASE, config.TLS_SIZE, UC_PROT_WRITE | UC_PROT_READ
+        )
         tls_ptr = config.TLS_BASE
         mu = self.emu.mu
         # TLS_SLOT_SELF
         memory_helpers.write_ptrs_sz(mu, tls_ptr, tls_ptr, ptr_sz)
         # TLS_SLOT_THREAD_ID
         memory_helpers.write_ptrs_sz(
-            mu, tls_ptr + ptr_sz, thread_internal_ptr, ptr_sz)
+            mu, tls_ptr + ptr_sz, thread_internal_ptr, ptr_sz
+        )
         # TLS_SLOT_ERRNO
         self._errno_ptr = tls_ptr + 2 * ptr_sz
         # TLS_SLOT_BIONIC_PREINIT
         memory_helpers.write_ptrs_sz(
-            mu, tls_ptr + 3 * ptr_sz, kernel_args_base, ptr_sz)
+            mu, tls_ptr + 3 * ptr_sz, kernel_args_base, ptr_sz
+        )
         arch = self.emu.get_arch()
 
         if arch == emu_const.Arch.ARM32:
@@ -178,7 +174,8 @@ class Modules:
         self._vfs_root = vfs_root
         soinfo_area_sz = 0x40000
         self._soinfo_area_base = emu.memory.map(
-            0, soinfo_area_sz, UC_PROT_WRITE | UC_PROT_READ)
+            0, soinfo_area_sz, UC_PROT_WRITE | UC_PROT_READ
+        )
         self._errno_ptr = 0
         self._tls_init()
 
@@ -198,7 +195,8 @@ class Modules:
             for lib_path in ld_library_path:
                 lib_full_path = "%s/%s" % (lib_path, so_name)
                 vfs_lib_path = misc_utils.vfs_path_to_system_path(
-                    self._vfs_root, lib_full_path)
+                    self._vfs_root, lib_full_path
+                )
                 if os.path.exists(vfs_lib_path):
                     return vfs_lib_path
 
@@ -248,10 +246,17 @@ class Modules:
 
         # do sth like linker
         reader = elf_reader.ELFReader(filename)
-        if self.emu.get_arch() == emu_const.Arch.ARM32 and not reader.is_elf32():
-            raise RuntimeError("arch is ARCH_ARM32 but so %s is not elf32" % filename)
+        if (
+            self.emu.get_arch() == emu_const.Arch.ARM32
+            and not reader.is_elf32()
+        ):
+            raise RuntimeError(
+                "arch is ARCH_ARM32 but so %s is not elf32" % filename
+            )
         elif self.emu.get_arch() == emu_const.Arch.ARM64 and reader.is_elf32():
-            raise RuntimeError("arch is ARCH_ARM64 but so %s is elf32" % filename)
+            raise RuntimeError(
+                "arch is ARCH_ARM64 but so %s is elf32" % filename
+            )
 
         # Parse program header (Execution view).
 
@@ -273,7 +278,7 @@ class Modules:
             if bound_high < high:
                 bound_high = high
 
-        '''
+        """
         // Segment addresses in memory.
         Elf32_Addr seg_start = phdr->p_vaddr + load_bias_;
         Elf32_Addr seg_end   = seg_start + phdr->p_memsz;
@@ -296,7 +301,7 @@ class Modules:
                                 MAP_FIXED|MAP_PRIVATE,
                                 fd_,
                                 file_page_start);
-        '''
+        """
         # Retrieve a base address for this module.
         load_base = self.mem_reserve(bound_low, bound_high)
         # 所谓load_bias实际上就是load_base-第0个load 的vaddr, 多数情况下第0个load的vaddr为0，所以就是load_base,但是有些so 第0个load vaddr为非零，此时linker会议这个addr为起点装so，不是从0开始！！！
@@ -305,9 +310,10 @@ class Modules:
         load_bias = load_base - bound_low
 
         vf = VirtualFile(
-            misc_utils.system_path_to_vfs_path(
-                self._vfs_root, filename), misc_utils.platform_open(
-                filename, os.O_RDONLY), filename)
+            misc_utils.system_path_to_vfs_path(self._vfs_root, filename),
+            misc_utils.platform_open(filename, os.O_RDONLY),
+            filename,
+        )
         for segment in load_segments:
             p_flags = segment["p_flags"]
             prot = get_segment_protection(p_flags)
@@ -328,16 +334,19 @@ class Modules:
 
             if file_length <= 0:
                 logger.error(
-                    'File length must be greater than zero. [p_filesz=%d,file_end=%d,file_page_start=%d,file_length=%d]',
+                    "File length must be greater than zero. [p_filesz=%d,file_end=%d,file_page_start=%d,file_length=%d]",
                     p_filesz,
                     file_end,
                     file_page_start,
-                    file_length)
-                logger.debug('Segment: %s', segment)
-                logger.debug('Load segments: %s', load_segments)
-                raise RuntimeError(f'File length must be greater than zero.')
+                    file_length,
+                )
+                logger.debug("Segment: %s", segment)
+                logger.debug("Load segments: %s", load_segments)
+                raise RuntimeError(f"File length must be greater than zero.")
 
-            self.emu.memory.map(seg_page_start, file_length, prot, vf, file_page_start)
+            self.emu.memory.map(
+                seg_page_start, file_length, prot, vf, file_page_start
+            )
 
             p_memsz = segment["p_memsz"]
             seg_end = seg_start + p_memsz
@@ -346,16 +355,18 @@ class Modules:
             seg_file_end = seg_start + p_filesz
 
             seg_file_end = page_end(seg_file_end)
-            '''
+            """
                     void* zeromap = mmap((void*)seg_file_end,
                         seg_page_end - seg_file_end,
                         PFLAGS_TO_PROT(phdr->p_flags),
                         MAP_FIXED|MAP_ANONYMOUS|MAP_PRIVATE,
                         -1,
                         0);
-            '''
+            """
             if seg_page_end > seg_file_end:
-                self.emu.memory.map(seg_file_end, seg_page_end - seg_file_end, prot)
+                self.emu.memory.map(
+                    seg_file_end, seg_page_end - seg_file_end, prot
+                )
 
         # Find init array.
         init_array_addr, init_array_size = reader.get_init_array()
@@ -368,8 +379,9 @@ class Modules:
             path = self.find_so_on_disk(so_name)
             if path is None:
                 logger.warning(
-                    "%s needed by %s do not exist in vfs %s" %
-                    (so_name, filename, self._vfs_root))
+                    "%s needed by %s do not exist in vfs %s"
+                    % (so_name, filename, self._vfs_root)
+                )
                 continue
 
             libmod = self.load_module(path)
@@ -392,11 +404,11 @@ class Modules:
             for rel in rel_tbl:
                 r_info_sym = rel["r_info_sym"]
                 sym = symbols[r_info_sym]
-                sym_value = sym['st_value']
+                sym_value = sym["st_value"]
 
                 # Location where relocation should happen
-                rel_addr = load_bias + rel['r_offset']
-                rel_info_type = rel['r_info_type']
+                rel_addr = load_bias + rel["r_offset"]
+                rel_info_type = rel["r_info_type"]
 
                 # print(filename)
                 # print("%x"%rel_addr)
@@ -409,7 +421,8 @@ class Modules:
 
                         value_orig_bytes = self.emu.mu.mem_read(rel_addr, 4)
                         value_orig = int.from_bytes(
-                            value_orig_bytes, byteorder='little')
+                            value_orig_bytes, byteorder="little"
+                        )
 
                         # R_ARM_ABS32 how to relocate see android linker source code
                         # *reinterpret_cast<Elf32_Addr*>(reloc) += sym_addr;
@@ -417,27 +430,34 @@ class Modules:
                         # Write the new value
                         # print(value)
                         self.emu.mu.mem_write(
-                            rel_addr, value.to_bytes(
-                                4, byteorder='little'))
+                            rel_addr, value.to_bytes(4, byteorder="little")
+                        )
 
-                elif rel_info_type in (arm.R_AARCH64_ABS64, arm.R_AARCH64_ABS32):
+                elif rel_info_type in (
+                    arm.R_AARCH64_ABS64,
+                    arm.R_AARCH64_ABS32,
+                ):
                     if sym_name in symbols_resolved:
                         # 同arm32 只是地址变成8个字节
                         sym_addr = symbols_resolved[sym_name]
 
                         value_orig_bytes = self.emu.mu.mem_read(rel_addr, 8)
                         value_orig = int.from_bytes(
-                            value_orig_bytes, byteorder='little')
+                            value_orig_bytes, byteorder="little"
+                        )
                         addend = rel["r_addend"]
 
                         value = sym_addr + value_orig + addend
                         # Write the new value
                         # print(value)
                         self.emu.mu.mem_write(
-                            rel_addr, value.to_bytes(
-                                8, byteorder='little'))
+                            rel_addr, value.to_bytes(8, byteorder="little")
+                        )
 
-                elif rel_info_type in (arm.R_ARM_GLOB_DAT, arm.R_ARM_JUMP_SLOT):
+                elif rel_info_type in (
+                    arm.R_ARM_GLOB_DAT,
+                    arm.R_ARM_JUMP_SLOT,
+                ):
                     # Resolve the symbol.
                     # R_ARM_GLOB_DAT，R_ARM_JUMP_SLOT how to relocate see android linker source code
                     # *reinterpret_cast<Elf32_Addr*>(reloc) = sym_addr;
@@ -447,10 +467,13 @@ class Modules:
                         # Write the new value
                         # print(value)
                         self.emu.mu.mem_write(
-                            rel_addr, value.to_bytes(
-                                4, byteorder='little'))
+                            rel_addr, value.to_bytes(4, byteorder="little")
+                        )
 
-                elif rel_info_type in (arm.R_AARCH64_GLOB_DAT, arm.R_AARCH64_JUMP_SLOT):
+                elif rel_info_type in (
+                    arm.R_AARCH64_GLOB_DAT,
+                    arm.R_AARCH64_JUMP_SLOT,
+                ):
                     # Resolve the symbol.
                     # R_ARM_GLOB_DAT，R_ARM_JUMP_SLOT how to relocate see android linker source code
                     # *reinterpret_cast<Elf32_Addr*>(reloc) = sym_addr;
@@ -461,17 +484,16 @@ class Modules:
                         # print(value)
                         self.emu.mu.mem_write(
                             rel_addr,
-                            (value +
-                             addend).to_bytes(
-                                8,
-                                byteorder='little'))
+                            (value + addend).to_bytes(8, byteorder="little"),
+                        )
 
                 elif rel_info_type in (arm.R_ARM_RELATIVE,):
                     if sym_value == 0:
                         # Load address at which it was linked originally.
                         value_orig_bytes = self.emu.mu.mem_read(rel_addr, 4)
                         value_orig = int.from_bytes(
-                            value_orig_bytes, byteorder='little')
+                            value_orig_bytes, byteorder="little"
+                        )
 
                         # Create the new value
                         value = load_bias + value_orig
@@ -479,8 +501,8 @@ class Modules:
                         # print(value)
                         # Write the new value
                         self.emu.mu.mem_write(
-                            rel_addr, value.to_bytes(
-                                4, byteorder='little'))
+                            rel_addr, value.to_bytes(4, byteorder="little")
+                        )
                     else:
                         raise NotImplementedError()  # impossible
                 elif rel_info_type in (arm.R_AARCH64_RELATIVE,):
@@ -493,17 +515,29 @@ class Modules:
                         # print(value)
                         # Write the new value
                         self.emu.mu.mem_write(
-                            rel_addr, value.to_bytes(
-                                8, byteorder='little'))
+                            rel_addr, value.to_bytes(8, byteorder="little")
+                        )
                     else:
                         raise NotImplementedError()  # impossible
                 elif rel_info_type == arm.R_ARM_TLS_TPOFF32:
-                    logger.warning('reltype R_ARM_TLS_TPOFF32 skipped: [symname=%s]', sym_name)
+                    logger.warning(
+                        "reltype R_ARM_TLS_TPOFF32 skipped: [symname=%s]",
+                        sym_name,
+                    )
                 elif rel_info_type == arm.R_ARM_IRELATIVE:
-                    logger.warning('reltype R_ARM_IRELATIVE skipped: [symname=%s]', sym_name)
+                    logger.warning(
+                        "reltype R_ARM_IRELATIVE skipped: [symname=%s]",
+                        sym_name,
+                    )
                 else:
-                    logger.error("Unhandled relocation type %i. symname=%s", rel_info_type, sym_name)
-                    raise NotImplementedError("Unhandled relocation type %i." % rel_info_type)
+                    logger.error(
+                        "Unhandled relocation type %i. symname=%s",
+                        rel_info_type,
+                        sym_name,
+                    )
+                    raise NotImplementedError(
+                        "Unhandled relocation type %i." % rel_info_type
+                    )
 
         if init_addr != 0:
             init_array.append(load_bias + init_addr)
@@ -514,55 +548,57 @@ class Modules:
 
         for _ in range(int(init_array_size / init_item_sz)):
             b = self.emu.mu.mem_read(load_bias + init_array_addr, init_item_sz)
-            fun_ptr = int.from_bytes(b, byteorder='little', signed=False)
+            fun_ptr = int.from_bytes(b, byteorder="little", signed=False)
             if fun_ptr != 0:
                 init_array.append(fun_ptr)
 
             init_array_addr += init_item_sz
 
         write_sz = reader.write_soinfo(
-            self.emu.mu,
-            load_base,
-            load_bias,
-            self._soinfo_area_base)
+            self.emu.mu, load_base, load_bias, self._soinfo_area_base
+        )
 
         # Store information about loaded module.
         module = Module(
             filename,
             load_base,
-            bound_high -
-            bound_low,
+            bound_high - bound_low,
             symbols_resolved,
             init_array,
-            self._soinfo_area_base)
+            self._soinfo_area_base,
+        )
         self.modules.append(module)
 
         self._soinfo_area_base += write_sz
         if do_init:
-            '''
+            """
             for r in self.emu.mu.mem_regions():
                 print("region begin :0x%08X end:0x%08X, prot:%d"%(r[0], r[1], r[2]))
 
-            '''
-            logger.debug('calling module init: [filename=%s,load_base=0x%X]', filename, load_base)
+            """
+            logger.debug(
+                "calling module init: [filename=%s,load_base=0x%X]",
+                filename,
+                load_base,
+            )
             module.call_init(self.emu)
 
         logger.info("finish load lib %s base 0x%08X" % (filename, load_base))
         return module
 
     def _elf_get_symval(self, load_bias, symbol):
-        #logger.debug('Getting symbal: %s', symbol)
+        # logger.debug('Getting symbal: %s', symbol)
 
         name = symbol["name"]
         if name in self.symbol_hooks:
             return self.symbol_hooks[name]
 
-        if symbol['st_shndx'] == elf_reader.SHN_UNDEF:
+        if symbol["st_shndx"] == elf_reader.SHN_UNDEF:
             # External symbol, lookup value.
             target = self._elf_lookup_symbol(name)
             if target is None:
                 # Extern symbol not found
-                if symbol['st_info_bind'] == elf_reader.STB_WEAK:
+                if symbol["st_info_bind"] == elf_reader.STB_WEAK:
                     # Weak symbol initialized as 0
                     return 0
                 else:
@@ -570,12 +606,12 @@ class Modules:
                     return None
             else:
                 return target
-        elif symbol['st_shndx'] == elf_reader.SHN_ABS:
+        elif symbol["st_shndx"] == elf_reader.SHN_ABS:
             # Absolute symbol.
-            return load_bias + symbol['st_value']
+            return load_bias + symbol["st_value"]
         else:
             # Internally defined symbol.
-            return load_bias + symbol['st_value']
+            return load_bias + symbol["st_value"]
 
     def _elf_lookup_symbol(self, name):
         for module in self.modules:

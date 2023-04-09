@@ -34,8 +34,9 @@ class InterruptHandler:
                     pc = self._mu.reg_read(UC_ARM64_REG_PC)
 
                 logger.error(
-                    "Unhandled interrupt %d at %x, stopping emulation" %
-                    (intno, pc))
+                    "Unhandled interrupt %d at %x, stopping emulation"
+                    % (intno, pc)
+                )
                 traceback.print_stack()
                 frame = inspect.currentframe()
                 stack_trace = traceback.format_stack(frame)

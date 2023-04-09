@@ -3,12 +3,8 @@ from androidemu.java.jvm_id_counter import *
 
 class JavaFieldDef:
     def __init__(
-            self,
-            name,
-            signature,
-            is_static,
-            static_value=None,
-            ignore=False):
+        self, name, signature, is_static, static_value=None, ignore=False
+    ):
         self.jvm_id = next_field_id()
         self.name = name
         self.signature = signature
@@ -18,4 +14,5 @@ class JavaFieldDef:
 
         if self.is_static and self.static_value is None:
             raise ValueError(
-                'Static value may not be None for a static field.')
+                "Static value may not be None for a static field."
+            )

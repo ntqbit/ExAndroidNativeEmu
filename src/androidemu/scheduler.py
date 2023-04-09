@@ -54,7 +54,8 @@ class Scheduler:
         self._emu.memory.map(
             config.STOP_MEMORY_BASE,
             config.STOP_MEMORY_SIZE,
-            UC_PROT_READ | UC_PROT_EXEC)
+            UC_PROT_READ | UC_PROT_EXEC,
+        )
         self._stop_pos = config.STOP_MEMORY_BASE
 
         # blocking futex ptr to thread lists,
@@ -111,8 +112,8 @@ class Scheduler:
         tid = self._emu.get_pcb().get_pid()
         if tid in self._tasks_map:
             raise RuntimeError(
-                "set_main_task fail for main task %d exist" %
-                tid)
+                "set_main_task fail for main task %d exist" % tid
+            )
 
         t = self._create_task(tid, 0, None, True, 0)
         self._tasks_map[tid] = t
@@ -150,19 +151,22 @@ class Scheduler:
                 tid = block_set.pop()
                 self._blocking_set.remove(tid)
                 logger.debug(
-                    "%d futex_wake tid %d waiting in futex_ptr 0x%08X is unblocked" %
-                    (cur_tid, tid, futex_ptr))
+                    "%d futex_wake tid %d waiting in futex_ptr 0x%08X is unblocked"
+                    % (cur_tid, tid, futex_ptr)
+                )
                 return True
             else:
                 logger.info(
-                    "%d futex_wake unblock nobody waiting in futex ptr 0x%08X" %
-                    (cur_tid, futex_ptr))
+                    "%d futex_wake unblock nobody waiting in futex ptr 0x%08X"
+                    % (cur_tid, futex_ptr)
+                )
                 return False
 
         else:
             logger.info(
-                "%d futex_wake unblock nobody waiting in futex ptr 0x%08X" %
-                (cur_tid, futex_ptr))
+                "%d futex_wake unblock nobody waiting in futex ptr 0x%08X"
+                % (cur_tid, futex_ptr)
+            )
             return False
 
     # 创建子线程任务
@@ -209,12 +213,15 @@ class Scheduler:
                         if task.blocking_timeout < 0:
                             # 只有一个线程且被无限期block，有bug
                             raise RuntimeError(
-                                "only one task %d exists, but blocking infinity dead lock bug!" % tid)
+                                "only one task %d exists, but blocking infinity dead lock bug!"
+                                % tid
+                            )
                         else:
                             # 优化，如果仅仅只有一个线程block，而且有timeout，直接sleep就行了，因为再继续运行都是没意义的循环
                             logger.debug(
-                                "only on task %d block with timeout %d ms do sleep" %
-                                (tid, task.blocking_timeout))
+                                "only on task %d block with timeout %d ms do sleep"
+                                % (tid, task.blocking_timeout)
+                            )
                             time.sleep(task.blocking_timeout / 1000)
                             # sleep返回则完成block
                             self._blocking_set.remove(tid)
@@ -225,21 +232,26 @@ class Scheduler:
                             if now - task.halt_ts < task.blocking_timeout:
                                 # 仍然未睡够，继续睡
                                 logger.debug(
-                                    "%d is blocking skip scheduling ts has block %d ms timeout %d ms" %
-                                    (tid, now - task.halt_ts, task.blocking_timeout))
+                                    "%d is blocking skip scheduling ts has block %d ms timeout %d ms"
+                                    % (
+                                        tid,
+                                        now - task.halt_ts,
+                                        task.blocking_timeout,
+                                    )
+                                )
                                 continue
                             else:
                                 logger.debug(
-                                    "%d is wait up for timeout" %
-                                    (tid, ))
+                                    "%d is wait up for timeout" % (tid,)
+                                )
                                 task.blocking_timeout = -1
                                 self._blocking_set.remove(tid)
                                 # 睡够了，不跳过循环 继续执行调度
                         else:
                             # 无限期block，直接跳过调度
                             logger.debug(
-                                "%d is blocking skip scheduling" %
-                                (tid,))
+                                "%d is blocking skip scheduling" % (tid,)
+                            )
                             continue
 
                 logger.debug("%d scheduling enter " % tid)
@@ -275,7 +287,11 @@ class Scheduler:
                 # print(hex(start_pos))
                 # 加上uc timeout参数有bug，会随机崩溃，这个机制是uc内部使用多线程实现的，但uc对象根本不是线程安全的，指令数可以加，但是很慢
                 # 第四个参数传100执行arm64的android6 libc会触发bug，具体原因见hooker.py FIXME注释
-                logger.debug('scheduler starting at 0x%X. stop pos: 0x%X', start_pos, self._stop_pos)
+                logger.debug(
+                    "scheduler starting at 0x%X. stop pos: 0x%X",
+                    start_pos,
+                    self._stop_pos,
+                )
                 self._emu.mu.emu_start(start_pos, self._stop_pos, 0, 0)
                 task.halt_ts = int(time.time() * 1000)
                 # after run
@@ -307,8 +323,8 @@ class Scheduler:
             if self._pid not in self._tasks_map:
                 # 主线程退出，退出调度循环
                 logger.debug(
-                    "main_thead tid [%d] exit exec return" %
-                    self._pid)
+                    "main_thead tid [%d] exit exec return" % self._pid
+                )
                 if clear_task_when_return:
                     # clear all unfinished task
                     self._tasks_map.clear()

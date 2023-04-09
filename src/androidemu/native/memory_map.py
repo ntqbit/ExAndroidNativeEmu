@@ -24,10 +24,11 @@ class MemoryMap:
     @staticmethod
     def _is_overlap(addr1, end1, addr2, end2):
         r = (
-            addr1 <= addr2 and end1 >= end2) or (
-            addr2 <= addr1 and end2 >= end1) or (
-            end1 > addr2 and addr1 < end2) or (
-                end2 > addr1 and addr2 < end1)
+            (addr1 <= addr2 and end1 >= end2)
+            or (addr2 <= addr1 and end2 >= end1)
+            or (end1 > addr2 and addr1 < end2)
+            or (end2 > addr1 and addr2 < end1)
+        )
         return r
 
     def __init__(self, mu, alloc_min_addr, alloc_max_addr):
@@ -49,8 +50,9 @@ class MemoryMap:
             while next_loop:
                 next_loop = False
                 for r in regions:
-                    if self._is_overlap(prefer_start,
-                                        prefer_start + size, r[0], r[1] + 1):
+                    if self._is_overlap(
+                        prefer_start, prefer_start + size, r[0], r[1] + 1
+                    ):
                         prefer_start = r[1] + 1
                         next_loop = True
                         break
@@ -59,8 +61,9 @@ class MemoryMap:
 
         if map_base > self._alloc_max_addr or map_base < self._alloc_min_addr:
             raise RuntimeError(
-                "mmap error map_base 0x%08X out of range (0x%08X-0x%08X)" %
-                (map_base, self._alloc_min_addr, self._alloc_max_addr))
+                "mmap error map_base 0x%08X out of range (0x%08X-0x%08X)"
+                % (map_base, self._alloc_min_addr, self._alloc_max_addr)
+            )
 
         return map_base
 
@@ -77,7 +80,9 @@ class MemoryMap:
         # logger.debug('Map: [address=0x%X,size=0x%X,prot=%d]', address, size, prot)
 
         if size <= 0:
-            raise Exception('Size of mapped region cannot be negative or zero.')
+            raise Exception(
+                "Size of mapped region cannot be negative or zero."
+            )
 
         try:
             if address == 0:
@@ -114,14 +119,15 @@ class MemoryMap:
             # impossible
             for r in self._mu.mem_regions():
                 print(
-                    "region begin :0x%08X end:0x%08X, prot:%d" %
-                    (r[0], r[1], r[2]))
+                    "region begin :0x%08X end:0x%08X, prot:%d"
+                    % (r[0], r[1], r[2])
+                )
 
             raise
 
     def _read_fully(self, fd, size):
         b_read = os.read(fd, size)
-        #print (b_read)
+        # print (b_read)
         sz_read = len(b_read)
         if sz_read <= 0:
             return b_read
@@ -130,7 +136,7 @@ class MemoryMap:
         while sz_left > 0:
             this_read = os.read(fd, sz_left)
             len_this_read = len(this_read)
-            #print (len_this_read)
+            # print (len_this_read)
             if len_this_read <= 0:
                 break
             b_read = b_read + this_read
@@ -139,19 +145,23 @@ class MemoryMap:
         return b_read
 
     def map(
-            self,
-            address,
-            size,
-            prot=UC_PROT_READ | UC_PROT_WRITE,
-            vf=None,
-            offset=0):
+        self,
+        address,
+        size,
+        prot=UC_PROT_READ | UC_PROT_WRITE,
+        vf=None,
+        offset=0,
+    ):
         if not self._is_page_align(address):
             raise RuntimeError(
-                'map addr was not multiple of page size (%d, %d).' %
-                (address, PAGE_SIZE))
+                "map addr was not multiple of page size (%d, %d)."
+                % (address, PAGE_SIZE)
+            )
 
-        logger.debug("map addr:0x%08X, end:0x%08X, sz:0x%08X vf=%s off=0x%08X" %
-                     (address, address + size, size, vf, offset))
+        logger.debug(
+            "map addr:0x%08X, end:0x%08X, sz:0x%08X vf=%s off=0x%08X"
+            % (address, address + size, size, vf, offset)
+        )
         # traceback.print_stack()
         al_address = address
         al_size = page_end(al_address + size) - al_address
@@ -160,20 +170,24 @@ class MemoryMap:
             # 需要mmap映射文件的时候,开辟一块内存,并将文件内容复制过去模拟
             if not self._is_page_align(offset):
                 raise RuntimeError(
-                    'map offset was not multiple of page size (%d, %d).' %
-                    (offset, PAGE_SIZE))
+                    "map offset was not multiple of page size (%d, %d)."
+                    % (offset, PAGE_SIZE)
+                )
 
-            if offset > 0xffffffff:
+            if offset > 0xFFFFFFFF:
                 raise NotImplementedError(
-                    "map offset %d > 4G not support now" % offset)
+                    "map offset %d > 4G not support now" % offset
+                )
 
             ori_off = os.lseek(vf.descriptor, 0, os.SEEK_CUR)
 
-            #logger.debug("mmap file ori_off %d"%(ori_off,))
+            # logger.debug("mmap file ori_off %d"%(ori_off,))
             os.lseek(vf.descriptor, offset, os.SEEK_SET)
             data = self._read_fully(vf.descriptor, size)
-            logger.debug("read for offset %d sz %d data sz:%d" %
-                         (offset, size, len(data)))
+            logger.debug(
+                "read for offset %d sz %d data sz:%d"
+                % (offset, size, len(data))
+            )
             # print("data:%r"%data)
             self._mu.mem_write(res_addr, data)
             self._file_map_addr[res_addr] = (res_addr + al_size, offset, vf)
@@ -184,16 +198,19 @@ class MemoryMap:
     def protect(self, addr, len, prot):
         if not self._is_page_align(addr):
             raise Exception(
-                'addr was not multiple of page size (%d, %d).' %
-                (addr, PAGE_SIZE))
+                "addr was not multiple of page size (%d, %d)."
+                % (addr, PAGE_SIZE)
+            )
 
         len_in = page_end(addr + len) - addr
         try:
             self._mu.mem_protect(addr, len_in, prot)
         except UcError as e:
             # TODO:just for debug
-            logger.warning("Warning mprotect with addr: 0x%08X len: 0x%08X prot:0x%08X failed" %
-                           (addr, len, prot))
+            logger.warning(
+                "Warning mprotect with addr: 0x%08X len: 0x%08X prot:0x%08X failed"
+                % (addr, len, prot)
+            )
             # self.dump_maps(sys.stdout)
             # raise
             return -1
@@ -203,19 +220,23 @@ class MemoryMap:
     def unmap(self, addr, size):
         if not self._is_page_align(addr):
             raise RuntimeError(
-                'addr was not multiple of page size (%d, %d).' %
-                (addr, PAGE_SIZE))
+                "addr was not multiple of page size (%d, %d)."
+                % (addr, PAGE_SIZE)
+            )
 
         size = page_end(addr + size) - addr
         try:
-            logger.debug("unmap 0x%08X sz=0x0x%08X end=0x0x%08X" %
-                         (addr, size, addr + size))
+            logger.debug(
+                "unmap 0x%08X sz=0x0x%08X end=0x0x%08X"
+                % (addr, size, addr + size)
+            )
             if addr in self._file_map_addr:
                 file_map_attr = self._file_map_addr[addr]
                 if addr + size != file_map_attr[0]:
                     raise RuntimeError(
-                        "unmap error, range 0x%08X-0x%08X does not match file map range 0x%08X-0x%08X from file" %
-                        (addr, addr + size, addr, file_map_attr[0]))
+                        "unmap error, range 0x%08X-0x%08X does not match file map range 0x%08X-0x%08X from file"
+                        % (addr, addr + size, addr, file_map_attr[0])
+                    )
 
                 self._file_map_addr.pop(addr)
 
@@ -226,8 +247,9 @@ class MemoryMap:
 
             for r in self._mu.mem_regions():
                 print(
-                    "region begin :0x%08X end:0x%08X, prot:%d" %
-                    (r[0], r[1], r[2]))
+                    "region begin :0x%08X end:0x%08X, prot:%d"
+                    % (r[0], r[1], r[2])
+                )
 
             raise
             return -1
@@ -262,11 +284,11 @@ class MemoryMap:
 
         regions.sort()
 
-        '''
+        """
         for region in regions:
             print("region begin :0x%08X end:0x%08X, prot:%d"%(region[0], region[1], region[2]))
 
-        '''
+        """
 
         n = len(regions)
         if n < 1:
@@ -289,5 +311,10 @@ class MemoryMap:
 
         for item in output:
             line = "%08x-%08x %s %08x 00:00 0 \t\t %s\n" % (
-                item[0], item[1], item[2], item[3], item[4])
+                item[0],
+                item[1],
+                item[2],
+                item[3],
+                item[4],
+            )
             stream.write(line)

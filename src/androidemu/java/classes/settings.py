@@ -6,19 +6,18 @@ from androidemu import config
 
 
 class Secure(
-        metaclass=JavaClassDef,
-        jvm_name='android/provider/Settings$Secure'):
+    metaclass=JavaClassDef, jvm_name="android/provider/Settings$Secure"
+):
     def __init__(self):
         pass
 
     @staticmethod
     @java_method_def(
-        name='getString',
-        args_list=[
-            "jobject",
-            "jstring"],
-        signature='(Landroid/content/ContentResolver;Ljava/lang/String;)Ljava/lang/String;',
-        native=False)
+        name="getString",
+        args_list=["jobject", "jstring"],
+        signature="(Landroid/content/ContentResolver;Ljava/lang/String;)Ljava/lang/String;",
+        native=False,
+    )
     def getString(emu, resolver, s1):
         print("call getString %r %r" % (resolver, s1))
         pys1 = s1.get_py_string()
@@ -30,6 +29,6 @@ class Secure(
         return String("")
 
 
-class Settings(metaclass=JavaClassDef, jvm_name='android/provider/Settings'):
+class Settings(metaclass=JavaClassDef, jvm_name="android/provider/Settings"):
     def __init__(self):
         pass

@@ -4,8 +4,7 @@ from androidemu.java.java_method_def import java_method_def, JavaMethodDef
 from androidemu.utils.repr import short_byte_repr
 
 
-class Array(metaclass=JavaClassDef, jvm_name='java/lang/reflect/Array'):
-
+class Array(metaclass=JavaClassDef, jvm_name="java/lang/reflect/Array"):
     def __init__(self, pyitems):
         self._pyitems = pyitems
 
@@ -25,17 +24,19 @@ class Array(metaclass=JavaClassDef, jvm_name='java/lang/reflect/Array'):
         return f"Array({self._pyitems})"
 
     @staticmethod
-    @java_method_def(name='set',
-                     signature='(Ljava/lang/Object;I)Ljava/lang/Object;',
-                     native=False)
+    @java_method_def(
+        name="set",
+        signature="(Ljava/lang/Object;I)Ljava/lang/Object;",
+        native=False,
+    )
     def set(emu, obj, index):
         raise NotImplementedError()
 
     # #TODO: 在继承多态机制完善后移动到Object类上
 
-    @java_method_def(name='getClass',
-                     signature='()Ljava/lang/Class;',
-                     native=False)
+    @java_method_def(
+        name="getClass", signature="()Ljava/lang/Class;", native=False
+    )
     def getClass(self, emu):
         return self.class_object
 
@@ -46,41 +47,44 @@ class ByteArray(Array, metaclass=JavaClassDef, jvm_name="[B", jvm_super=Array):
         Array.__init__(self, item_list)
 
     def __repr__(self):
-        return f'ByteArray({short_byte_repr(self._pyitems)})'
+        return f"ByteArray({short_byte_repr(self._pyitems)})"
 
 
 # 外面用到，因为与Array jvm name不同，所以暂时手动定义，与Array作用一样
 class ObjectArray(
-        Array,
-        metaclass=JavaClassDef,
-        jvm_name="[Ljava/lang/Object;",
-        jvm_super=Array):
+    Array,
+    metaclass=JavaClassDef,
+    jvm_name="[Ljava/lang/Object;",
+    jvm_super=Array,
+):
     def __init__(self, item_list):
         Array.__init__(self, item_list)
 
     def __repr__(self):
-        return f'ObjectArray({self._pyitems})'
+        return f"ObjectArray({self._pyitems})"
 
 
 class ClassArray(
-        Array,
-        metaclass=JavaClassDef,
-        jvm_name="[Ljava/lang/Class;",
-        jvm_super=Array):
+    Array,
+    metaclass=JavaClassDef,
+    jvm_name="[Ljava/lang/Class;",
+    jvm_super=Array,
+):
     def __init__(self, item_list):
         Array.__init__(self, item_list)
 
     def __repr__(self):
-        return f'ClassArray({self._pyitems})'
+        return f"ClassArray({self._pyitems})"
 
 
 class StringArray(
-        Array,
-        metaclass=JavaClassDef,
-        jvm_name="[Ljava/lang/String;",
-        jvm_super=Array):
+    Array,
+    metaclass=JavaClassDef,
+    jvm_name="[Ljava/lang/String;",
+    jvm_super=Array,
+):
     def __init__(self, item_list):
         Array.__init__(self, item_list)
 
     def __repr__(self):
-        return f'StringArray({self._pyitems})'
+        return f"StringArray({self._pyitems})"

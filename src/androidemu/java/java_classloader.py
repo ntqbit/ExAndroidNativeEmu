@@ -3,8 +3,8 @@ from androidemu.java.classes.clazz import Class
 
 
 class JavaClassLoader(
-        metaclass=JavaClassDef,
-        jvm_name='java/lang/ClassLoader'):
+    metaclass=JavaClassDef, jvm_name="java/lang/ClassLoader"
+):
 
     """
     :type class_by_id dict[int, JavaClassDef]
@@ -17,12 +17,12 @@ class JavaClassLoader(
 
     def add_class(self, clazz):
         if not isinstance(clazz, JavaClassDef):
-            raise ValueError('Expected a JavaClassDef.')
+            raise ValueError("Expected a JavaClassDef.")
 
         if clazz.jvm_name in self.class_by_name:
             raise KeyError(
-                'The class \'%s\' is already registered.' %
-                clazz.jvm_name)
+                "The class '%s' is already registered." % clazz.jvm_name
+            )
 
         if clazz.class_object is None:
             # FIXME 两个emulaotr add_class是同一个class 实例,会互相影响

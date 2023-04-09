@@ -1,5 +1,3 @@
-
-
 PR_UNALIGN_NOPRINT = 1  # /* silently fix up unaligned user accesses */
 PR_UNALIGN_SIGBUS = 2  # /* generate SIGBUS on unaligned user access */
 PR_GET_DUMPABLE = 3
@@ -20,4 +18,4 @@ PR_TIMING_TIMESTAMP = 1  # /* Accurate timestamp based
 PR_SET_NAME = 15  # /* Set process name */
 PR_GET_NAME = 16  # /* Get process name */
 
-PR_SET_VMA = 0x53564d41
+PR_SET_VMA = 0x53564D41

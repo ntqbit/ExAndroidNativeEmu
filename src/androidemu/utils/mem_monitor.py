@@ -10,7 +10,7 @@ class MemoryMonitor:
         self._read_not_writed = set()
 
     def feed_write(self, pc, address, size):
-        #data = self._emu.mu.mem_read(address, size)
+        # data = self._emu.mu.mem_read(address, size)
         for addr in range(address, address + size):
             self._has_writed.add(addr)
 
@@ -48,5 +48,9 @@ class MemoryMonitor:
                 base_pc = 0
 
             line = "[0x%08X(%s) 0x%08X(%s)]\n" % (
-                addr - base_read, name_read, pc - base_pc, name_pc)
+                addr - base_read,
+                name_read,
+                pc - base_pc,
+                name_pc,
+            )
             f.write(line)

@@ -51,38 +51,77 @@ class SyscallHooks:
             self._syscall_handler.set_handler(0x1A, "ptrace", 4, self._ptrace)
             self._syscall_handler.set_handler(0x25, "kill", 2, self._kill)
             self._syscall_handler.set_handler(0x2A, "pipe", 1, self._pipe)
-            self._syscall_handler.set_handler(0x43, "sigaction", 3, self._handle_sigaction)
-            self._syscall_handler.set_handler(0x4E, "gettimeofday", 2, self._handle_gettimeofday)
+            self._syscall_handler.set_handler(
+                0x43, "sigaction", 3, self._handle_sigaction
+            )
+            self._syscall_handler.set_handler(
+                0x4E, "gettimeofday", 2, self._handle_gettimeofday
+            )
             self._syscall_handler.set_handler(0x72, "wait4", 4, self._wait4)
-            self._syscall_handler.set_handler(0x74, "sysinfo", 1, self._sysinfo)
+            self._syscall_handler.set_handler(
+                0x74, "sysinfo", 1, self._sysinfo
+            )
             self._syscall_handler.set_handler(0x78, "clone", 5, self._clone)
             self._syscall_handler.set_handler(0x7A, "uname", 1, self._uname)
-            self._syscall_handler.set_handler(0x7E, "sigprocmask", 3, self._handle_sigprocmask)
-            self._syscall_handler.set_handler(0xAC, "prctl", 5, self._handle_prctl)
-            self._syscall_handler.set_handler(0xAE, "rt_sigaction", 4, self._rt_sigaction)
-            self._syscall_handler.set_handler(0xAF, "rt_sigprocmask", 4, self._handle_rt_sigprocmask)
-            self._syscall_handler.set_handler(0xBA, "sigaltstack", 2, self._sigaltstack)
+            self._syscall_handler.set_handler(
+                0x7E, "sigprocmask", 3, self._handle_sigprocmask
+            )
+            self._syscall_handler.set_handler(
+                0xAC, "prctl", 5, self._handle_prctl
+            )
+            self._syscall_handler.set_handler(
+                0xAE, "rt_sigaction", 4, self._rt_sigaction
+            )
+            self._syscall_handler.set_handler(
+                0xAF, "rt_sigprocmask", 4, self._handle_rt_sigprocmask
+            )
+            self._syscall_handler.set_handler(
+                0xBA, "sigaltstack", 2, self._sigaltstack
+            )
             self._syscall_handler.set_handler(0xBE, "vfork", 0, self._vfork)
-            self._syscall_handler.set_handler(0xC7, "getuid32", 0, self._get_uid)
-            self._syscall_handler.set_handler(0xDA, "set_tid_address", 1, self._set_tid_address)
+            self._syscall_handler.set_handler(
+                0xC7, "getuid32", 0, self._get_uid
+            )
+            self._syscall_handler.set_handler(
+                0xDA, "set_tid_address", 1, self._set_tid_address
+            )
             self._syscall_handler.set_handler(0xE0, "gettid", 0, self._gettid)
-            self._syscall_handler.set_handler(0xF0, "futex", 6, self._handle_futex)
-            self._syscall_handler.set_handler(0x10c, "tgkill", 3, self._handle_tgkill)
-            self._syscall_handler.set_handler(0x107, "clock_gettime", 2, self._handle_clock_gettime)
+            self._syscall_handler.set_handler(
+                0xF0, "futex", 6, self._handle_futex
+            )
+            self._syscall_handler.set_handler(
+                0x10C, "tgkill", 3, self._handle_tgkill
+            )
+            self._syscall_handler.set_handler(
+                0x107, "clock_gettime", 2, self._handle_clock_gettime
+            )
             self._syscall_handler.set_handler(0x119, "socket", 3, self._socket)
-            self._syscall_handler.set_handler(0x11a, "bind", 3, self._bind)
-            self._syscall_handler.set_handler(0x11b, "connect", 3, self._connect)
-            self._syscall_handler.set_handler(0x126, "setsockopt", 5, self._setsockopt)
+            self._syscall_handler.set_handler(0x11A, "bind", 3, self._bind)
+            self._syscall_handler.set_handler(
+                0x11B, "connect", 3, self._connect
+            )
+            self._syscall_handler.set_handler(
+                0x126, "setsockopt", 5, self._setsockopt
+            )
             self._syscall_handler.set_handler(0x159, "getcpu", 3, self._getcpu)
             self._syscall_handler.set_handler(0x166, "dup3", 3, self._dup3)
             self._syscall_handler.set_handler(0x167, "pipe2", 2, self._pipe2)
-            self._syscall_handler.set_handler(0x178, "process_vm_readv", 6, self._process_vm_readv)
-            self._syscall_handler.set_handler(0x180, "getrandom", 3, self._getrandom)
-            self._syscall_handler.set_handler(0xf0002, "ARM_cacheflush", 0, self._ARM_cacheflush)
-            self._syscall_handler.set_handler(0xf0005, "ARM_set_tls", 1, self._ARM_set_tls)
+            self._syscall_handler.set_handler(
+                0x178, "process_vm_readv", 6, self._process_vm_readv
+            )
+            self._syscall_handler.set_handler(
+                0x180, "getrandom", 3, self._getrandom
+            )
+            self._syscall_handler.set_handler(
+                0xF0002, "ARM_cacheflush", 0, self._ARM_cacheflush
+            )
+            self._syscall_handler.set_handler(
+                0xF0005, "ARM_set_tls", 1, self._ARM_set_tls
+            )
 
             self._syscall_handler.set_handler(
-                0xa2, "nanosleep", 2, self._nanosleep)
+                0xA2, "nanosleep", 2, self._nanosleep
+            )
         else:
             # arm64
             self._syscall_handler.set_handler(0x5D, "exit", 1, self._exit)
@@ -94,33 +133,61 @@ class SyscallHooks:
             self._syscall_handler.set_handler(0x81, "kill", 2, self._kill)
             # arm64没有pipe系统调用
             # arm64没sigaction系统调用
-            self._syscall_handler.set_handler(0xA9, "gettimeofday", 2, self._handle_gettimeofday)
+            self._syscall_handler.set_handler(
+                0xA9, "gettimeofday", 2, self._handle_gettimeofday
+            )
             self._syscall_handler.set_handler(0x104, "wait4", 4, self._wait4)
-            self._syscall_handler.set_handler(0xB3, "sysinfo", 1, self._sysinfo)
+            self._syscall_handler.set_handler(
+                0xB3, "sysinfo", 1, self._sysinfo
+            )
             self._syscall_handler.set_handler(0xDC, "clone", 5, self._clone)
             self._syscall_handler.set_handler(0xA0, "uname", 1, self._uname)
             # no sigprocmask
-            self._syscall_handler.set_handler(0xA7, "prctl", 5, self._handle_prctl)
-            self._syscall_handler.set_handler(0x86, "rt_sigaction", 4, self._rt_sigaction)
-            self._syscall_handler.set_handler(0x87, "rt_sigprocmask", 4, self._handle_rt_sigprocmask)
-            self._syscall_handler.set_handler(0x84, "sigaltstack", 2, self._sigaltstack)
+            self._syscall_handler.set_handler(
+                0xA7, "prctl", 5, self._handle_prctl
+            )
+            self._syscall_handler.set_handler(
+                0x86, "rt_sigaction", 4, self._rt_sigaction
+            )
+            self._syscall_handler.set_handler(
+                0x87, "rt_sigprocmask", 4, self._handle_rt_sigprocmask
+            )
+            self._syscall_handler.set_handler(
+                0x84, "sigaltstack", 2, self._sigaltstack
+            )
             # no vfork
             # no getuid32
             self._syscall_handler.set_handler(0xB2, "gettid", 0, self._gettid)
-            self._syscall_handler.set_handler(0x62, "futex", 6, self._handle_futex)
-            self._syscall_handler.set_handler(0x83, "tgkill", 3, self._handle_tgkill)
-            self._syscall_handler.set_handler(0x71, "clock_gettime", 2, self._handle_clock_gettime)
+            self._syscall_handler.set_handler(
+                0x62, "futex", 6, self._handle_futex
+            )
+            self._syscall_handler.set_handler(
+                0x83, "tgkill", 3, self._handle_tgkill
+            )
+            self._syscall_handler.set_handler(
+                0x71, "clock_gettime", 2, self._handle_clock_gettime
+            )
             self._syscall_handler.set_handler(0xC6, "socket", 3, self._socket)
             self._syscall_handler.set_handler(0xC8, "bind", 3, self._bind)
-            self._syscall_handler.set_handler(0xCB, "connect", 3, self._connect)
-            self._syscall_handler.set_handler(0xD0, "setsockopt", 5, self._setsockopt)
+            self._syscall_handler.set_handler(
+                0xCB, "connect", 3, self._connect
+            )
+            self._syscall_handler.set_handler(
+                0xD0, "setsockopt", 5, self._setsockopt
+            )
             self._syscall_handler.set_handler(0xA8, "getcpu", 3, self._getcpu)
             self._syscall_handler.set_handler(0x18, "dup3", 3, self._dup3)
             self._syscall_handler.set_handler(0x3B, "pipe2", 2, self._pipe2)
-            self._syscall_handler.set_handler(0x10E, "process_vm_readv", 6, self._process_vm_readv)
-            self._syscall_handler.set_handler(0x116, "getrandom", 3, self._getrandom)
+            self._syscall_handler.set_handler(
+                0x10E, "process_vm_readv", 6, self._process_vm_readv
+            )
+            self._syscall_handler.set_handler(
+                0x116, "getrandom", 3, self._getrandom
+            )
             # no ARM_cacheflush
-            self._syscall_handler.set_handler(0x65, "nanosleep", 2, self._nanosleep)
+            self._syscall_handler.set_handler(
+                0x65, "nanosleep", 2, self._nanosleep
+            )
 
         self._clock_start = time.time()
         self._clock_offset = randint(50000, 100000)
@@ -154,8 +221,8 @@ class SyscallHooks:
             tid_addr_futex = self._tid_2_tid_addr[cur_tid]
             sch.futex_wake(tid_addr_futex)
             mu.mem_write(
-                tid_addr_futex, int(0).to_bytes(
-                    4, byteorder='little'))
+                tid_addr_futex, int(0).to_bytes(4, byteorder="little")
+            )
             self._tid_2_tid_addr.pop(cur_tid)
 
         # TODO use err_code
@@ -190,17 +257,17 @@ class SyscallHooks:
             os.write(1, output.encode("utf-8"))
             sys.exit(0)
 
-        elif cmd.find('wm density') > -1:
+        elif cmd.find("wm density") > -1:
             output = "Physical density: 420"
             logger.info("write to stdout [%s]" % output)
             os.write(1, output.encode("utf-8"))
             sys.exit(0)
-        elif cmd.find('wm size') > -1:
+        elif cmd.find("wm size") > -1:
             output = "Physical size: 1080x1920"
             logger.info("write to stdout [%s]" % output)
             os.write(1, output.encode("utf-8"))
             sys.exit(0)
-        elif cmd.find('adbd') > -1:
+        elif cmd.find("adbd") > -1:
             output = ""
             logger.info("write to stdout [%s]" % output)
             os.write(1, output.encode("utf-8"))
@@ -214,16 +281,17 @@ class SyscallHooks:
 
     def _ptrace(self, mu, request, pid, addr, data):
         logger.warning(
-            "skip syscall ptrace request [%d] pid [0x%x] addr [0x%08X] data [0x%08X]" %
-            (request, pid, addr, data))
+            "skip syscall ptrace request [%d] pid [0x%x] addr [0x%08X] data [0x%08X]"
+            % (request, pid, addr, data)
+        )
         return 0
 
     def _kill(self, mu, pid, sig):
         logger.warning("kill is call pid=0x%x sig=%d" % (pid, sig))
         if pid == self._getpid(mu):
             logger.error(
-                "process 0x%x is killing self maybe encounter anti-debug" %
-                pid)
+                "process 0x%x is killing self maybe encounter anti-debug" % pid
+            )
             self._mu.emu_stop()
 
     def _pipe_common(self, mu, files_ptr, flags):
@@ -238,15 +306,15 @@ class SyscallHooks:
         self._pcb.add_fd("[pipe_r]", "[pipe_r]", ps[0])
         self._pcb.add_fd("[pipe_w]", "[pipe_w]", ps[1])
         # files_ptr 无论32还是64 都是个int数组，因此写4没有问题
-        mu.mem_write(files_ptr, int(ps[0]).to_bytes(4, byteorder='little'))
-        mu.mem_write(files_ptr + 4, int(ps[1]).to_bytes(4, byteorder='little'))
+        mu.mem_write(files_ptr, int(ps[0]).to_bytes(4, byteorder="little"))
+        mu.mem_write(files_ptr + 4, int(ps[1]).to_bytes(4, byteorder="little"))
         return 0
 
     def _pipe(self, mu, files_ptr):
         return self._pipe_common(mu, files_ptr, 0)
 
     def _handle_sigaction(self, mu, sig, act, oact):
-        '''
+        """
         struct sigaction {
             union {
                 void     (*sa_handler)(int);
@@ -256,7 +324,7 @@ class SyscallHooks:
             int        sa_flags;
             void     (*sa_restorer)(void);
         };
-        '''
+        """
         act_off = act
         sa_handler = memory_helpers.read_ptr_sz(mu, act_off, self._ptr_sz)
         act_off += self._ptr_sz
@@ -267,13 +335,14 @@ class SyscallHooks:
         sa_restorer = memory_helpers.read_ptr_sz(mu, act_off, self._ptr_sz)
 
         logger.debug(
-            "sa_handler [0x%08X] sa_mask [0x%08X] sa_flag [0x%08X] sa_restorer [0x%08X]" %
-            (sa_handler, sa_mask, sa_flag, sa_restorer))
+            "sa_handler [0x%08X] sa_mask [0x%08X] sa_flag [0x%08X] sa_restorer [0x%08X]"
+            % (sa_handler, sa_mask, sa_flag, sa_restorer)
+        )
         self._sig_maps[sig] = (sa_handler, sa_mask, sa_flag, sa_restorer)
         return 0
 
     def _rt_sigaction(self, mu, sig, act, oact, sigsetsize):
-        '''
+        """
         struct sigaction {
             union {
                 void     (*sa_handler)(int);
@@ -283,7 +352,7 @@ class SyscallHooks:
             int        sa_flags;
             void     (*sa_restorer)(void);
         };
-        '''
+        """
         act_off = act
         sa_handler = memory_helpers.read_ptr_sz(mu, act_off, self._ptr_sz)
         act_off += self._ptr_sz
@@ -296,8 +365,9 @@ class SyscallHooks:
         sa_restorer = memory_helpers.read_ptr_sz(mu, act_off, self._ptr_sz)
 
         logger.debug(
-            "sa_handler [0x%08X] sa_mask [0x%08X] sa_flag [0x%08X] sa_restorer [0x%08X]" %
-            (sa_handler, sa_mask, sa_flag, sa_restorer))
+            "sa_handler [0x%08X] sa_mask [0x%08X] sa_flag [0x%08X] sa_restorer [0x%08X]"
+            % (sa_handler, sa_mask, sa_flag, sa_restorer)
+        )
         self._sig_maps[sig] = (sa_handler, sa_mask, sa_flag, sa_restorer)
         return 0
 
@@ -312,7 +382,7 @@ class SyscallHooks:
     def _getcpu(self, mu, _cpu, node, cache):
         if _cpu != 0:
             # unsigned *指针，写4没问题
-            mu.mem_write(_cpu, int(1).to_bytes(4, byteorder='little'))
+            mu.mem_write(_cpu, int(1).to_bytes(4, byteorder="little"))
         return 0
 
     def _handle_gettimeofday(self, uc, tv, tz):
@@ -326,38 +396,34 @@ class SyscallHooks:
                 uc.mem_write(
                     tv + 0,
                     int(OVERRIDE_TIMEOFDAY_SEC).to_bytes(
-                        ptr_sz,
-                        byteorder='little'))
+                        ptr_sz, byteorder="little"
+                    ),
+                )
                 uc.mem_write(
                     tv + ptr_sz,
                     int(OVERRIDE_TIMEOFDAY_USEC).to_bytes(
-                        ptr_sz,
-                        byteorder='little'))
+                        ptr_sz, byteorder="little"
+                    ),
+                )
             else:
                 timestamp = time.time()
                 (usec, sec) = math.modf(timestamp)
                 usec = abs(int(usec * 100000))
 
                 uc.mem_write(
-                    tv + 0,
-                    int(sec).to_bytes(
-                        ptr_sz,
-                        byteorder='little'))
+                    tv + 0, int(sec).to_bytes(ptr_sz, byteorder="little")
+                )
                 uc.mem_write(
-                    tv + ptr_sz,
-                    int(usec).to_bytes(
-                        ptr_sz,
-                        byteorder='little'))
+                    tv + ptr_sz, int(usec).to_bytes(ptr_sz, byteorder="little")
+                )
 
         if tz != 0:
             # timezone结构体不64还是32都是两个4字节成员
             # minuteswest -(+GMT_HOURS) * 60
-            uc.mem_write(tz + 0, int(-120).to_bytes(4, byteorder='little'))
+            uc.mem_write(tz + 0, int(-120).to_bytes(4, byteorder="little"))
             uc.mem_write(
-                tz + 4,
-                int().to_bytes(
-                    4,
-                    byteorder='little'))  # dsttime
+                tz + 4, int().to_bytes(4, byteorder="little")
+            )  # dsttime
 
         return 0
 
@@ -372,7 +438,7 @@ class SyscallHooks:
         return t[0]
 
     def _sysinfo(self, mu, info_ptr):
-        '''
+        """
         si = {sysinfo}
         uptime = {__kernel_long_t} 91942
         loads = {__kernel_ulong_t [3]}
@@ -391,134 +457,92 @@ class SyscallHooks:
         freehigh = {__kernel_ulong_t} 1863680
         mem_unit = {__u32} 1
         f = 0 char[8]
-        '''
+        """
         uptime = int(self._clock_offset + time.time() - self._clock_start)
         if self._emu.get_arch() == emu_const.Arch.ARM32:
             mu.mem_write(
-                info_ptr + 0,
-                int(uptime).to_bytes(
-                    4,
-                    byteorder='little'))
+                info_ptr + 0, int(uptime).to_bytes(4, byteorder="little")
+            )
             mu.mem_write(
-                info_ptr + 4,
-                int(503328).to_bytes(
-                    4,
-                    byteorder='little'))
+                info_ptr + 4, int(503328).to_bytes(4, byteorder="little")
+            )
             mu.mem_write(
-                info_ptr + 8,
-                int(504576).to_bytes(
-                    4,
-                    byteorder='little'))
+                info_ptr + 8, int(504576).to_bytes(4, byteorder="little")
+            )
             mu.mem_write(
-                info_ptr + 12,
-                int(537280).to_bytes(
-                    4,
-                    byteorder='little'))
+                info_ptr + 12, int(537280).to_bytes(4, byteorder="little")
+            )
             mu.mem_write(
-                info_ptr + 16,
-                int(1945137152).to_bytes(
-                    4,
-                    byteorder='little'))
+                info_ptr + 16, int(1945137152).to_bytes(4, byteorder="little")
+            )
             mu.mem_write(
-                info_ptr + 20,
-                int(47845376).to_bytes(
-                    4,
-                    byteorder='little'))
-            mu.mem_write(info_ptr + 24, int(0).to_bytes(4, byteorder='little'))
+                info_ptr + 20, int(47845376).to_bytes(4, byteorder="little")
+            )
+            mu.mem_write(info_ptr + 24, int(0).to_bytes(4, byteorder="little"))
             mu.mem_write(
-                info_ptr + 28,
-                int(169373696).to_bytes(
-                    4,
-                    byteorder='little'))
-            mu.mem_write(info_ptr + 32, int(0).to_bytes(4, byteorder='little'))
-            mu.mem_write(info_ptr + 36, int(0).to_bytes(4, byteorder='little'))
+                info_ptr + 28, int(169373696).to_bytes(4, byteorder="little")
+            )
+            mu.mem_write(info_ptr + 32, int(0).to_bytes(4, byteorder="little"))
+            mu.mem_write(info_ptr + 36, int(0).to_bytes(4, byteorder="little"))
             mu.mem_write(
-                info_ptr + 40,
-                int(1297).to_bytes(
-                    2,
-                    byteorder='little'))
-            mu.mem_write(info_ptr + 42, int(0).to_bytes(2, byteorder='little'))
+                info_ptr + 40, int(1297).to_bytes(2, byteorder="little")
+            )
+            mu.mem_write(info_ptr + 42, int(0).to_bytes(2, byteorder="little"))
             mu.mem_write(
-                info_ptr + 44,
-                int(1185939456).to_bytes(
-                    4,
-                    byteorder='little'))
+                info_ptr + 44, int(1185939456).to_bytes(4, byteorder="little")
+            )
             mu.mem_write(
-                info_ptr + 48,
-                int(1863680).to_bytes(
-                    4,
-                    byteorder='little'))
-            mu.mem_write(info_ptr + 52, int(1).to_bytes(4, byteorder='little'))
-            mu.mem_write(info_ptr + 56, int(0).to_bytes(8, byteorder='little'))
+                info_ptr + 48, int(1863680).to_bytes(4, byteorder="little")
+            )
+            mu.mem_write(info_ptr + 52, int(1).to_bytes(4, byteorder="little"))
+            mu.mem_write(info_ptr + 56, int(0).to_bytes(8, byteorder="little"))
             # sz 64
         else:
             # arm64
             mu.mem_write(
-                info_ptr + 0,
-                int(uptime).to_bytes(
-                    8,
-                    byteorder='little'))
+                info_ptr + 0, int(uptime).to_bytes(8, byteorder="little")
+            )
             mu.mem_write(
-                info_ptr + 8,
-                int(503328).to_bytes(
-                    8,
-                    byteorder='little'))
+                info_ptr + 8, int(503328).to_bytes(8, byteorder="little")
+            )
             mu.mem_write(
-                info_ptr + 16,
-                int(504576).to_bytes(
-                    8,
-                    byteorder='little'))
+                info_ptr + 16, int(504576).to_bytes(8, byteorder="little")
+            )
             mu.mem_write(
-                info_ptr + 24,
-                int(537280).to_bytes(
-                    8,
-                    byteorder='little'))
+                info_ptr + 24, int(537280).to_bytes(8, byteorder="little")
+            )
             mu.mem_write(
-                info_ptr + 32,
-                int(1945137152).to_bytes(
-                    8,
-                    byteorder='little'))
+                info_ptr + 32, int(1945137152).to_bytes(8, byteorder="little")
+            )
             mu.mem_write(
-                info_ptr + 40,
-                int(47845376).to_bytes(
-                    8,
-                    byteorder='little'))
-            mu.mem_write(info_ptr + 48, int(0).to_bytes(8, byteorder='little'))
+                info_ptr + 40, int(47845376).to_bytes(8, byteorder="little")
+            )
+            mu.mem_write(info_ptr + 48, int(0).to_bytes(8, byteorder="little"))
             mu.mem_write(
-                info_ptr + 56,
-                int(169373696).to_bytes(
-                    8,
-                    byteorder='little'))
-            mu.mem_write(info_ptr + 64, int(0).to_bytes(8, byteorder='little'))
-            mu.mem_write(info_ptr + 72, int(0).to_bytes(8, byteorder='little'))
+                info_ptr + 56, int(169373696).to_bytes(8, byteorder="little")
+            )
+            mu.mem_write(info_ptr + 64, int(0).to_bytes(8, byteorder="little"))
+            mu.mem_write(info_ptr + 72, int(0).to_bytes(8, byteorder="little"))
             mu.mem_write(
-                info_ptr + 80,
-                int(1297).to_bytes(
-                    2,
-                    byteorder='little'))
+                info_ptr + 80, int(1297).to_bytes(2, byteorder="little")
+            )
             mu.mem_write(
-                info_ptr + 82,
-                int(0).to_bytes(
-                    6,
-                    byteorder='little'))  # pading
+                info_ptr + 82, int(0).to_bytes(6, byteorder="little")
+            )  # pading
 
-            mu.mem_write(info_ptr + 88, int(0).to_bytes(8, byteorder='little'))
-            mu.mem_write(info_ptr + 96, int(0).to_bytes(8, byteorder='little'))
+            mu.mem_write(info_ptr + 88, int(0).to_bytes(8, byteorder="little"))
+            mu.mem_write(info_ptr + 96, int(0).to_bytes(8, byteorder="little"))
             mu.mem_write(
-                info_ptr + 104,
-                int(1).to_bytes(
-                    4,
-                    byteorder='little'))
+                info_ptr + 104, int(1).to_bytes(4, byteorder="little")
+            )
             mu.mem_write(
-                info_ptr + 108,
-                int(0).to_bytes(
-                    4,
-                    byteorder='little'))
+                info_ptr + 108, int(0).to_bytes(4, byteorder="little")
+            )
             # sz 112
 
         logger.warning(
-            "syscall sysinfo buf 0x%08X return fixed value" %
-            (info_ptr))
+            "syscall sysinfo buf 0x%08X return fixed value" % (info_ptr)
+        )
         return 0
 
     def _clone(self, mu, flags, child_stack, parent_tid, new_tls, child_tid):
@@ -539,11 +563,21 @@ class SyscallHooks:
         fork_flags = CLONE_CHILD_SETTID | CLONE_CHILD_CLEARTID | SIGCHLD
 
         # thread clone flags
-        thread_flags = CLONE_FILES | CLONE_FS | CLONE_VM | CLONE_SIGHAND | CLONE_THREAD | CLONE_SYSVSEM
+        thread_flags = (
+            CLONE_FILES
+            | CLONE_FS
+            | CLONE_VM
+            | CLONE_SIGHAND
+            | CLONE_THREAD
+            | CLONE_SYSVSEM
+        )
         # 6.0 clone thread CLONE_FILES| CLONE_FS | CLONE_VM| CLONE_SIGHAND |
         # CLONE_THREAD | CLONE_SYSVSEM | CLONE_SETTLS | CLONE_PARENT_SETTID |
         # CLONE_CHILD_CLEARTID
-        if flags & fork_flags == fork_flags or flags & vfork_flags == vfork_flags:
+        if (
+            flags & fork_flags == fork_flags
+            or flags & vfork_flags == vfork_flags
+        ):
             # fork or vfork
             # 0x01200011 is fork flag
             # clone(0x01200011, 0x00000000, 0x00000000, 0x00000000, 0x00000008)
@@ -557,22 +591,34 @@ class SyscallHooks:
             sch = self._emu.get_schduler()
             # 父线程调用clone，返回子线程tid
             tls_ptr = 0
-            if flags & (CLONE_SETTLS | CLONE_CHILD_SETTID |
-                        CLONE_CHILD_CLEARTID) != 0:
+            if (
+                flags
+                & (CLONE_SETTLS | CLONE_CHILD_SETTID | CLONE_CHILD_CLEARTID)
+                != 0
+            ):
                 tls_ptr = new_tls
             tid = sch.add_sub_task(child_stack, tls_ptr)
             logger.debug(
-                "clone thread call in parent thread return child thread tid [%d] child_stack [0x%08X] tls_ptr [0x%08X]" %
-                (tid, child_stack, tls_ptr))
+                "clone thread call in parent thread return child thread tid [%d] child_stack [0x%08X] tls_ptr [0x%08X]"
+                % (tid, child_stack, tls_ptr)
+            )
             # let the child thread run first
             sch.yield_task()
             # 6.0的libc使用这几个参数设置tid，而不使用返回值，这跟4.4的libc实现不同，两个都要兼容
-            if (flags & (CLONE_PARENT_SETTID | CLONE_SETTLS |
-                         CLONE_CHILD_SETTID | CLONE_CHILD_CLEARTID) != 0):
-                mu.mem_write(parent_tid, tid.to_bytes(4, byteorder='little'))
+            if (
+                flags
+                & (
+                    CLONE_PARENT_SETTID
+                    | CLONE_SETTLS
+                    | CLONE_CHILD_SETTID
+                    | CLONE_CHILD_CLEARTID
+                )
+                != 0
+            ):
+                mu.mem_write(parent_tid, tid.to_bytes(4, byteorder="little"))
 
             if flags & (CLONE_CHILD_SETTID | CLONE_CHILD_CLEARTID) != 0:
-                mu.mem_write(child_tid, tid.to_bytes(4, byteorder='little'))
+                mu.mem_write(child_tid, tid.to_bytes(4, byteorder="little"))
 
             if flags & CLONE_CHILD_CLEARTID:
                 # save the child_tid ptr
@@ -595,19 +641,26 @@ class SyscallHooks:
         - https://android.googlesource.com/platform/bionic/+/263325d/libc/include/sys/prctl.h
         - https://sourceforge.net/p/strace/mailman/message/34329772/
         """
-        get_sets = set([PR_GET_DUMPABLE,
-                        PR_GET_UNALIGN,
-                        PR_GET_FPEMU,
-                        PR_GET_FPEXC,
-                        PR_GET_TIMING,
-                        PR_GET_NAME])
+        get_sets = set(
+            [
+                PR_GET_DUMPABLE,
+                PR_GET_UNALIGN,
+                PR_GET_FPEMU,
+                PR_GET_FPEXC,
+                PR_GET_TIMING,
+                PR_GET_NAME,
+            ]
+        )
         if option in get_sets and arg2 == 0:
             # 传入非法指针，linux内核不会出发crash而只会返回失败
             logger.warning("prctl getter but buffer is 0")
             return -1
 
         if option == PR_SET_VMA:
-            logger.debug('prtcl(PR_SET_VMA) called. Name: %s', memory_helpers.read_utf8(mu, arg5))
+            logger.debug(
+                "prtcl(PR_SET_VMA) called. Name: %s",
+                memory_helpers.read_utf8(mu, arg5),
+            )
             return 0
         elif option == PR_SET_DUMPABLE:
             return 0
@@ -616,18 +669,16 @@ class SyscallHooks:
             return 0
         elif option == PR_GET_DUMPABLE:
             mu.mem_write(
-                arg2,
-                int(0).to_bytes(
-                    self._ptr_sz,
-                    byteorder='little'))
+                arg2, int(0).to_bytes(self._ptr_sz, byteorder="little")
+            )
             return 0
         elif option == PR_SET_NAME:
             self._process_name = memory_helpers.read_utf8(mu, arg2)
             return 0
         else:
             raise NotImplementedError(
-                "Unsupported prctl option %d (0x%x)" %
-                (option, option))
+                "Unsupported prctl option %d (0x%x)" % (option, option)
+            )
 
     def _uname(self, mu, buf):
         #    uts.sysname = Linux
@@ -641,7 +692,8 @@ class SyscallHooks:
         memory_helpers.write_utf8(mu, buf + 65, "localhost")
         memory_helpers.write_utf8(mu, buf + 130, "3.10.73-gf97f123")
         memory_helpers.write_utf8(
-            mu, buf + 195, "#1 SMP PREEMPT Mon Nov 2 20:10:58 UTC 2015")
+            mu, buf + 195, "#1 SMP PREEMPT Mon Nov 2 20:10:58 UTC 2015"
+        )
         memory_helpers.write_utf8(mu, buf + 260, "armv8l")
         memory_helpers.write_utf8(mu, buf + 325, "localdomain")
 
@@ -676,7 +728,7 @@ class SyscallHooks:
     def _handle_futex(self, mu, uaddr, op, val, timeout_ptr, uaddr2, val3):
         # uaddr 是u32指针，所以指向的大小恒为4
         v = mu.mem_read(uaddr, 4)
-        v = int.from_bytes(v, byteorder='little', signed=False)
+        v = int.from_bytes(v, byteorder="little", signed=False)
         """
         See: https://linux.die.net/man/2/futex
         """
@@ -685,31 +737,38 @@ class SyscallHooks:
         if cmd == FUTEX_WAIT or cmd == FUTEX_WAIT_BITSET:
             # TODO implement timeout
             logger.info(
-                "futext_wait call op=0x%08X uaddr=0x%08X *uaddr=0x%08X val=0x%08X timeout=0x%08X" %
-                (op, uaddr, v, val, timeout_ptr))
+                "futext_wait call op=0x%08X uaddr=0x%08X *uaddr=0x%08X val=0x%08X timeout=0x%08X"
+                % (op, uaddr, v, val, timeout_ptr)
+            )
             if v == val:
                 timeout = -1
                 if timeout_ptr:
                     req_tv_sec = memory_helpers.read_ptr_sz(
-                        mu, timeout_ptr, self._ptr_sz)
+                        mu, timeout_ptr, self._ptr_sz
+                    )
                     req_tv_nsec = memory_helpers.read_ptr_sz(
-                        mu, timeout_ptr + self._ptr_sz, self._ptr_sz)
+                        mu, timeout_ptr + self._ptr_sz, self._ptr_sz
+                    )
                     ms = req_tv_sec * 1000 + req_tv_nsec / 1000000
                     timeout = ms
                     # TODO
                     # 这里timeout返回-1和ETIMEOUT，不能在这里返回，需要在调度器判断是否timeout而写r0和set_errno，暂时没实现，写死返回0
                     logger.warning(
-                        "futex timeout %d ms is set, the return value is 0 not matter if it expired" %
-                        ms)
+                        "futex timeout %d ms is set, the return value is 0 not matter if it expired"
+                        % ms
+                    )
 
                 sch.futex_wait(uaddr, timeout)
 
             return 0
         elif cmd == FUTEX_WAKE or cmd == FUTEX_WAKE_BITSET:
             logger.debug(
-                "futex_wake call op=0x%08X uaddr=0x%08X val=0x%08X" %
-                (op, uaddr, val))
-            assert val <= 0x7fffffff, "futex wake val=0x%08X bigger than int max" % val
+                "futex_wake call op=0x%08X uaddr=0x%08X val=0x%08X"
+                % (op, uaddr, val)
+            )
+            assert val <= 0x7FFFFFFF, (
+                "futex wake val=0x%08X bigger than int max" % val
+            )
             nwake = 0
             for i in range(0, val):
                 wake_ok = sch.futex_wake(uaddr)
@@ -767,43 +826,44 @@ class SyscallHooks:
 
             mu.mem_write(
                 tp_ptr + 0,
-                int(clock_real).to_bytes(
-                    self._ptr_sz,
-                    byteorder='little'))
+                int(clock_real).to_bytes(self._ptr_sz, byteorder="little"),
+            )
             mu.mem_write(
                 tp_ptr + self._ptr_sz,
-                int(0).to_bytes(
-                    self._ptr_sz,
-                    byteorder='little'))
+                int(0).to_bytes(self._ptr_sz, byteorder="little"),
+            )
             return 0
         elif clk_id == CLOCK_MONOTONIC or clk_id == CLOCK_MONOTONIC_COARSE:
             if OVERRIDE_CLOCK:
                 mu.mem_write(
                     tp_ptr + 0,
                     int(OVERRIDE_CLOCK_TIME).to_bytes(
-                        self._ptr_sz,
-                        byteorder='little'))
+                        self._ptr_sz, byteorder="little"
+                    ),
+                )
                 mu.mem_write(
                     tp_ptr + self._ptr_sz,
-                    int(0).to_bytes(
-                        self._ptr_sz,
-                        byteorder='little'))
+                    int(0).to_bytes(self._ptr_sz, byteorder="little"),
+                )
             else:
                 # Seconds passed since clock_start was set.
                 clock_add = time.time() - self._clock_start
 
-                mu.mem_write(tp_ptr + 0, int(self._clock_start +
-                             clock_add).to_bytes(self._ptr_sz, byteorder='little'))
+                mu.mem_write(
+                    tp_ptr + 0,
+                    int(self._clock_start + clock_add).to_bytes(
+                        self._ptr_sz, byteorder="little"
+                    ),
+                )
                 mu.mem_write(
                     tp_ptr + self._ptr_sz,
-                    int(0).to_bytes(
-                        self._ptr_sz,
-                        byteorder='little'))
+                    int(0).to_bytes(self._ptr_sz, byteorder="little"),
+                )
             return 0
         else:
             raise NotImplementedError(
-                "Unsupported clk_id: %d (%x)" %
-                (clk_id, clk_id))
+                "Unsupported clk_id: %d (%x)" % (clk_id, clk_id)
+            )
 
     def _socket(self, mu, family, type_in, protocol):
         if family == 16:
@@ -825,7 +885,7 @@ class SyscallHooks:
         # The struct is confusing..
         addr = mu.mem_read(addr + 3, addr_len - 3).decode(encoding="utf-8")
 
-        logger.info('Binding socket to ://%s' % addr)
+        logger.info("Binding socket to ://%s" % addr)
         raise NotImplementedError()
         return 0
 
@@ -855,29 +915,25 @@ class SyscallHooks:
         return count
 
     def _process_vm_readv(
-            self,
-            mu,
-            pid,
-            local_iov,
-            liovcnt,
-            remote_iov,
-            riovcnt,
-            flag):
-        '''
+        self, mu, pid, local_iov, liovcnt, remote_iov, riovcnt, flag
+    ):
+        """
         struct iovec {
             void  *iov_base;    /* Starting address */
             size_t iov_len;     /* Number of bytes to transfer */
         };
-        '''
+        """
         if pid != self._getpid(mu):
             raise NotImplementedError(
-                "__process_vm_readv return other process not support...")
+                "__process_vm_readv return other process not support..."
+            )
         off_r = remote_iov
-        b = b''
+        b = b""
         for i in range(0, riovcnt):
             rbase = memory_helpers.read_ptr_sz(mu, off_r, self._ptr_sz)
             iov_len = memory_helpers.read_ptr_sz(
-                mu, off_r + self._ptr_sz, self._ptr_sz)
+                mu, off_r + self._ptr_sz, self._ptr_sz
+            )
             tmp = memory_helpers.read_byte_array(mu, rbase, iov_len)
             b += tmp
             off_r += 2 * self._ptr_sz
@@ -887,7 +943,8 @@ class SyscallHooks:
         for j in range(0, liovcnt):
             lbase = memory_helpers.read_ptr_sz(mu, off_l, self._ptr_sz)
             liov_len = memory_helpers.read_ptr_sz(
-                mu, off_l + self._ptr_sz, self._ptr_sz)
+                mu, off_l + self._ptr_sz, self._ptr_sz
+            )
             tmp = b[has_read:liov_len]
             mu.mem_write(lbase, tmp)
             has_read += len(tmp)
@@ -901,21 +958,23 @@ class SyscallHooks:
         return 0
 
     def _ARM_set_tls(self, mu, tls_ptr):
-        assert self._emu.get_arch(
-        ) == emu_const.Arch.ARM32, "error only arm32 has _ARM_set_tls syscall"
+        assert (
+            self._emu.get_arch() == emu_const.Arch.ARM32
+        ), "error only arm32 has _ARM_set_tls syscall"
         self._emu.mu.reg_write(UC_ARM_REG_C13_C0_3, tls_ptr)
 
     def _nanosleep(self, mu, req, rem):
-        '''
+        """
         int nanosleep(const struct timespec *req,struct timespec *rem);
         struct timespec{
               time_t  tv_sec;         /* seconds */
               long    tv_nsec;        /* nanoseconds */
         };
-        '''
+        """
         req_tv_sec = memory_helpers.read_ptr_sz(mu, req, self._ptr_sz)
         req_tv_nsec = memory_helpers.read_ptr_sz(
-            mu, req + self._ptr_sz, self._ptr_sz)
+            mu, req + self._ptr_sz, self._ptr_sz
+        )
         ms = req_tv_sec * 1000 + req_tv_nsec / 1000000
         logger.debug("nanosleep sleep %.3f ms" % ms)
         sch = self._emu.get_schduler()

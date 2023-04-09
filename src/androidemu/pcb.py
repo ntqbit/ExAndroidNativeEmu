@@ -11,11 +11,14 @@ class Pcb:
     def __init__(self):
         self._fds = {}
         self._fds[sys.stdin.fileno()] = VirtualFile(
-            'stdin', sys.stdin.fileno())
+            "stdin", sys.stdin.fileno()
+        )
         self._fds[sys.stdout.fileno()] = VirtualFile(
-            'stdout', sys.stdout.fileno())
+            "stdout", sys.stdout.fileno()
+        )
         self._fds[sys.stderr.fileno()] = VirtualFile(
-            'stderr', sys.stderr.fileno())
+            "stderr", sys.stderr.fileno()
+        )
 
     def get_pid(self):
         return os.getpid()

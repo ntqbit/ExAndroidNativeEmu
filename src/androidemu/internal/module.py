@@ -11,13 +11,8 @@ class Module:
     """
 
     def __init__(
-            self,
-            filename,
-            address,
-            size,
-            symbols_resolved,
-            init_array,
-            soinfo_ptr):
+        self, filename, address, size, symbols_resolved, init_array, soinfo_ptr
+    ):
         self.filename = filename
         self.base = address
         self.size = size
@@ -49,6 +44,7 @@ class Module:
         for fun_ptr in self.init_array:
             fun_addr = fun_ptr
             logger.debug(
-                "Calling Init_array %s function: 0x%08X " %
-                (self.filename, fun_addr))
+                "Calling Init_array %s function: 0x%08X "
+                % (self.filename, fun_addr)
+            )
             emu.call_native(fun_addr)

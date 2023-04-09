@@ -4,12 +4,7 @@ JNI_FUNCTIONS = [
         "ret": "jint",
         "name": "GetVersion",
         "va": False,
-        "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            }
-        ]
+        "args": [{"name": "env", "type": "JNIEnv*"}],
     },
     {
         "id": 5,
@@ -17,27 +12,12 @@ JNI_FUNCTIONS = [
         "name": "DefineClass",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "name",
-                "type": "char*"
-            },
-            {
-                "name": "loader",
-                "type": "jobject"
-            },
-            {
-                "name": "buf",
-                "type": "jbyte*"
-            },
-            {
-                "name": "len",
-                "type": "jsize"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "name", "type": "char*"},
+            {"name": "loader", "type": "jobject"},
+            {"name": "buf", "type": "jbyte*"},
+            {"name": "len", "type": "jsize"},
+        ],
     },
     {
         "id": 6,
@@ -45,15 +25,9 @@ JNI_FUNCTIONS = [
         "name": "FindClass",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "name",
-                "type": "char*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "name", "type": "char*"},
+        ],
     },
     {
         "id": 7,
@@ -61,15 +35,9 @@ JNI_FUNCTIONS = [
         "name": "FromReflectedMethod",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "method",
-                "type": "jobject"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "method", "type": "jobject"},
+        ],
     },
     {
         "id": 8,
@@ -77,15 +45,9 @@ JNI_FUNCTIONS = [
         "name": "FromReflectedField",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "field",
-                "type": "jobject"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "field", "type": "jobject"},
+        ],
     },
     {
         "id": 9,
@@ -93,23 +55,11 @@ JNI_FUNCTIONS = [
         "name": "ToReflectedMethod",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "cls",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "isStatic",
-                "type": "jboolean"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "cls", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "isStatic", "type": "jboolean"},
+        ],
     },
     {
         "id": 10,
@@ -117,15 +67,9 @@ JNI_FUNCTIONS = [
         "name": "GetSuperclass",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "sub",
-                "type": "jclass"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "sub", "type": "jclass"},
+        ],
     },
     {
         "id": 11,
@@ -133,19 +77,10 @@ JNI_FUNCTIONS = [
         "name": "IsAssignableFrom",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "sub",
-                "type": "jclass"
-            },
-            {
-                "name": "sup",
-                "type": "jclass"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "sub", "type": "jclass"},
+            {"name": "sup", "type": "jclass"},
+        ],
     },
     {
         "id": 12,
@@ -153,23 +88,11 @@ JNI_FUNCTIONS = [
         "name": "ToReflectedField",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "cls",
-                "type": "jclass"
-            },
-            {
-                "name": "fieldID",
-                "type": "jfieldID"
-            },
-            {
-                "name": "isStatic",
-                "type": "jboolean"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "cls", "type": "jclass"},
+            {"name": "fieldID", "type": "jfieldID"},
+            {"name": "isStatic", "type": "jboolean"},
+        ],
     },
     {
         "id": 13,
@@ -177,15 +100,9 @@ JNI_FUNCTIONS = [
         "name": "Throw",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jthrowable"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jthrowable"},
+        ],
     },
     {
         "id": 14,
@@ -193,55 +110,31 @@ JNI_FUNCTIONS = [
         "name": "ThrowNew",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "msg",
-                "type": "char*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "msg", "type": "char*"},
+        ],
     },
     {
         "id": 15,
         "ret": "jthrowable",
         "name": "ExceptionOccurred",
         "va": False,
-        "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            }
-        ]
+        "args": [{"name": "env", "type": "JNIEnv*"}],
     },
     {
         "id": 16,
         "ret": "void",
         "name": "ExceptionDescribe",
         "va": False,
-        "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            }
-        ]
+        "args": [{"name": "env", "type": "JNIEnv*"}],
     },
     {
         "id": 17,
         "ret": "void",
         "name": "ExceptionClear",
         "va": False,
-        "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            }
-        ]
+        "args": [{"name": "env", "type": "JNIEnv*"}],
     },
     {
         "id": 18,
@@ -249,15 +142,9 @@ JNI_FUNCTIONS = [
         "name": "FatalError",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "msg",
-                "type": "char*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "msg", "type": "char*"},
+        ],
     },
     {
         "id": 19,
@@ -265,15 +152,9 @@ JNI_FUNCTIONS = [
         "name": "PushLocalFrame",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "capacity",
-                "type": "jint"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "capacity", "type": "jint"},
+        ],
     },
     {
         "id": 20,
@@ -281,15 +162,9 @@ JNI_FUNCTIONS = [
         "name": "PopLocalFrame",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "result",
-                "type": "jobject"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "result", "type": "jobject"},
+        ],
     },
     {
         "id": 21,
@@ -297,15 +172,9 @@ JNI_FUNCTIONS = [
         "name": "NewGlobalRef",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "lobj",
-                "type": "jobject"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "lobj", "type": "jobject"},
+        ],
     },
     {
         "id": 22,
@@ -313,15 +182,9 @@ JNI_FUNCTIONS = [
         "name": "DeleteGlobalRef",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "gref",
-                "type": "jobject"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "gref", "type": "jobject"},
+        ],
     },
     {
         "id": 23,
@@ -329,15 +192,9 @@ JNI_FUNCTIONS = [
         "name": "DeleteLocalRef",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+        ],
     },
     {
         "id": 24,
@@ -345,19 +202,10 @@ JNI_FUNCTIONS = [
         "name": "IsSameObject",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj1",
-                "type": "jobject"
-            },
-            {
-                "name": "obj2",
-                "type": "jobject"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj1", "type": "jobject"},
+            {"name": "obj2", "type": "jobject"},
+        ],
     },
     {
         "id": 25,
@@ -365,15 +213,9 @@ JNI_FUNCTIONS = [
         "name": "NewLocalRef",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "ref",
-                "type": "jobject"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "ref", "type": "jobject"},
+        ],
     },
     {
         "id": 26,
@@ -381,15 +223,9 @@ JNI_FUNCTIONS = [
         "name": "EnsureLocalCapacity",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "capacity",
-                "type": "jint"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "capacity", "type": "jint"},
+        ],
     },
     {
         "id": 27,
@@ -397,15 +233,9 @@ JNI_FUNCTIONS = [
         "name": "AllocObject",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+        ],
     },
     {
         "id": 28,
@@ -413,19 +243,10 @@ JNI_FUNCTIONS = [
         "name": "NewObject",
         "va": True,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+        ],
     },
     {
         "id": 29,
@@ -433,23 +254,11 @@ JNI_FUNCTIONS = [
         "name": "NewObjectV",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "va_list"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "va_list"},
+        ],
     },
     {
         "id": 30,
@@ -457,23 +266,11 @@ JNI_FUNCTIONS = [
         "name": "NewObjectA",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "jvalue*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "jvalue*"},
+        ],
     },
     {
         "id": 31,
@@ -481,15 +278,9 @@ JNI_FUNCTIONS = [
         "name": "GetObjectClass",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+        ],
     },
     {
         "id": 32,
@@ -497,19 +288,10 @@ JNI_FUNCTIONS = [
         "name": "IsInstanceOf",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "clazz", "type": "jclass"},
+        ],
     },
     {
         "id": 33,
@@ -517,23 +299,11 @@ JNI_FUNCTIONS = [
         "name": "GetMethodID",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "name",
-                "type": "char*"
-            },
-            {
-                "name": "sig",
-                "type": "char*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "name", "type": "char*"},
+            {"name": "sig", "type": "char*"},
+        ],
     },
     {
         "id": 34,
@@ -541,19 +311,10 @@ JNI_FUNCTIONS = [
         "name": "CallObjectMethod",
         "va": True,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "methodID", "type": "jmethodID"},
+        ],
     },
     {
         "id": 35,
@@ -561,23 +322,11 @@ JNI_FUNCTIONS = [
         "name": "CallObjectMethodV",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "va_list"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "va_list"},
+        ],
     },
     {
         "id": 36,
@@ -585,23 +334,11 @@ JNI_FUNCTIONS = [
         "name": "CallObjectMethodA",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "jvalue*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "jvalue*"},
+        ],
     },
     {
         "id": 37,
@@ -609,19 +346,10 @@ JNI_FUNCTIONS = [
         "name": "CallBooleanMethod",
         "va": True,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "methodID", "type": "jmethodID"},
+        ],
     },
     {
         "id": 38,
@@ -629,23 +357,11 @@ JNI_FUNCTIONS = [
         "name": "CallBooleanMethodV",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "va_list"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "va_list"},
+        ],
     },
     {
         "id": 39,
@@ -653,23 +369,11 @@ JNI_FUNCTIONS = [
         "name": "CallBooleanMethodA",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "jvalue*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "jvalue*"},
+        ],
     },
     {
         "id": 40,
@@ -677,19 +381,10 @@ JNI_FUNCTIONS = [
         "name": "CallByteMethod",
         "va": True,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "methodID", "type": "jmethodID"},
+        ],
     },
     {
         "id": 41,
@@ -697,23 +392,11 @@ JNI_FUNCTIONS = [
         "name": "CallByteMethodV",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "va_list"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "va_list"},
+        ],
     },
     {
         "id": 42,
@@ -721,23 +404,11 @@ JNI_FUNCTIONS = [
         "name": "CallByteMethodA",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "jvalue*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "jvalue*"},
+        ],
     },
     {
         "id": 43,
@@ -745,19 +416,10 @@ JNI_FUNCTIONS = [
         "name": "CallCharMethod",
         "va": True,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "methodID", "type": "jmethodID"},
+        ],
     },
     {
         "id": 44,
@@ -765,23 +427,11 @@ JNI_FUNCTIONS = [
         "name": "CallCharMethodV",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "va_list"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "va_list"},
+        ],
     },
     {
         "id": 45,
@@ -789,23 +439,11 @@ JNI_FUNCTIONS = [
         "name": "CallCharMethodA",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "jvalue*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "jvalue*"},
+        ],
     },
     {
         "id": 46,
@@ -813,19 +451,10 @@ JNI_FUNCTIONS = [
         "name": "CallShortMethod",
         "va": True,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "methodID", "type": "jmethodID"},
+        ],
     },
     {
         "id": 47,
@@ -833,23 +462,11 @@ JNI_FUNCTIONS = [
         "name": "CallShortMethodV",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "va_list"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "va_list"},
+        ],
     },
     {
         "id": 48,
@@ -857,23 +474,11 @@ JNI_FUNCTIONS = [
         "name": "CallShortMethodA",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "jvalue*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "jvalue*"},
+        ],
     },
     {
         "id": 49,
@@ -881,19 +486,10 @@ JNI_FUNCTIONS = [
         "name": "CallIntMethod",
         "va": True,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "methodID", "type": "jmethodID"},
+        ],
     },
     {
         "id": 50,
@@ -901,23 +497,11 @@ JNI_FUNCTIONS = [
         "name": "CallIntMethodV",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "va_list"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "va_list"},
+        ],
     },
     {
         "id": 51,
@@ -925,23 +509,11 @@ JNI_FUNCTIONS = [
         "name": "CallIntMethodA",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "jvalue*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "jvalue*"},
+        ],
     },
     {
         "id": 52,
@@ -949,19 +521,10 @@ JNI_FUNCTIONS = [
         "name": "CallLongMethod",
         "va": True,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "methodID", "type": "jmethodID"},
+        ],
     },
     {
         "id": 53,
@@ -969,23 +532,11 @@ JNI_FUNCTIONS = [
         "name": "CallLongMethodV",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "va_list"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "va_list"},
+        ],
     },
     {
         "id": 54,
@@ -993,23 +544,11 @@ JNI_FUNCTIONS = [
         "name": "CallLongMethodA",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "jvalue*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "jvalue*"},
+        ],
     },
     {
         "id": 55,
@@ -1017,19 +556,10 @@ JNI_FUNCTIONS = [
         "name": "CallFloatMethod",
         "va": True,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "methodID", "type": "jmethodID"},
+        ],
     },
     {
         "id": 56,
@@ -1037,23 +567,11 @@ JNI_FUNCTIONS = [
         "name": "CallFloatMethodV",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "va_list"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "va_list"},
+        ],
     },
     {
         "id": 57,
@@ -1061,23 +579,11 @@ JNI_FUNCTIONS = [
         "name": "CallFloatMethodA",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "jvalue*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "jvalue*"},
+        ],
     },
     {
         "id": 58,
@@ -1085,19 +591,10 @@ JNI_FUNCTIONS = [
         "name": "CallDoubleMethod",
         "va": True,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "methodID", "type": "jmethodID"},
+        ],
     },
     {
         "id": 59,
@@ -1105,23 +602,11 @@ JNI_FUNCTIONS = [
         "name": "CallDoubleMethodV",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "va_list"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "va_list"},
+        ],
     },
     {
         "id": 60,
@@ -1129,23 +614,11 @@ JNI_FUNCTIONS = [
         "name": "CallDoubleMethodA",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "jvalue*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "jvalue*"},
+        ],
     },
     {
         "id": 61,
@@ -1153,19 +626,10 @@ JNI_FUNCTIONS = [
         "name": "CallVoidMethod",
         "va": True,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "methodID", "type": "jmethodID"},
+        ],
     },
     {
         "id": 62,
@@ -1173,23 +637,11 @@ JNI_FUNCTIONS = [
         "name": "CallVoidMethodV",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "va_list"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "va_list"},
+        ],
     },
     {
         "id": 63,
@@ -1197,23 +649,11 @@ JNI_FUNCTIONS = [
         "name": "CallVoidMethodA",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "jvalue*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "jvalue*"},
+        ],
     },
     {
         "id": 64,
@@ -1221,23 +661,11 @@ JNI_FUNCTIONS = [
         "name": "CallNonvirtualObjectMethod",
         "va": True,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+        ],
     },
     {
         "id": 65,
@@ -1245,27 +673,12 @@ JNI_FUNCTIONS = [
         "name": "CallNonvirtualObjectMethodV",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "va_list"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "va_list"},
+        ],
     },
     {
         "id": 66,
@@ -1273,27 +686,12 @@ JNI_FUNCTIONS = [
         "name": "CallNonvirtualObjectMethodA",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "jvalue*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "jvalue*"},
+        ],
     },
     {
         "id": 67,
@@ -1301,23 +699,11 @@ JNI_FUNCTIONS = [
         "name": "CallNonvirtualBooleanMethod",
         "va": True,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+        ],
     },
     {
         "id": 68,
@@ -1325,27 +711,12 @@ JNI_FUNCTIONS = [
         "name": "CallNonvirtualBooleanMethodV",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "va_list"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "va_list"},
+        ],
     },
     {
         "id": 69,
@@ -1353,27 +724,12 @@ JNI_FUNCTIONS = [
         "name": "CallNonvirtualBooleanMethodA",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "jvalue*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "jvalue*"},
+        ],
     },
     {
         "id": 70,
@@ -1381,23 +737,11 @@ JNI_FUNCTIONS = [
         "name": "CallNonvirtualByteMethod",
         "va": True,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+        ],
     },
     {
         "id": 71,
@@ -1405,27 +749,12 @@ JNI_FUNCTIONS = [
         "name": "CallNonvirtualByteMethodV",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "va_list"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "va_list"},
+        ],
     },
     {
         "id": 72,
@@ -1433,27 +762,12 @@ JNI_FUNCTIONS = [
         "name": "CallNonvirtualByteMethodA",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "jvalue*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "jvalue*"},
+        ],
     },
     {
         "id": 73,
@@ -1461,23 +775,11 @@ JNI_FUNCTIONS = [
         "name": "CallNonvirtualCharMethod",
         "va": True,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+        ],
     },
     {
         "id": 74,
@@ -1485,27 +787,12 @@ JNI_FUNCTIONS = [
         "name": "CallNonvirtualCharMethodV",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "va_list"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "va_list"},
+        ],
     },
     {
         "id": 75,
@@ -1513,27 +800,12 @@ JNI_FUNCTIONS = [
         "name": "CallNonvirtualCharMethodA",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "jvalue*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "jvalue*"},
+        ],
     },
     {
         "id": 76,
@@ -1541,23 +813,11 @@ JNI_FUNCTIONS = [
         "name": "CallNonvirtualShortMethod",
         "va": True,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+        ],
     },
     {
         "id": 77,
@@ -1565,27 +825,12 @@ JNI_FUNCTIONS = [
         "name": "CallNonvirtualShortMethodV",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "va_list"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "va_list"},
+        ],
     },
     {
         "id": 78,
@@ -1593,27 +838,12 @@ JNI_FUNCTIONS = [
         "name": "CallNonvirtualShortMethodA",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "jvalue*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "jvalue*"},
+        ],
     },
     {
         "id": 79,
@@ -1621,23 +851,11 @@ JNI_FUNCTIONS = [
         "name": "CallNonvirtualIntMethod",
         "va": True,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+        ],
     },
     {
         "id": 80,
@@ -1645,27 +863,12 @@ JNI_FUNCTIONS = [
         "name": "CallNonvirtualIntMethodV",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "va_list"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "va_list"},
+        ],
     },
     {
         "id": 81,
@@ -1673,27 +876,12 @@ JNI_FUNCTIONS = [
         "name": "CallNonvirtualIntMethodA",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "jvalue*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "jvalue*"},
+        ],
     },
     {
         "id": 82,
@@ -1701,23 +889,11 @@ JNI_FUNCTIONS = [
         "name": "CallNonvirtualLongMethod",
         "va": True,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+        ],
     },
     {
         "id": 83,
@@ -1725,27 +901,12 @@ JNI_FUNCTIONS = [
         "name": "CallNonvirtualLongMethodV",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "va_list"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "va_list"},
+        ],
     },
     {
         "id": 84,
@@ -1753,27 +914,12 @@ JNI_FUNCTIONS = [
         "name": "CallNonvirtualLongMethodA",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "jvalue*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "jvalue*"},
+        ],
     },
     {
         "id": 85,
@@ -1781,23 +927,11 @@ JNI_FUNCTIONS = [
         "name": "CallNonvirtualFloatMethod",
         "va": True,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+        ],
     },
     {
         "id": 86,
@@ -1805,27 +939,12 @@ JNI_FUNCTIONS = [
         "name": "CallNonvirtualFloatMethodV",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "va_list"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "va_list"},
+        ],
     },
     {
         "id": 87,
@@ -1833,27 +952,12 @@ JNI_FUNCTIONS = [
         "name": "CallNonvirtualFloatMethodA",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "jvalue*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "jvalue*"},
+        ],
     },
     {
         "id": 88,
@@ -1861,23 +965,11 @@ JNI_FUNCTIONS = [
         "name": "CallNonvirtualDoubleMethod",
         "va": True,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+        ],
     },
     {
         "id": 89,
@@ -1885,27 +977,12 @@ JNI_FUNCTIONS = [
         "name": "CallNonvirtualDoubleMethodV",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "va_list"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "va_list"},
+        ],
     },
     {
         "id": 90,
@@ -1913,27 +990,12 @@ JNI_FUNCTIONS = [
         "name": "CallNonvirtualDoubleMethodA",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "jvalue*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "jvalue*"},
+        ],
     },
     {
         "id": 91,
@@ -1941,23 +1003,11 @@ JNI_FUNCTIONS = [
         "name": "CallNonvirtualVoidMethod",
         "va": True,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+        ],
     },
     {
         "id": 92,
@@ -1965,27 +1015,12 @@ JNI_FUNCTIONS = [
         "name": "CallNonvirtualVoidMethodV",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "va_list"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "va_list"},
+        ],
     },
     {
         "id": 93,
@@ -1993,27 +1028,12 @@ JNI_FUNCTIONS = [
         "name": "CallNonvirtualVoidMethodA",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "jvalue*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "jvalue*"},
+        ],
     },
     {
         "id": 94,
@@ -2021,23 +1041,11 @@ JNI_FUNCTIONS = [
         "name": "GetFieldID",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "name",
-                "type": "char*"
-            },
-            {
-                "name": "sig",
-                "type": "char*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "name", "type": "char*"},
+            {"name": "sig", "type": "char*"},
+        ],
     },
     {
         "id": 95,
@@ -2045,19 +1053,10 @@ JNI_FUNCTIONS = [
         "name": "GetObjectField",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "fieldID",
-                "type": "jfieldID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "fieldID", "type": "jfieldID"},
+        ],
     },
     {
         "id": 96,
@@ -2065,19 +1064,10 @@ JNI_FUNCTIONS = [
         "name": "GetBooleanField",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "fieldID",
-                "type": "jfieldID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "fieldID", "type": "jfieldID"},
+        ],
     },
     {
         "id": 97,
@@ -2085,19 +1075,10 @@ JNI_FUNCTIONS = [
         "name": "GetByteField",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "fieldID",
-                "type": "jfieldID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "fieldID", "type": "jfieldID"},
+        ],
     },
     {
         "id": 98,
@@ -2105,19 +1086,10 @@ JNI_FUNCTIONS = [
         "name": "GetCharField",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "fieldID",
-                "type": "jfieldID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "fieldID", "type": "jfieldID"},
+        ],
     },
     {
         "id": 99,
@@ -2125,19 +1097,10 @@ JNI_FUNCTIONS = [
         "name": "GetShortField",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "fieldID",
-                "type": "jfieldID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "fieldID", "type": "jfieldID"},
+        ],
     },
     {
         "id": 100,
@@ -2145,19 +1108,10 @@ JNI_FUNCTIONS = [
         "name": "GetIntField",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "fieldID",
-                "type": "jfieldID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "fieldID", "type": "jfieldID"},
+        ],
     },
     {
         "id": 101,
@@ -2165,19 +1119,10 @@ JNI_FUNCTIONS = [
         "name": "GetLongField",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "fieldID",
-                "type": "jfieldID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "fieldID", "type": "jfieldID"},
+        ],
     },
     {
         "id": 102,
@@ -2185,19 +1130,10 @@ JNI_FUNCTIONS = [
         "name": "GetFloatField",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "fieldID",
-                "type": "jfieldID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "fieldID", "type": "jfieldID"},
+        ],
     },
     {
         "id": 103,
@@ -2205,19 +1141,10 @@ JNI_FUNCTIONS = [
         "name": "GetDoubleField",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "fieldID",
-                "type": "jfieldID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "fieldID", "type": "jfieldID"},
+        ],
     },
     {
         "id": 104,
@@ -2225,23 +1152,11 @@ JNI_FUNCTIONS = [
         "name": "SetObjectField",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "fieldID",
-                "type": "jfieldID"
-            },
-            {
-                "name": "val",
-                "type": "jobject"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "fieldID", "type": "jfieldID"},
+            {"name": "val", "type": "jobject"},
+        ],
     },
     {
         "id": 105,
@@ -2249,23 +1164,11 @@ JNI_FUNCTIONS = [
         "name": "SetBooleanField",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "fieldID",
-                "type": "jfieldID"
-            },
-            {
-                "name": "val",
-                "type": "jboolean"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "fieldID", "type": "jfieldID"},
+            {"name": "val", "type": "jboolean"},
+        ],
     },
     {
         "id": 106,
@@ -2273,23 +1176,11 @@ JNI_FUNCTIONS = [
         "name": "SetByteField",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "fieldID",
-                "type": "jfieldID"
-            },
-            {
-                "name": "val",
-                "type": "jbyte"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "fieldID", "type": "jfieldID"},
+            {"name": "val", "type": "jbyte"},
+        ],
     },
     {
         "id": 107,
@@ -2297,23 +1188,11 @@ JNI_FUNCTIONS = [
         "name": "SetCharField",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "fieldID",
-                "type": "jfieldID"
-            },
-            {
-                "name": "val",
-                "type": "jchar"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "fieldID", "type": "jfieldID"},
+            {"name": "val", "type": "jchar"},
+        ],
     },
     {
         "id": 108,
@@ -2321,23 +1200,11 @@ JNI_FUNCTIONS = [
         "name": "SetShortField",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "fieldID",
-                "type": "jfieldID"
-            },
-            {
-                "name": "val",
-                "type": "jshort"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "fieldID", "type": "jfieldID"},
+            {"name": "val", "type": "jshort"},
+        ],
     },
     {
         "id": 109,
@@ -2345,23 +1212,11 @@ JNI_FUNCTIONS = [
         "name": "SetIntField",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "fieldID",
-                "type": "jfieldID"
-            },
-            {
-                "name": "val",
-                "type": "jint"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "fieldID", "type": "jfieldID"},
+            {"name": "val", "type": "jint"},
+        ],
     },
     {
         "id": 110,
@@ -2369,23 +1224,11 @@ JNI_FUNCTIONS = [
         "name": "SetLongField",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "fieldID",
-                "type": "jfieldID"
-            },
-            {
-                "name": "val",
-                "type": "jlong"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "fieldID", "type": "jfieldID"},
+            {"name": "val", "type": "jlong"},
+        ],
     },
     {
         "id": 111,
@@ -2393,23 +1236,11 @@ JNI_FUNCTIONS = [
         "name": "SetFloatField",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "fieldID",
-                "type": "jfieldID"
-            },
-            {
-                "name": "val",
-                "type": "jfloat"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "fieldID", "type": "jfieldID"},
+            {"name": "val", "type": "jfloat"},
+        ],
     },
     {
         "id": 112,
@@ -2417,23 +1248,11 @@ JNI_FUNCTIONS = [
         "name": "SetDoubleField",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            },
-            {
-                "name": "fieldID",
-                "type": "jfieldID"
-            },
-            {
-                "name": "val",
-                "type": "jdouble"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+            {"name": "fieldID", "type": "jfieldID"},
+            {"name": "val", "type": "jdouble"},
+        ],
     },
     {
         "id": 113,
@@ -2441,23 +1260,11 @@ JNI_FUNCTIONS = [
         "name": "GetStaticMethodID",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "name",
-                "type": "char*"
-            },
-            {
-                "name": "sig",
-                "type": "char*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "name", "type": "char*"},
+            {"name": "sig", "type": "char*"},
+        ],
     },
     {
         "id": 114,
@@ -2465,19 +1272,10 @@ JNI_FUNCTIONS = [
         "name": "CallStaticObjectMethod",
         "va": True,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+        ],
     },
     {
         "id": 115,
@@ -2485,23 +1283,11 @@ JNI_FUNCTIONS = [
         "name": "CallStaticObjectMethodV",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "va_list"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "va_list"},
+        ],
     },
     {
         "id": 116,
@@ -2509,23 +1295,11 @@ JNI_FUNCTIONS = [
         "name": "CallStaticObjectMethodA",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "jvalue*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "jvalue*"},
+        ],
     },
     {
         "id": 117,
@@ -2533,19 +1307,10 @@ JNI_FUNCTIONS = [
         "name": "CallStaticBooleanMethod",
         "va": True,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+        ],
     },
     {
         "id": 118,
@@ -2553,23 +1318,11 @@ JNI_FUNCTIONS = [
         "name": "CallStaticBooleanMethodV",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "va_list"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "va_list"},
+        ],
     },
     {
         "id": 119,
@@ -2577,23 +1330,11 @@ JNI_FUNCTIONS = [
         "name": "CallStaticBooleanMethodA",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "jvalue*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "jvalue*"},
+        ],
     },
     {
         "id": 120,
@@ -2601,19 +1342,10 @@ JNI_FUNCTIONS = [
         "name": "CallStaticByteMethod",
         "va": True,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+        ],
     },
     {
         "id": 121,
@@ -2621,23 +1353,11 @@ JNI_FUNCTIONS = [
         "name": "CallStaticByteMethodV",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "va_list"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "va_list"},
+        ],
     },
     {
         "id": 122,
@@ -2645,23 +1365,11 @@ JNI_FUNCTIONS = [
         "name": "CallStaticByteMethodA",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "jvalue*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "jvalue*"},
+        ],
     },
     {
         "id": 123,
@@ -2669,19 +1377,10 @@ JNI_FUNCTIONS = [
         "name": "CallStaticCharMethod",
         "va": True,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+        ],
     },
     {
         "id": 124,
@@ -2689,23 +1388,11 @@ JNI_FUNCTIONS = [
         "name": "CallStaticCharMethodV",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "va_list"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "va_list"},
+        ],
     },
     {
         "id": 125,
@@ -2713,23 +1400,11 @@ JNI_FUNCTIONS = [
         "name": "CallStaticCharMethodA",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "jvalue*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "jvalue*"},
+        ],
     },
     {
         "id": 126,
@@ -2737,19 +1412,10 @@ JNI_FUNCTIONS = [
         "name": "CallStaticShortMethod",
         "va": True,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+        ],
     },
     {
         "id": 127,
@@ -2757,23 +1423,11 @@ JNI_FUNCTIONS = [
         "name": "CallStaticShortMethodV",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "va_list"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "va_list"},
+        ],
     },
     {
         "id": 128,
@@ -2781,23 +1435,11 @@ JNI_FUNCTIONS = [
         "name": "CallStaticShortMethodA",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "jvalue*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "jvalue*"},
+        ],
     },
     {
         "id": 129,
@@ -2805,19 +1447,10 @@ JNI_FUNCTIONS = [
         "name": "CallStaticIntMethod",
         "va": True,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+        ],
     },
     {
         "id": 130,
@@ -2825,23 +1458,11 @@ JNI_FUNCTIONS = [
         "name": "CallStaticIntMethodV",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "va_list"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "va_list"},
+        ],
     },
     {
         "id": 131,
@@ -2849,23 +1470,11 @@ JNI_FUNCTIONS = [
         "name": "CallStaticIntMethodA",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "jvalue*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "jvalue*"},
+        ],
     },
     {
         "id": 132,
@@ -2873,19 +1482,10 @@ JNI_FUNCTIONS = [
         "name": "CallStaticLongMethod",
         "va": True,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+        ],
     },
     {
         "id": 133,
@@ -2893,23 +1493,11 @@ JNI_FUNCTIONS = [
         "name": "CallStaticLongMethodV",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "va_list"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "va_list"},
+        ],
     },
     {
         "id": 134,
@@ -2917,23 +1505,11 @@ JNI_FUNCTIONS = [
         "name": "CallStaticLongMethodA",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "jvalue*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "jvalue*"},
+        ],
     },
     {
         "id": 135,
@@ -2941,19 +1517,10 @@ JNI_FUNCTIONS = [
         "name": "CallStaticFloatMethod",
         "va": True,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+        ],
     },
     {
         "id": 136,
@@ -2961,23 +1528,11 @@ JNI_FUNCTIONS = [
         "name": "CallStaticFloatMethodV",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "va_list"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "va_list"},
+        ],
     },
     {
         "id": 137,
@@ -2985,23 +1540,11 @@ JNI_FUNCTIONS = [
         "name": "CallStaticFloatMethodA",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "jvalue*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "jvalue*"},
+        ],
     },
     {
         "id": 138,
@@ -3009,19 +1552,10 @@ JNI_FUNCTIONS = [
         "name": "CallStaticDoubleMethod",
         "va": True,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+        ],
     },
     {
         "id": 139,
@@ -3029,23 +1563,11 @@ JNI_FUNCTIONS = [
         "name": "CallStaticDoubleMethodV",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "va_list"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "va_list"},
+        ],
     },
     {
         "id": 140,
@@ -3053,23 +1575,11 @@ JNI_FUNCTIONS = [
         "name": "CallStaticDoubleMethodA",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "jvalue*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "jvalue*"},
+        ],
     },
     {
         "id": 141,
@@ -3077,19 +1587,10 @@ JNI_FUNCTIONS = [
         "name": "CallStaticVoidMethod",
         "va": True,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "cls",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "cls", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+        ],
     },
     {
         "id": 142,
@@ -3097,23 +1598,11 @@ JNI_FUNCTIONS = [
         "name": "CallStaticVoidMethodV",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "cls",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "va_list"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "cls", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "va_list"},
+        ],
     },
     {
         "id": 143,
@@ -3121,23 +1610,11 @@ JNI_FUNCTIONS = [
         "name": "CallStaticVoidMethodA",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "cls",
-                "type": "jclass"
-            },
-            {
-                "name": "methodID",
-                "type": "jmethodID"
-            },
-            {
-                "name": "args",
-                "type": "jvalue*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "cls", "type": "jclass"},
+            {"name": "methodID", "type": "jmethodID"},
+            {"name": "args", "type": "jvalue*"},
+        ],
     },
     {
         "id": 144,
@@ -3145,23 +1622,11 @@ JNI_FUNCTIONS = [
         "name": "GetStaticFieldID",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "name",
-                "type": "char*"
-            },
-            {
-                "name": "sig",
-                "type": "char*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "name", "type": "char*"},
+            {"name": "sig", "type": "char*"},
+        ],
     },
     {
         "id": 145,
@@ -3169,19 +1634,10 @@ JNI_FUNCTIONS = [
         "name": "GetStaticObjectField",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "fieldID",
-                "type": "jfieldID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "fieldID", "type": "jfieldID"},
+        ],
     },
     {
         "id": 146,
@@ -3189,19 +1645,10 @@ JNI_FUNCTIONS = [
         "name": "GetStaticBooleanField",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "fieldID",
-                "type": "jfieldID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "fieldID", "type": "jfieldID"},
+        ],
     },
     {
         "id": 147,
@@ -3209,19 +1656,10 @@ JNI_FUNCTIONS = [
         "name": "GetStaticByteField",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "fieldID",
-                "type": "jfieldID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "fieldID", "type": "jfieldID"},
+        ],
     },
     {
         "id": 148,
@@ -3229,19 +1667,10 @@ JNI_FUNCTIONS = [
         "name": "GetStaticCharField",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "fieldID",
-                "type": "jfieldID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "fieldID", "type": "jfieldID"},
+        ],
     },
     {
         "id": 149,
@@ -3249,19 +1678,10 @@ JNI_FUNCTIONS = [
         "name": "GetStaticShortField",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "fieldID",
-                "type": "jfieldID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "fieldID", "type": "jfieldID"},
+        ],
     },
     {
         "id": 150,
@@ -3269,19 +1689,10 @@ JNI_FUNCTIONS = [
         "name": "GetStaticIntField",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "fieldID",
-                "type": "jfieldID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "fieldID", "type": "jfieldID"},
+        ],
     },
     {
         "id": 151,
@@ -3289,19 +1700,10 @@ JNI_FUNCTIONS = [
         "name": "GetStaticLongField",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "fieldID",
-                "type": "jfieldID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "fieldID", "type": "jfieldID"},
+        ],
     },
     {
         "id": 152,
@@ -3309,19 +1711,10 @@ JNI_FUNCTIONS = [
         "name": "GetStaticFloatField",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "fieldID",
-                "type": "jfieldID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "fieldID", "type": "jfieldID"},
+        ],
     },
     {
         "id": 153,
@@ -3329,19 +1722,10 @@ JNI_FUNCTIONS = [
         "name": "GetStaticDoubleField",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "fieldID",
-                "type": "jfieldID"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "fieldID", "type": "jfieldID"},
+        ],
     },
     {
         "id": 154,
@@ -3349,23 +1733,11 @@ JNI_FUNCTIONS = [
         "name": "SetStaticObjectField",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "fieldID",
-                "type": "jfieldID"
-            },
-            {
-                "name": "value",
-                "type": "jobject"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "fieldID", "type": "jfieldID"},
+            {"name": "value", "type": "jobject"},
+        ],
     },
     {
         "id": 155,
@@ -3373,23 +1745,11 @@ JNI_FUNCTIONS = [
         "name": "SetStaticBooleanField",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "fieldID",
-                "type": "jfieldID"
-            },
-            {
-                "name": "value",
-                "type": "jboolean"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "fieldID", "type": "jfieldID"},
+            {"name": "value", "type": "jboolean"},
+        ],
     },
     {
         "id": 156,
@@ -3397,23 +1757,11 @@ JNI_FUNCTIONS = [
         "name": "SetStaticByteField",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "fieldID",
-                "type": "jfieldID"
-            },
-            {
-                "name": "value",
-                "type": "jbyte"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "fieldID", "type": "jfieldID"},
+            {"name": "value", "type": "jbyte"},
+        ],
     },
     {
         "id": 157,
@@ -3421,23 +1769,11 @@ JNI_FUNCTIONS = [
         "name": "SetStaticCharField",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "fieldID",
-                "type": "jfieldID"
-            },
-            {
-                "name": "value",
-                "type": "jchar"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "fieldID", "type": "jfieldID"},
+            {"name": "value", "type": "jchar"},
+        ],
     },
     {
         "id": 158,
@@ -3445,23 +1781,11 @@ JNI_FUNCTIONS = [
         "name": "SetStaticShortField",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "fieldID",
-                "type": "jfieldID"
-            },
-            {
-                "name": "value",
-                "type": "jshort"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "fieldID", "type": "jfieldID"},
+            {"name": "value", "type": "jshort"},
+        ],
     },
     {
         "id": 159,
@@ -3469,23 +1793,11 @@ JNI_FUNCTIONS = [
         "name": "SetStaticIntField",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "fieldID",
-                "type": "jfieldID"
-            },
-            {
-                "name": "value",
-                "type": "jint"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "fieldID", "type": "jfieldID"},
+            {"name": "value", "type": "jint"},
+        ],
     },
     {
         "id": 160,
@@ -3493,23 +1805,11 @@ JNI_FUNCTIONS = [
         "name": "SetStaticLongField",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "fieldID",
-                "type": "jfieldID"
-            },
-            {
-                "name": "value",
-                "type": "jlong"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "fieldID", "type": "jfieldID"},
+            {"name": "value", "type": "jlong"},
+        ],
     },
     {
         "id": 161,
@@ -3517,23 +1817,11 @@ JNI_FUNCTIONS = [
         "name": "SetStaticFloatField",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "fieldID",
-                "type": "jfieldID"
-            },
-            {
-                "name": "value",
-                "type": "jfloat"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "fieldID", "type": "jfieldID"},
+            {"name": "value", "type": "jfloat"},
+        ],
     },
     {
         "id": 162,
@@ -3541,23 +1829,11 @@ JNI_FUNCTIONS = [
         "name": "SetStaticDoubleField",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "fieldID",
-                "type": "jfieldID"
-            },
-            {
-                "name": "value",
-                "type": "jdouble"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "fieldID", "type": "jfieldID"},
+            {"name": "value", "type": "jdouble"},
+        ],
     },
     {
         "id": 163,
@@ -3565,19 +1841,10 @@ JNI_FUNCTIONS = [
         "name": "NewString",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "unicode",
-                "type": "jchar*"
-            },
-            {
-                "name": "len",
-                "type": "jsize"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "unicode", "type": "jchar*"},
+            {"name": "len", "type": "jsize"},
+        ],
     },
     {
         "id": 164,
@@ -3585,15 +1852,9 @@ JNI_FUNCTIONS = [
         "name": "GetStringLength",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "str",
-                "type": "jstring"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "str", "type": "jstring"},
+        ],
     },
     {
         "id": 165,
@@ -3601,19 +1862,10 @@ JNI_FUNCTIONS = [
         "name": "GetStringChars",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "str",
-                "type": "jstring"
-            },
-            {
-                "name": "isCopy",
-                "type": "jboolean*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "str", "type": "jstring"},
+            {"name": "isCopy", "type": "jboolean*"},
+        ],
     },
     {
         "id": 166,
@@ -3621,19 +1873,10 @@ JNI_FUNCTIONS = [
         "name": "ReleaseStringChars",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "str",
-                "type": "jstring"
-            },
-            {
-                "name": "chars",
-                "type": "jchar*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "str", "type": "jstring"},
+            {"name": "chars", "type": "jchar*"},
+        ],
     },
     {
         "id": 167,
@@ -3641,15 +1884,9 @@ JNI_FUNCTIONS = [
         "name": "NewStringUTF",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "utf",
-                "type": "char*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "utf", "type": "char*"},
+        ],
     },
     {
         "id": 168,
@@ -3657,15 +1894,9 @@ JNI_FUNCTIONS = [
         "name": "GetStringUTFLength",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "str",
-                "type": "jstring"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "str", "type": "jstring"},
+        ],
     },
     {
         "id": 169,
@@ -3673,19 +1904,10 @@ JNI_FUNCTIONS = [
         "name": "GetStringUTFChars",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "str",
-                "type": "jstring"
-            },
-            {
-                "name": "isCopy",
-                "type": "jboolean*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "str", "type": "jstring"},
+            {"name": "isCopy", "type": "jboolean*"},
+        ],
     },
     {
         "id": 170,
@@ -3693,19 +1915,10 @@ JNI_FUNCTIONS = [
         "name": "ReleaseStringUTFChars",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "str",
-                "type": "jstring"
-            },
-            {
-                "name": "chars",
-                "type": "char*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "str", "type": "jstring"},
+            {"name": "chars", "type": "char*"},
+        ],
     },
     {
         "id": 171,
@@ -3713,15 +1926,9 @@ JNI_FUNCTIONS = [
         "name": "GetArrayLength",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "array",
-                "type": "jarray"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "array", "type": "jarray"},
+        ],
     },
     {
         "id": 172,
@@ -3729,23 +1936,11 @@ JNI_FUNCTIONS = [
         "name": "NewObjectArray",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "len",
-                "type": "jsize"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "init",
-                "type": "jobject"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "len", "type": "jsize"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "init", "type": "jobject"},
+        ],
     },
     {
         "id": 173,
@@ -3753,19 +1948,10 @@ JNI_FUNCTIONS = [
         "name": "GetObjectArrayElement",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "array",
-                "type": "jobjectArray"
-            },
-            {
-                "name": "index",
-                "type": "jsize"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "array", "type": "jobjectArray"},
+            {"name": "index", "type": "jsize"},
+        ],
     },
     {
         "id": 174,
@@ -3773,23 +1959,11 @@ JNI_FUNCTIONS = [
         "name": "SetObjectArrayElement",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "array",
-                "type": "jobjectArray"
-            },
-            {
-                "name": "index",
-                "type": "jsize"
-            },
-            {
-                "name": "val",
-                "type": "jobject"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "array", "type": "jobjectArray"},
+            {"name": "index", "type": "jsize"},
+            {"name": "val", "type": "jobject"},
+        ],
     },
     {
         "id": 175,
@@ -3797,15 +1971,9 @@ JNI_FUNCTIONS = [
         "name": "NewBooleanArray",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "len",
-                "type": "jsize"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "len", "type": "jsize"},
+        ],
     },
     {
         "id": 176,
@@ -3813,15 +1981,9 @@ JNI_FUNCTIONS = [
         "name": "NewByteArray",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "len",
-                "type": "jsize"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "len", "type": "jsize"},
+        ],
     },
     {
         "id": 177,
@@ -3829,15 +1991,9 @@ JNI_FUNCTIONS = [
         "name": "NewCharArray",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "len",
-                "type": "jsize"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "len", "type": "jsize"},
+        ],
     },
     {
         "id": 178,
@@ -3845,15 +2001,9 @@ JNI_FUNCTIONS = [
         "name": "NewShortArray",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "len",
-                "type": "jsize"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "len", "type": "jsize"},
+        ],
     },
     {
         "id": 179,
@@ -3861,15 +2011,9 @@ JNI_FUNCTIONS = [
         "name": "NewIntArray",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "len",
-                "type": "jsize"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "len", "type": "jsize"},
+        ],
     },
     {
         "id": 180,
@@ -3877,15 +2021,9 @@ JNI_FUNCTIONS = [
         "name": "NewLongArray",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "len",
-                "type": "jsize"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "len", "type": "jsize"},
+        ],
     },
     {
         "id": 181,
@@ -3893,15 +2031,9 @@ JNI_FUNCTIONS = [
         "name": "NewFloatArray",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "len",
-                "type": "jsize"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "len", "type": "jsize"},
+        ],
     },
     {
         "id": 182,
@@ -3909,15 +2041,9 @@ JNI_FUNCTIONS = [
         "name": "NewDoubleArray",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "len",
-                "type": "jsize"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "len", "type": "jsize"},
+        ],
     },
     {
         "id": 183,
@@ -3925,19 +2051,10 @@ JNI_FUNCTIONS = [
         "name": "GetBooleanArrayElements",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "array",
-                "type": "jbooleanArray"
-            },
-            {
-                "name": "isCopy",
-                "type": "jboolean*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "array", "type": "jbooleanArray"},
+            {"name": "isCopy", "type": "jboolean*"},
+        ],
     },
     {
         "id": 184,
@@ -3945,19 +2062,10 @@ JNI_FUNCTIONS = [
         "name": "GetByteArrayElements",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "array",
-                "type": "jbyteArray"
-            },
-            {
-                "name": "isCopy",
-                "type": "jboolean*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "array", "type": "jbyteArray"},
+            {"name": "isCopy", "type": "jboolean*"},
+        ],
     },
     {
         "id": 185,
@@ -3965,19 +2073,10 @@ JNI_FUNCTIONS = [
         "name": "GetCharArrayElements",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "array",
-                "type": "jcharArray"
-            },
-            {
-                "name": "isCopy",
-                "type": "jboolean*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "array", "type": "jcharArray"},
+            {"name": "isCopy", "type": "jboolean*"},
+        ],
     },
     {
         "id": 186,
@@ -3985,19 +2084,10 @@ JNI_FUNCTIONS = [
         "name": "GetShortArrayElements",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "array",
-                "type": "jshortArray"
-            },
-            {
-                "name": "isCopy",
-                "type": "jboolean*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "array", "type": "jshortArray"},
+            {"name": "isCopy", "type": "jboolean*"},
+        ],
     },
     {
         "id": 187,
@@ -4005,19 +2095,10 @@ JNI_FUNCTIONS = [
         "name": "GetIntArrayElements",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "array",
-                "type": "jintArray"
-            },
-            {
-                "name": "isCopy",
-                "type": "jboolean*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "array", "type": "jintArray"},
+            {"name": "isCopy", "type": "jboolean*"},
+        ],
     },
     {
         "id": 188,
@@ -4025,19 +2106,10 @@ JNI_FUNCTIONS = [
         "name": "GetLongArrayElements",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "array",
-                "type": "jlongArray"
-            },
-            {
-                "name": "isCopy",
-                "type": "jboolean*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "array", "type": "jlongArray"},
+            {"name": "isCopy", "type": "jboolean*"},
+        ],
     },
     {
         "id": 189,
@@ -4045,19 +2117,10 @@ JNI_FUNCTIONS = [
         "name": "GetFloatArrayElements",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "array",
-                "type": "jfloatArray"
-            },
-            {
-                "name": "isCopy",
-                "type": "jboolean*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "array", "type": "jfloatArray"},
+            {"name": "isCopy", "type": "jboolean*"},
+        ],
     },
     {
         "id": 190,
@@ -4065,19 +2128,10 @@ JNI_FUNCTIONS = [
         "name": "GetDoubleArrayElements",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "array",
-                "type": "jdoubleArray"
-            },
-            {
-                "name": "isCopy",
-                "type": "jboolean*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "array", "type": "jdoubleArray"},
+            {"name": "isCopy", "type": "jboolean*"},
+        ],
     },
     {
         "id": 191,
@@ -4085,23 +2139,11 @@ JNI_FUNCTIONS = [
         "name": "ReleaseBooleanArrayElements",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "array",
-                "type": "jbooleanArray"
-            },
-            {
-                "name": "elems",
-                "type": "jboolean*"
-            },
-            {
-                "name": "mode",
-                "type": "jint"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "array", "type": "jbooleanArray"},
+            {"name": "elems", "type": "jboolean*"},
+            {"name": "mode", "type": "jint"},
+        ],
     },
     {
         "id": 192,
@@ -4109,23 +2151,11 @@ JNI_FUNCTIONS = [
         "name": "ReleaseByteArrayElements",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "array",
-                "type": "jbyteArray"
-            },
-            {
-                "name": "elems",
-                "type": "jbyte*"
-            },
-            {
-                "name": "mode",
-                "type": "jint"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "array", "type": "jbyteArray"},
+            {"name": "elems", "type": "jbyte*"},
+            {"name": "mode", "type": "jint"},
+        ],
     },
     {
         "id": 193,
@@ -4133,23 +2163,11 @@ JNI_FUNCTIONS = [
         "name": "ReleaseCharArrayElements",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "array",
-                "type": "jcharArray"
-            },
-            {
-                "name": "elems",
-                "type": "jchar*"
-            },
-            {
-                "name": "mode",
-                "type": "jint"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "array", "type": "jcharArray"},
+            {"name": "elems", "type": "jchar*"},
+            {"name": "mode", "type": "jint"},
+        ],
     },
     {
         "id": 194,
@@ -4157,23 +2175,11 @@ JNI_FUNCTIONS = [
         "name": "ReleaseShortArrayElements",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "array",
-                "type": "jshortArray"
-            },
-            {
-                "name": "elems",
-                "type": "jshort*"
-            },
-            {
-                "name": "mode",
-                "type": "jint"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "array", "type": "jshortArray"},
+            {"name": "elems", "type": "jshort*"},
+            {"name": "mode", "type": "jint"},
+        ],
     },
     {
         "id": 195,
@@ -4181,23 +2187,11 @@ JNI_FUNCTIONS = [
         "name": "ReleaseIntArrayElements",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "array",
-                "type": "jintArray"
-            },
-            {
-                "name": "elems",
-                "type": "jint*"
-            },
-            {
-                "name": "mode",
-                "type": "jint"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "array", "type": "jintArray"},
+            {"name": "elems", "type": "jint*"},
+            {"name": "mode", "type": "jint"},
+        ],
     },
     {
         "id": 196,
@@ -4205,23 +2199,11 @@ JNI_FUNCTIONS = [
         "name": "ReleaseLongArrayElements",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "array",
-                "type": "jlongArray"
-            },
-            {
-                "name": "elems",
-                "type": "jlong*"
-            },
-            {
-                "name": "mode",
-                "type": "jint"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "array", "type": "jlongArray"},
+            {"name": "elems", "type": "jlong*"},
+            {"name": "mode", "type": "jint"},
+        ],
     },
     {
         "id": 197,
@@ -4229,23 +2211,11 @@ JNI_FUNCTIONS = [
         "name": "ReleaseFloatArrayElements",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "array",
-                "type": "jfloatArray"
-            },
-            {
-                "name": "elems",
-                "type": "jfloat*"
-            },
-            {
-                "name": "mode",
-                "type": "jint"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "array", "type": "jfloatArray"},
+            {"name": "elems", "type": "jfloat*"},
+            {"name": "mode", "type": "jint"},
+        ],
     },
     {
         "id": 198,
@@ -4253,23 +2223,11 @@ JNI_FUNCTIONS = [
         "name": "ReleaseDoubleArrayElements",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "array",
-                "type": "jdoubleArray"
-            },
-            {
-                "name": "elems",
-                "type": "jdouble*"
-            },
-            {
-                "name": "mode",
-                "type": "jint"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "array", "type": "jdoubleArray"},
+            {"name": "elems", "type": "jdouble*"},
+            {"name": "mode", "type": "jint"},
+        ],
     },
     {
         "id": 199,
@@ -4277,27 +2235,12 @@ JNI_FUNCTIONS = [
         "name": "GetBooleanArrayRegion",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "array",
-                "type": "jbooleanArray"
-            },
-            {
-                "name": "start",
-                "type": "jsize"
-            },
-            {
-                "name": "l",
-                "type": "jsize"
-            },
-            {
-                "name": "buf",
-                "type": "jboolean*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "array", "type": "jbooleanArray"},
+            {"name": "start", "type": "jsize"},
+            {"name": "l", "type": "jsize"},
+            {"name": "buf", "type": "jboolean*"},
+        ],
     },
     {
         "id": 200,
@@ -4305,27 +2248,12 @@ JNI_FUNCTIONS = [
         "name": "GetByteArrayRegion",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "array",
-                "type": "jbyteArray"
-            },
-            {
-                "name": "start",
-                "type": "jsize"
-            },
-            {
-                "name": "len",
-                "type": "jsize"
-            },
-            {
-                "name": "buf",
-                "type": "jbyte*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "array", "type": "jbyteArray"},
+            {"name": "start", "type": "jsize"},
+            {"name": "len", "type": "jsize"},
+            {"name": "buf", "type": "jbyte*"},
+        ],
     },
     {
         "id": 201,
@@ -4333,27 +2261,12 @@ JNI_FUNCTIONS = [
         "name": "GetCharArrayRegion",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "array",
-                "type": "jcharArray"
-            },
-            {
-                "name": "start",
-                "type": "jsize"
-            },
-            {
-                "name": "len",
-                "type": "jsize"
-            },
-            {
-                "name": "buf",
-                "type": "jchar*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "array", "type": "jcharArray"},
+            {"name": "start", "type": "jsize"},
+            {"name": "len", "type": "jsize"},
+            {"name": "buf", "type": "jchar*"},
+        ],
     },
     {
         "id": 202,
@@ -4361,27 +2274,12 @@ JNI_FUNCTIONS = [
         "name": "GetShortArrayRegion",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "array",
-                "type": "jshortArray"
-            },
-            {
-                "name": "start",
-                "type": "jsize"
-            },
-            {
-                "name": "len",
-                "type": "jsize"
-            },
-            {
-                "name": "buf",
-                "type": "jshort*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "array", "type": "jshortArray"},
+            {"name": "start", "type": "jsize"},
+            {"name": "len", "type": "jsize"},
+            {"name": "buf", "type": "jshort*"},
+        ],
     },
     {
         "id": 203,
@@ -4389,27 +2287,12 @@ JNI_FUNCTIONS = [
         "name": "GetIntArrayRegion",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "array",
-                "type": "jintArray"
-            },
-            {
-                "name": "start",
-                "type": "jsize"
-            },
-            {
-                "name": "len",
-                "type": "jsize"
-            },
-            {
-                "name": "buf",
-                "type": "jint*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "array", "type": "jintArray"},
+            {"name": "start", "type": "jsize"},
+            {"name": "len", "type": "jsize"},
+            {"name": "buf", "type": "jint*"},
+        ],
     },
     {
         "id": 204,
@@ -4417,27 +2300,12 @@ JNI_FUNCTIONS = [
         "name": "GetLongArrayRegion",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "array",
-                "type": "jlongArray"
-            },
-            {
-                "name": "start",
-                "type": "jsize"
-            },
-            {
-                "name": "len",
-                "type": "jsize"
-            },
-            {
-                "name": "buf",
-                "type": "jlong*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "array", "type": "jlongArray"},
+            {"name": "start", "type": "jsize"},
+            {"name": "len", "type": "jsize"},
+            {"name": "buf", "type": "jlong*"},
+        ],
     },
     {
         "id": 205,
@@ -4445,27 +2313,12 @@ JNI_FUNCTIONS = [
         "name": "GetFloatArrayRegion",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "array",
-                "type": "jfloatArray"
-            },
-            {
-                "name": "start",
-                "type": "jsize"
-            },
-            {
-                "name": "len",
-                "type": "jsize"
-            },
-            {
-                "name": "buf",
-                "type": "jfloat*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "array", "type": "jfloatArray"},
+            {"name": "start", "type": "jsize"},
+            {"name": "len", "type": "jsize"},
+            {"name": "buf", "type": "jfloat*"},
+        ],
     },
     {
         "id": 206,
@@ -4473,27 +2326,12 @@ JNI_FUNCTIONS = [
         "name": "GetDoubleArrayRegion",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "array",
-                "type": "jdoubleArray"
-            },
-            {
-                "name": "start",
-                "type": "jsize"
-            },
-            {
-                "name": "len",
-                "type": "jsize"
-            },
-            {
-                "name": "buf",
-                "type": "jdouble*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "array", "type": "jdoubleArray"},
+            {"name": "start", "type": "jsize"},
+            {"name": "len", "type": "jsize"},
+            {"name": "buf", "type": "jdouble*"},
+        ],
     },
     {
         "id": 207,
@@ -4501,27 +2339,12 @@ JNI_FUNCTIONS = [
         "name": "SetBooleanArrayRegion",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "array",
-                "type": "jbooleanArray"
-            },
-            {
-                "name": "start",
-                "type": "jsize"
-            },
-            {
-                "name": "l",
-                "type": "jsize"
-            },
-            {
-                "name": "buf",
-                "type": "jboolean*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "array", "type": "jbooleanArray"},
+            {"name": "start", "type": "jsize"},
+            {"name": "l", "type": "jsize"},
+            {"name": "buf", "type": "jboolean*"},
+        ],
     },
     {
         "id": 208,
@@ -4529,27 +2352,12 @@ JNI_FUNCTIONS = [
         "name": "SetByteArrayRegion",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "array",
-                "type": "jbyteArray"
-            },
-            {
-                "name": "start",
-                "type": "jsize"
-            },
-            {
-                "name": "len",
-                "type": "jsize"
-            },
-            {
-                "name": "buf",
-                "type": "jbyte*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "array", "type": "jbyteArray"},
+            {"name": "start", "type": "jsize"},
+            {"name": "len", "type": "jsize"},
+            {"name": "buf", "type": "jbyte*"},
+        ],
     },
     {
         "id": 209,
@@ -4557,27 +2365,12 @@ JNI_FUNCTIONS = [
         "name": "SetCharArrayRegion",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "array",
-                "type": "jcharArray"
-            },
-            {
-                "name": "start",
-                "type": "jsize"
-            },
-            {
-                "name": "len",
-                "type": "jsize"
-            },
-            {
-                "name": "buf",
-                "type": "jchar*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "array", "type": "jcharArray"},
+            {"name": "start", "type": "jsize"},
+            {"name": "len", "type": "jsize"},
+            {"name": "buf", "type": "jchar*"},
+        ],
     },
     {
         "id": 210,
@@ -4585,27 +2378,12 @@ JNI_FUNCTIONS = [
         "name": "SetShortArrayRegion",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "array",
-                "type": "jshortArray"
-            },
-            {
-                "name": "start",
-                "type": "jsize"
-            },
-            {
-                "name": "len",
-                "type": "jsize"
-            },
-            {
-                "name": "buf",
-                "type": "jshort*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "array", "type": "jshortArray"},
+            {"name": "start", "type": "jsize"},
+            {"name": "len", "type": "jsize"},
+            {"name": "buf", "type": "jshort*"},
+        ],
     },
     {
         "id": 211,
@@ -4613,27 +2391,12 @@ JNI_FUNCTIONS = [
         "name": "SetIntArrayRegion",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "array",
-                "type": "jintArray"
-            },
-            {
-                "name": "start",
-                "type": "jsize"
-            },
-            {
-                "name": "len",
-                "type": "jsize"
-            },
-            {
-                "name": "buf",
-                "type": "jint*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "array", "type": "jintArray"},
+            {"name": "start", "type": "jsize"},
+            {"name": "len", "type": "jsize"},
+            {"name": "buf", "type": "jint*"},
+        ],
     },
     {
         "id": 212,
@@ -4641,27 +2404,12 @@ JNI_FUNCTIONS = [
         "name": "SetLongArrayRegion",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "array",
-                "type": "jlongArray"
-            },
-            {
-                "name": "start",
-                "type": "jsize"
-            },
-            {
-                "name": "len",
-                "type": "jsize"
-            },
-            {
-                "name": "buf",
-                "type": "jlong*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "array", "type": "jlongArray"},
+            {"name": "start", "type": "jsize"},
+            {"name": "len", "type": "jsize"},
+            {"name": "buf", "type": "jlong*"},
+        ],
     },
     {
         "id": 213,
@@ -4669,27 +2417,12 @@ JNI_FUNCTIONS = [
         "name": "SetFloatArrayRegion",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "array",
-                "type": "jfloatArray"
-            },
-            {
-                "name": "start",
-                "type": "jsize"
-            },
-            {
-                "name": "len",
-                "type": "jsize"
-            },
-            {
-                "name": "buf",
-                "type": "jfloat*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "array", "type": "jfloatArray"},
+            {"name": "start", "type": "jsize"},
+            {"name": "len", "type": "jsize"},
+            {"name": "buf", "type": "jfloat*"},
+        ],
     },
     {
         "id": 214,
@@ -4697,27 +2430,12 @@ JNI_FUNCTIONS = [
         "name": "SetDoubleArrayRegion",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "array",
-                "type": "jdoubleArray"
-            },
-            {
-                "name": "start",
-                "type": "jsize"
-            },
-            {
-                "name": "len",
-                "type": "jsize"
-            },
-            {
-                "name": "buf",
-                "type": "jdouble*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "array", "type": "jdoubleArray"},
+            {"name": "start", "type": "jsize"},
+            {"name": "len", "type": "jsize"},
+            {"name": "buf", "type": "jdouble*"},
+        ],
     },
     {
         "id": 215,
@@ -4725,23 +2443,11 @@ JNI_FUNCTIONS = [
         "name": "RegisterNatives",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            },
-            {
-                "name": "methods",
-                "type": "JNINativeMethod*"
-            },
-            {
-                "name": "nMethods",
-                "type": "jint"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+            {"name": "methods", "type": "JNINativeMethod*"},
+            {"name": "nMethods", "type": "jint"},
+        ],
     },
     {
         "id": 216,
@@ -4749,15 +2455,9 @@ JNI_FUNCTIONS = [
         "name": "UnregisterNatives",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "clazz",
-                "type": "jclass"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "clazz", "type": "jclass"},
+        ],
     },
     {
         "id": 217,
@@ -4765,15 +2465,9 @@ JNI_FUNCTIONS = [
         "name": "MonitorEnter",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+        ],
     },
     {
         "id": 218,
@@ -4781,15 +2475,9 @@ JNI_FUNCTIONS = [
         "name": "MonitorExit",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+        ],
     },
     {
         "id": 219,
@@ -4797,15 +2485,9 @@ JNI_FUNCTIONS = [
         "name": "GetJavaVM",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "vm",
-                "type": "JavaVM**"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "vm", "type": "JavaVM**"},
+        ],
     },
     {
         "id": 220,
@@ -4813,27 +2495,12 @@ JNI_FUNCTIONS = [
         "name": "GetStringRegion",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "str",
-                "type": "jstring"
-            },
-            {
-                "name": "start",
-                "type": "jsize"
-            },
-            {
-                "name": "len",
-                "type": "jsize"
-            },
-            {
-                "name": "buf",
-                "type": "jchar*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "str", "type": "jstring"},
+            {"name": "start", "type": "jsize"},
+            {"name": "len", "type": "jsize"},
+            {"name": "buf", "type": "jchar*"},
+        ],
     },
     {
         "id": 221,
@@ -4841,27 +2508,12 @@ JNI_FUNCTIONS = [
         "name": "GetStringUTFRegion",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "str",
-                "type": "jstring"
-            },
-            {
-                "name": "start",
-                "type": "jsize"
-            },
-            {
-                "name": "len",
-                "type": "jsize"
-            },
-            {
-                "name": "buf",
-                "type": "char*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "str", "type": "jstring"},
+            {"name": "start", "type": "jsize"},
+            {"name": "len", "type": "jsize"},
+            {"name": "buf", "type": "char*"},
+        ],
     },
     {
         "id": 222,
@@ -4869,19 +2521,10 @@ JNI_FUNCTIONS = [
         "name": "GetPrimitiveArrayCritical",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "array",
-                "type": "jarray"
-            },
-            {
-                "name": "isCopy",
-                "type": "jboolean*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "array", "type": "jarray"},
+            {"name": "isCopy", "type": "jboolean*"},
+        ],
     },
     {
         "id": 223,
@@ -4889,23 +2532,11 @@ JNI_FUNCTIONS = [
         "name": "ReleasePrimitiveArrayCritical",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "array",
-                "type": "jarray"
-            },
-            {
-                "name": "carray",
-                "type": "void*"
-            },
-            {
-                "name": "mode",
-                "type": "jint"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "array", "type": "jarray"},
+            {"name": "carray", "type": "void*"},
+            {"name": "mode", "type": "jint"},
+        ],
     },
     {
         "id": 224,
@@ -4913,19 +2544,10 @@ JNI_FUNCTIONS = [
         "name": "GetStringCritical",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "string",
-                "type": "jstring"
-            },
-            {
-                "name": "isCopy",
-                "type": "jboolean*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "string", "type": "jstring"},
+            {"name": "isCopy", "type": "jboolean*"},
+        ],
     },
     {
         "id": 225,
@@ -4933,19 +2555,10 @@ JNI_FUNCTIONS = [
         "name": "ReleaseStringCritical",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "string",
-                "type": "jstring"
-            },
-            {
-                "name": "cstring",
-                "type": "jchar*"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "string", "type": "jstring"},
+            {"name": "cstring", "type": "jchar*"},
+        ],
     },
     {
         "id": 226,
@@ -4953,15 +2566,9 @@ JNI_FUNCTIONS = [
         "name": "NewWeakGlobalRef",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+        ],
     },
     {
         "id": 227,
@@ -4969,27 +2576,16 @@ JNI_FUNCTIONS = [
         "name": "DeleteWeakGlobalRef",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "ref",
-                "type": "jweak"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "ref", "type": "jweak"},
+        ],
     },
     {
         "id": 228,
         "ret": "jboolean",
         "name": "ExceptionCheck",
         "va": False,
-        "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            }
-        ]
+        "args": [{"name": "env", "type": "JNIEnv*"}],
     },
     {
         "id": 229,
@@ -4997,19 +2593,10 @@ JNI_FUNCTIONS = [
         "name": "NewDirectByteBuffer",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "address",
-                "type": "void*"
-            },
-            {
-                "name": "capacity",
-                "type": "jlong"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "address", "type": "void*"},
+            {"name": "capacity", "type": "jlong"},
+        ],
     },
     {
         "id": 230,
@@ -5017,15 +2604,9 @@ JNI_FUNCTIONS = [
         "name": "GetDirectBufferAddress",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "buf",
-                "type": "jobject"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "buf", "type": "jobject"},
+        ],
     },
     {
         "id": 231,
@@ -5033,15 +2614,9 @@ JNI_FUNCTIONS = [
         "name": "GetDirectBufferCapacity",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "buf",
-                "type": "jobject"
-            }
-        ]
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "buf", "type": "jobject"},
+        ],
     },
     {
         "id": 232,
@@ -5049,14 +2624,8 @@ JNI_FUNCTIONS = [
         "name": "GetObjectRefType",
         "va": False,
         "args": [
-            {
-                "name": "env",
-                "type": "JNIEnv*"
-            },
-            {
-                "name": "obj",
-                "type": "jobject"
-            }
-        ]
-    }
+            {"name": "env", "type": "JNIEnv*"},
+            {"name": "obj", "type": "jobject"},
+        ],
+    },
 ]

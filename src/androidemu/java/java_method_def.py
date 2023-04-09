@@ -10,15 +10,16 @@ from androidemu.java.constant_values import JAVA_NULL
 
 class JavaMethodDef:
     def __init__(
-            self,
-            func_name,
-            func,
-            name,
-            signature,
-            native,
-            args_list=None,
-            modifier=None,
-            ignore=None):
+        self,
+        func_name,
+        func,
+        name,
+        signature,
+        native,
+        args_list=None,
+        modifier=None,
+        ignore=None,
+    ):
         self.jvm_id = next_method_id()
         self.func_name = func_name
         self.func = func
@@ -32,12 +33,8 @@ class JavaMethodDef:
 
 
 def java_method_def(
-        name,
-        signature,
-        native=False,
-        args_list=None,
-        modifier=None,
-        ignore=False):
+    name, signature, native=False, args_list=None, modifier=None, ignore=False
+):
     def java_method_def_real(func):
         def native_wrapper(*args, **kwargs):
             clz = args[0].__class__
@@ -49,7 +46,9 @@ def java_method_def(
                 emulator = args[1]
                 extra_args = args[2:]
 
-                first_obj = emulator.java_vm.jni_env.add_local_reference(jobject(args[0]))
+                first_obj = emulator.java_vm.jni_env.add_local_reference(
+                    jobject(args[0])
+                )
             else:
                 emulator = args[0]
                 extra_args = args[1:]
@@ -60,24 +59,30 @@ def java_method_def(
 
                 pyclazz = vals
                 if not isinstance(pyclazz, JavaClassDef):
-                    raise RuntimeError("Error class %s is not register as jvm class" % clsname)
+                    raise RuntimeError(
+                        "Error class %s is not register as jvm class" % clsname
+                    )
 
                 jvm_clazz = pyclazz.class_object
-                first_obj = emulator.java_vm.jni_env.add_local_reference(jclass(jvm_clazz))
+                first_obj = emulator.java_vm.jni_env.add_local_reference(
+                    jclass(jvm_clazz)
+                )
 
             brace_index = signature.find(")")
             if brace_index == -1:
-                raise RuntimeError("native_wrapper invalid function signature %s" % signature)
+                raise RuntimeError(
+                    "native_wrapper invalid function signature %s" % signature
+                )
 
             return_index = brace_index + 1
             return_ch = signature[return_index]
             res = None
             arch = emulator.get_arch()
-            if return_ch in ('J', 'D') and arch == emu_const.Arch.ARM32:
+            if return_ch in ("J", "D") and arch == emu_const.Arch.ARM32:
                 res = emulator.call_native_return_2reg(
                     native_wrapper.jvm_method.native_addr,
                     emulator.java_vm.jni_env.address_ptr,  # JNIEnv*
-                    first_obj,    # this object or this class
+                    first_obj,  # this object or this class
                     # method has been declared in
                     *extra_args  # Extra args.
                 )
@@ -85,16 +90,17 @@ def java_method_def(
                 res = emulator.call_native(
                     native_wrapper.jvm_method.native_addr,
                     emulator.java_vm.jni_env.address_ptr,  # JNIEnv*
-                    first_obj,    # this object or this class
+                    first_obj,  # this object or this class
                     # method has been declared in
                     *extra_args  # Extra args.
                 )
 
             r = None
-            if return_ch in ('[', 'L'):
+            if return_ch in ("[", "L"):
                 result_idx = res
                 result = emulator.java_vm.jni_env.get_local_reference(
-                    result_idx)
+                    result_idx
+                )
                 if result is None:
                     r = JAVA_NULL
                 else:
@@ -120,7 +126,8 @@ def java_method_def(
             native,
             args_list=args_list,
             modifier=modifier,
-            ignore=ignore)
+            ignore=ignore,
+        )
         return wrapper
 
     return java_method_def_real

@@ -10,28 +10,28 @@ import xml.dom.minidom
 
 
 class Editor(
-        metaclass=JavaClassDef,
-        jvm_name='android/content/SharedPreferences$Editor'):
+    metaclass=JavaClassDef, jvm_name="android/content/SharedPreferences$Editor"
+):
     def __init__(self):
         pass
 
     @java_method_def(
-        name='putString',
-        args_list=[
-            "jstring",
-            "jstring"],
-        signature='(Ljava/lang/String;Ljava/lang/String;)Landroid/content/SharedPreferences$Editor;',
-        native=False)
+        name="putString",
+        args_list=["jstring", "jstring"],
+        signature="(Ljava/lang/String;Ljava/lang/String;)Landroid/content/SharedPreferences$Editor;",
+        native=False,
+    )
     def putString(self, emu, skey, svalue):
         raise NotImplementedError()
 
-    @java_method_def(name='commit', signature='()Z', native=False)
+    @java_method_def(name="commit", signature="()Z", native=False)
     def commit(self, emu):
         raise NotImplementedError()
 
 
-class SharedPreferences(metaclass=JavaClassDef,
-                        jvm_name='android/content/SharedPreferences'):
+class SharedPreferences(
+    metaclass=JavaClassDef, jvm_name="android/content/SharedPreferences"
+):
     def __init__(self, emu, path):
         vfs_root = emu.get_vfs_root()
         real_path = misc_utils.vfs_path_to_system_path(vfs_root, path)
@@ -47,17 +47,20 @@ class SharedPreferences(metaclass=JavaClassDef,
                 v = str(node.childNodes[0].data)
                 self._string_values[k] = String(v)
 
-    @java_method_def(name='edit',
-                     signature='()Landroid/content/SharedPreferences$Editor;',
-                     native=False)
+    @java_method_def(
+        name="edit",
+        signature="()Landroid/content/SharedPreferences$Editor;",
+        native=False,
+    )
     def edit(self, emu):
         return self._editor
 
-    @java_method_def(name='getString',
-                     args_list=["jstring",
-                                "jstring"],
-                     signature='(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;',
-                     native=False)
+    @java_method_def(
+        name="getString",
+        args_list=["jstring", "jstring"],
+        signature="(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+        native=False,
+    )
     def getString(self, emu, skey, sdefault):
         pyKey = skey.get_py_string()
         if pyKey in self._string_values:

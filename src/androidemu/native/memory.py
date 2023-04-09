@@ -15,11 +15,17 @@ class NativeMemory:
         self._memory = memory
         self._syscall_handler = syscall_handler
 
-        self._syscall_handler.set_handler(0x2d, "brk", 1, self._handle_brk)
-        self._syscall_handler.set_handler(0x5B, "munmap", 2, self._handle_munmap)
-        self._syscall_handler.set_handler(0x7D, "mprotect", 3, self._handle_mprotect)
+        self._syscall_handler.set_handler(0x2D, "brk", 1, self._handle_brk)
+        self._syscall_handler.set_handler(
+            0x5B, "munmap", 2, self._handle_munmap
+        )
+        self._syscall_handler.set_handler(
+            0x7D, "mprotect", 3, self._handle_mprotect
+        )
         self._syscall_handler.set_handler(0xC0, "mmap2", 6, self._handle_mmap2)
-        self._syscall_handler.set_handler(0xDC, "madvise", 3, self._handle_madvise)
+        self._syscall_handler.set_handler(
+            0xDC, "madvise", 3, self._handle_madvise
+        )
 
     def _handle_brk(self, uc, brk):
         # TODO: set errno
@@ -44,9 +50,11 @@ class NativeMemory:
         # define MAP_ANONYMOUS 0x20
         # define MAP_UNINITIALIZED 0x0
         res = None
-        if fd != 0xffffffff:
+        if fd != 0xFFFFFFFF:
             if fd <= 2:
-                raise NotImplementedError("Unsupported read operation for file descriptor %d." % fd)
+                raise NotImplementedError(
+                    "Unsupported read operation for file descriptor %d." % fd
+                )
 
             if fd not in self._file_system._virtual_files:
                 # TODO: Return valid error.

@@ -3,12 +3,12 @@ from unicorn.arm_const import *
 
 
 def read_ptr_sz(mu, address, sz):
-    return int.from_bytes(mu.mem_read(address, sz), byteorder='little')
+    return int.from_bytes(mu.mem_read(address, sz), byteorder="little")
 
 
 def read_ptr(mu, address):
     # FIXME 写死了ptr大小，所有调用这个函数都要改成read_ptr_sz
-    return int.from_bytes(mu.mem_read(address, 4), byteorder='little')
+    return int.from_bytes(mu.mem_read(address, 4), byteorder="little")
 
 
 def read_byte_array(mu, address, size):
@@ -24,8 +24,8 @@ def read_utf8(mu, address):
     # Keep reading until we read something that contains a null terminator.
     while null_pos is None:
         buf_read = mu.mem_read(buffer_address, buffer_read_size)
-        if b'\x00' in buf_read:
-            null_pos = len(buffer) + buf_read.index(b'\x00')
+        if b"\x00" in buf_read:
+            null_pos = len(buffer) + buf_read.index(b"\x00")
         buffer += buf_read
         buffer_address += buffer_read_size
 
@@ -52,7 +52,7 @@ def write_uints(mu, address, num):
         l = num
 
     for v in l:
-        mu.mem_write(address, int(v).to_bytes(4, byteorder='little'))
+        mu.mem_write(address, int(v).to_bytes(4, byteorder="little"))
         address += 4
 
 
@@ -64,7 +64,7 @@ def write_ptrs_sz(mu, address, num, ptr_sz):
         l = num
     n = 0
     for v in l:
-        mu.mem_write(address, int(v).to_bytes(ptr_sz, byteorder='little'))
+        mu.mem_write(address, int(v).to_bytes(ptr_sz, byteorder="little"))
         address += ptr_sz
         n += ptr_sz
 

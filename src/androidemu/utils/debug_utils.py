@@ -1,4 +1,3 @@
-
 import capstone
 import os
 import io
@@ -55,8 +54,28 @@ def dump_registers(emu, fd):
         lr = mu.reg_read(UC_ARM_REG_LR)
         pc = mu.reg_read(UC_ARM_REG_PC)
         cpsr = mu.reg_read(UC_ARM_REG_CPSR)
-        regs = "\tR0=0x%08X,R1=0x%08X,R2=0x%08X,R3=0x%08X,R4=0x%08X,R5=0x%08X,R6=0x%08X,R7=0x%08X,\n\tR8=0x%08X,R9=0x%08X,R10=0x%08X,R11=0x%08X,R12=0x%08X\n\tLR=0x%08X,PC=0x%08X, SP=0x%08X,CPSR=0x%08X"\
-            % (r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12, lr, pc, sp, cpsr)
+        regs = (
+            "\tR0=0x%08X,R1=0x%08X,R2=0x%08X,R3=0x%08X,R4=0x%08X,R5=0x%08X,R6=0x%08X,R7=0x%08X,\n\tR8=0x%08X,R9=0x%08X,R10=0x%08X,R11=0x%08X,R12=0x%08X\n\tLR=0x%08X,PC=0x%08X, SP=0x%08X,CPSR=0x%08X"
+            % (
+                r0,
+                r1,
+                r2,
+                r3,
+                r4,
+                r5,
+                r6,
+                r7,
+                r8,
+                r9,
+                r10,
+                r11,
+                r12,
+                lr,
+                pc,
+                sp,
+                cpsr,
+            )
+        )
     else:
         # arm64
         x0 = mu.reg_read(UC_ARM64_REG_X0)
@@ -75,8 +94,27 @@ def dump_registers(emu, fd):
         sp = mu.reg_read(UC_ARM64_REG_SP)
         x30 = mu.reg_read(UC_ARM64_REG_X30)
         pc = mu.reg_read(UC_ARM64_REG_PC)
-        regs = "\tX0=0x%016X,X1=0x%016X,X2=0x%016X,X3=0x%016X,X4=0x%016X,X5=0x%016X,X6=0x%016X,X7=0x%016X,\n\tX8=0x%016X,X9=0x%016X,X10=0x%016X,X11=0x%016X,X12=0x%016X\n\tLR=0x%016X,PC=0x%016X, SP=0x%016X"\
-            % (x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x30, pc, sp)
+        regs = (
+            "\tX0=0x%016X,X1=0x%016X,X2=0x%016X,X3=0x%016X,X4=0x%016X,X5=0x%016X,X6=0x%016X,X7=0x%016X,\n\tX8=0x%016X,X9=0x%016X,X10=0x%016X,X11=0x%016X,X12=0x%016X\n\tLR=0x%016X,PC=0x%016X, SP=0x%016X"
+            % (
+                x0,
+                x1,
+                x2,
+                x3,
+                x4,
+                x5,
+                x6,
+                x7,
+                x8,
+                x9,
+                x10,
+                x11,
+                x12,
+                x30,
+                pc,
+                sp,
+            )
+        )
 
     fd.write(regs + "\n")
 
@@ -144,18 +182,20 @@ def dump_code(emu, address, size, fd, dump_reg_type=DUMP_REG_READ):
             base = module.base
             funName = module.is_symbol_addr(addr)
 
-        instruction_str = ''.join('{:02X} '.format(x) for x in i.bytes)
+        instruction_str = "".join("{:02X} ".format(x) for x in i.bytes)
         tid = ""
         if emu.get_muti_task_support():
             sch = emu.get_schduler()
             tid = "%d:" % sch.get_current_tid()
-        line = "%s(%20s[0x%08X])[%-12s]0x%08X:\t%s\t%s" % (tid,
-                                                           name,
-                                                           base,
-                                                           instruction_str,
-                                                           addr - base,
-                                                           i.mnemonic.upper(),
-                                                           i.op_str.upper())
+        line = "%s(%20s[0x%08X])[%-12s]0x%08X:\t%s\t%s" % (
+            tid,
+            name,
+            base,
+            instruction_str,
+            addr - base,
+            i.mnemonic.upper(),
+            i.op_str.upper(),
+        )
         if funName is not None:
             line = line + " ; %s" % funName
 
@@ -168,7 +208,9 @@ def dump_code(emu, address, size, fd, dump_reg_type=DUMP_REG_READ):
         regs_io = io.StringIO()
         for rid in regs_dump:
             reg_str = "%s=0x%08X " % (
-                i.reg_name(rid).upper(), mu.reg_read(rid))
+                i.reg_name(rid).upper(),
+                mu.reg_read(rid),
+            )
             regs_io.write(reg_str)
 
         regs = regs_io.getvalue()
@@ -190,6 +232,6 @@ def dump_stack(emu, fd, max_deep=512):
     ptr_sz = emu.get_ptr_size()
     for ptr in range(sp, stop, ptr_sz):
         valb = mu.mem_read(ptr, ptr_sz)
-        val = int.from_bytes(valb, byteorder='little', signed=False)
+        val = int.from_bytes(valb, byteorder="little", signed=False)
         line = "0x%08X: 0x%08X\n" % (ptr, val)
         fd.write(line)

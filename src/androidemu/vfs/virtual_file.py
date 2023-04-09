@@ -5,4 +5,4 @@ class VirtualFile:
         self.descriptor = file_descriptor
 
     def __repr__(self):
-        return f'VirtualFile(name={self.name},name_in_system={self.name_in_system},descriptor={self.descriptor})'
+        return f"VirtualFile(name={self.name},name_in_system={self.name_in_system},descriptor={self.descriptor})"

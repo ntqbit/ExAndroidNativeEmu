@@ -5,16 +5,17 @@ from androidemu.java.constant_values import *
 from androidemu.java.classes.string import String
 
 
-class System(metaclass=JavaClassDef, jvm_name='java/lang/System'):
-
+class System(metaclass=JavaClassDef, jvm_name="java/lang/System"):
     def __init__(self):
         pass
 
     @staticmethod
-    @java_method_def(name='getProperty',
-                     args_list=["jstring"],
-                     signature='(Ljava/lang/String;)Ljava/lang/String;',
-                     native=False)
+    @java_method_def(
+        name="getProperty",
+        args_list=["jstring"],
+        signature="(Ljava/lang/String;)Ljava/lang/String;",
+        native=False,
+    )
     def getProperty(mu, s1):
         key = s1.get_py_string()
         # TODO 放到配置文件
