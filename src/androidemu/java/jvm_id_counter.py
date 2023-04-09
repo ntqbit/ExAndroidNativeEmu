@@ -1,9 +1,9 @@
 import itertools
-from androidemu import config
+from androidemu.const.emu_const import JMETHOD_ID_BASE, JFIELD_ID_BASE
 
 g_next_jvm_id = itertools.count(start=1)
-g_next_jvm_method_id = itertools.count(start=config.JMETHOD_ID_BASE, step=4)
-g_next_jvm_field_id = itertools.count(start=config.JFIELD_ID_BASE, step=4)
+g_next_jvm_method_id = itertools.count(start=JMETHOD_ID_BASE, step=4)
+g_next_jvm_field_id = itertools.count(start=JFIELD_ID_BASE, step=4)
 
 
 def next_cls_id():

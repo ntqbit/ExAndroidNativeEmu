@@ -87,7 +87,7 @@ def native_translate_arg(emu, val):
         return val
     elif isinstance(val, bytearray):
         return emu.java_vm.jni_env.add_local_reference(jobject(val))
-    elif isinstance(val, JavaClassDef):
+    elif isinstance(type(val), JavaClassDef):
         return emu.java_vm.jni_env.add_local_reference(jobject(val))
     else:
         raise NotImplementedError(

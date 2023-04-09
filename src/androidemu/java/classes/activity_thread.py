@@ -48,8 +48,7 @@ class ViewRootImpl(
     jvm_fields=[
         JavaFieldDef(
             "mAccessibilityInteractionController",
-            "android/view/AccessibilityInteractionController",
-            False,
+            "android/view/AccessibilityInteractionController"
         )
     ],
 ):
@@ -63,7 +62,7 @@ class AttachInfo(
     metaclass=JavaClassDef,
     jvm_name="android/view/View$AttachInfo",
     jvm_fields=[
-        JavaFieldDef("mViewRootImpl", "android/view/ViewRootImpl", False)
+        JavaFieldDef("mViewRootImpl", "android/view/ViewRootImpl")
     ],
 ):
     def __init__(self, view_root_impl):
@@ -73,7 +72,7 @@ class AttachInfo(
 class View(
     metaclass=JavaClassDef,
     jvm_name="android/view/View",
-    jvm_fields=[JavaFieldDef("", "android/view/View$AttachInfo", False)],
+    jvm_fields=[JavaFieldDef("", "android/view/View$AttachInfo")],
 ):
     def __init__(self):
         self.mAttachInfo = AttachInfo(ViewRootImpl())
@@ -104,8 +103,8 @@ class ActivityClientRecord(
     metaclass=JavaClassDef,
     jvm_name="android/app/ActivityThread$ActivityClientRecord",
     jvm_fields=[
-        JavaFieldDef("paused", "Z", False),
-        JavaFieldDef("activity", "Landroid/app/Activity;", False),
+        JavaFieldDef("paused", "Z"),
+        JavaFieldDef("activity", "Landroid/app/Activity;"),
     ],
 ):
     def __init__(self):
@@ -204,8 +203,7 @@ class ActivityThread(
     metaclass=JavaClassDef,
     jvm_name="android/app/ActivityThread",
     jvm_fields=[
-        JavaFieldDef("mActivities", "Landroid/util/ArrayMap;", False),
-        # FIXME 多个虚拟机实例怎么办,作为静态对象,如何适应一个进程多个package name的情况?
+        JavaFieldDef("mActivities", "Landroid/util/ArrayMap;"),
         JavaFieldDef(
             "sPackageManager",
             "Landroid/content/pm/IPackageManager;",
@@ -217,8 +215,8 @@ class ActivityThread(
 
     s_am = {}
 
-    def __init__(self, pyPkgName):
-        self._ctx_impl = ContextImpl(pyPkgName)
+    def __init__(self, package_name):
+        self._ctx_impl = ContextImpl(package_name)
         self.app = Application()
         self.app.attachBaseContext(self._ctx_impl)
         self.mActivities = ArrayMap([ActivityClientRecord()])
@@ -231,12 +229,12 @@ class ActivityThread(
         signature="()Landroid/app/ActivityThread;",
         native=False,
     )
-    def currentActivityThread(emu):
-        pyPkgName = emu.config.get("pkg_name")
-        if pyPkgName not in ActivityThread.s_am:
-            ActivityThread.s_am[pyPkgName] = ActivityThread(pyPkgName)
+    def currentActivityThread(emu: 'Emulator'):
+        package_name = emu.environment.get_process_name()
+        if package_name not in ActivityThread.s_am:
+            ActivityThread.s_am[package_name] = ActivityThread(package_name)
 
-        return ActivityThread.s_am[pyPkgName]
+        return ActivityThread.s_am[package_name]
 
     @staticmethod
     @java_method_def(

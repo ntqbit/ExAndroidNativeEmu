@@ -59,9 +59,7 @@ def java_method_def(
 
                 pyclazz = vals
                 if not isinstance(pyclazz, JavaClassDef):
-                    raise RuntimeError(
-                        "Error class %s is not register as jvm class" % clsname
-                    )
+                    raise RuntimeError(f"Error class {clsname} is not register as jvm class")
 
                 jvm_clazz = pyclazz.class_object
                 first_obj = emulator.java_vm.jni_env.add_local_reference(
@@ -70,9 +68,7 @@ def java_method_def(
 
             brace_index = signature.find(")")
             if brace_index == -1:
-                raise RuntimeError(
-                    "native_wrapper invalid function signature %s" % signature
-                )
+                raise RuntimeError(f"native_wrapper invalid function signature {signature}")
 
             return_index = brace_index + 1
             return_ch = signature[return_index]
@@ -107,7 +103,6 @@ def java_method_def(
                     r = result.value
 
             else:
-                # 基本类型的话直接返回
                 r = res
 
             emulator.java_vm.jni_env.clear_locals()

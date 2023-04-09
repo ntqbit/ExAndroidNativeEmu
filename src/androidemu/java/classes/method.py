@@ -13,8 +13,8 @@ class Method(
     metaclass=JavaClassDef,
     jvm_name="java/lang/reflect/Method",
     jvm_fields=[
-        JavaFieldDef("slot", "I", False, ignore=True),
-        JavaFieldDef("declaringClass", "Ljava/lang/Class;", False),
+        JavaFieldDef("slot", "I", ignore=True),
+        JavaFieldDef("declaringClass", "Ljava/lang/Class;"),
     ],
     jvm_super=Executable,
 ):

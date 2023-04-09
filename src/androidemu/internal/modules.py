@@ -1,3 +1,4 @@
+import os
 import verboselogs
 
 from unicorn import UC_PROT_ALL, UC_PROT_WRITE, UC_PROT_READ
@@ -15,7 +16,8 @@ from androidemu.vfs.virtual_file import VirtualFile
 from androidemu import config
 from androidemu.internal import elf_reader
 from androidemu.const import linux
-import os
+from androidemu.const.emu_const import BASE_ADDR, TLS_BASE, TLS_SIZE
+
 
 logger = verboselogs.VerboseLogger(__name__)
 
@@ -136,9 +138,9 @@ class Modules:
 
         # tls单独一个区域，不放在stack中
         self.emu.mu.mem_map(
-            config.TLS_BASE, config.TLS_SIZE, UC_PROT_WRITE | UC_PROT_READ
+            TLS_BASE, TLS_SIZE, UC_PROT_WRITE | UC_PROT_READ
         )
-        tls_ptr = config.TLS_BASE
+        tls_ptr = TLS_BASE
         mu = self.emu.mu
         # TLS_SLOT_SELF
         memory_helpers.write_ptrs_sz(mu, tls_ptr, tls_ptr, ptr_sz)
@@ -170,7 +172,7 @@ class Modules:
         self.emu = emu
         self.modules = list()
         self.symbol_hooks = dict()
-        self.counter_memory = config.BASE_ADDR
+        self.counter_memory = BASE_ADDR
         self._vfs_root = vfs_root
         soinfo_area_sz = 0x40000
         self._soinfo_area_base = emu.memory.map(

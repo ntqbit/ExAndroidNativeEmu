@@ -1,22 +1,26 @@
+
+import time
+
 import verboselogs
-import os
-import time
-import importlib
-import inspect
-import pkgutil
-import sys
-import os.path
-import time
 
-from random import randint
+from unicorn.unicorn_const import UC_PROT_READ, UC_PROT_EXEC
+from unicorn.arm_const import (
+    UC_ARM_REG_LR,
+    UC_ARM_REG_SP,
+    UC_ARM_REG_R0,
+    UC_ARM_REG_PC,
+    UC_ARM_REG_C13_C0_3,
+    UC_ARM_REG_CPSR
+)
+from unicorn.arm64_const import (
+    UC_ARM64_REG_SP,
+    UC_ARM64_REG_X0,
+    UC_ARM64_REG_PC,
+    UC_ARM64_REG_TPIDR_EL0,
+    UC_ARM64_REG_X30
+)
 
-from unicorn import *
-from unicorn.arm_const import *
-from unicorn.arm64_const import *
-from androidemu import config
-from androidemu import pcb
-from androidemu.const import emu_const
-from androidemu.utils import misc_utils
+from androidemu.const.emu_const import STOP_MEMORY_BASE, STOP_MEMORY_SIZE, Arch
 
 
 logger = verboselogs.VerboseLogger(__name__)
@@ -52,11 +56,11 @@ class Scheduler:
         self._cur_tid = 0
 
         self._emu.memory.map(
-            config.STOP_MEMORY_BASE,
-            config.STOP_MEMORY_SIZE,
+            STOP_MEMORY_BASE,
+            STOP_MEMORY_SIZE,
             UC_PROT_READ | UC_PROT_EXEC,
         )
-        self._stop_pos = config.STOP_MEMORY_BASE
+        self._stop_pos = STOP_MEMORY_BASE
 
         # blocking futex ptr to thread lists,
         # 记录在futex中等待的任务id
@@ -65,7 +69,7 @@ class Scheduler:
         self._blocking_set = set()
 
     def _get_pc(self):
-        if self._emu.get_arch() == emu_const.Arch.ARM32:
+        if self._emu.get_arch() == Arch.ARM32:
             pc = self._emu.mu.reg_read(UC_ARM_REG_PC)
             return pc
         else:
@@ -73,26 +77,26 @@ class Scheduler:
 
     def _clear_reg0(self):
 
-        if self._emu.get_arch() == emu_const.Arch.ARM32:
+        if self._emu.get_arch() == Arch.ARM32:
             self._mu.reg_write(UC_ARM_REG_R0, 0)
         else:
             self._mu.reg_write(UC_ARM64_REG_X0, 0)
 
     def _set_sp(self, sp):
-        if self._emu.get_arch() == emu_const.Arch.ARM32:
+        if self._emu.get_arch() == Arch.ARM32:
             self._emu.mu.reg_write(UC_ARM_REG_SP, sp)
         else:
             self._emu.mu.reg_write(UC_ARM64_REG_SP, sp)
 
     def _set_tls(self, tls_ptr):
-        if self._emu.get_arch() == emu_const.Arch.ARM32:
+        if self._emu.get_arch() == Arch.ARM32:
             self._emu.mu.reg_write(UC_ARM_REG_C13_C0_3, tls_ptr)
         else:
             self._emu.mu.reg_write(UC_ARM64_REG_TPIDR_EL0, tls_ptr)
 
     def _get_interrupted_entry(self):
         pc = self._get_pc()
-        if self._emu.get_arch() == emu_const.Arch.ARM32:
+        if self._emu.get_arch() == Arch.ARM32:
             cpsr = self._emu.mu.reg_read(UC_ARM_REG_CPSR)
             if cpsr & (1 << 5):
                 pc = pc | 1
@@ -198,7 +202,7 @@ class Scheduler:
 
     def exec(self, main_entry, clear_task_when_return=True):
         self._set_main_task()
-        if self._emu.get_arch() == emu_const.Arch.ARM32:
+        if self._emu.get_arch() == Arch.ARM32:
             self._emu.mu.reg_write(UC_ARM_REG_LR, self._stop_pos)
         else:
             self._emu.mu.reg_write(UC_ARM64_REG_X30, self._stop_pos)
@@ -209,28 +213,23 @@ class Scheduler:
                 if tid in self._blocking_set:
                     # 处理block
                     if len(self._ordered_tasks_list) == 1:
-                        # 只有主线程，而且被block
                         if task.blocking_timeout < 0:
-                            # 只有一个线程且被无限期block，有bug
                             raise RuntimeError(
                                 "only one task %d exists, but blocking infinity dead lock bug!"
                                 % tid
                             )
                         else:
-                            # 优化，如果仅仅只有一个线程block，而且有timeout，直接sleep就行了，因为再继续运行都是没意义的循环
                             logger.debug(
                                 "only on task %d block with timeout %d ms do sleep"
                                 % (tid, task.blocking_timeout)
                             )
                             time.sleep(task.blocking_timeout / 1000)
-                            # sleep返回则完成block
                             self._blocking_set.remove(tid)
 
                     else:
                         if task.blocking_timeout > 0:
                             now = int(time.time() * 1000)
                             if now - task.halt_ts < task.blocking_timeout:
-                                # 仍然未睡够，继续睡
                                 logger.debug(
                                     "%d is blocking skip scheduling ts has block %d ms timeout %d ms"
                                     % (
@@ -246,9 +245,7 @@ class Scheduler:
                                 )
                                 task.blocking_timeout = -1
                                 self._blocking_set.remove(tid)
-                                # 睡够了，不跳过循环 继续执行调度
                         else:
-                            # 无限期block，直接跳过调度
                             logger.debug(
                                 "%d is blocking skip scheduling" % (tid,)
                             )

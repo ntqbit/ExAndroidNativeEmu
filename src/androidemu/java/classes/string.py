@@ -6,7 +6,9 @@ from androidemu.java.classes.array import *
 
 class String(metaclass=JavaClassDef, jvm_name="java/lang/String"):
     def __init__(self, pystr=""):
-        assert isinstance(pystr, str)
+        if not isinstance(pystr, str):
+            raise ValueError(f'Java String class got {type(pystr)} instead of str.')
+
         self._str = pystr
 
     def __repr__(self):

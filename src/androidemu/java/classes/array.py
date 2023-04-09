@@ -41,7 +41,6 @@ class Array(metaclass=JavaClassDef, jvm_name="java/lang/reflect/Array"):
         return self.class_object
 
 
-# 外面用到，因为与Array jvm name不同，所以暂时手动定义，与Array作用一样
 class ByteArray(Array, metaclass=JavaClassDef, jvm_name="[B", jvm_super=Array):
     def __init__(self, item_list):
         Array.__init__(self, item_list)
@@ -50,7 +49,6 @@ class ByteArray(Array, metaclass=JavaClassDef, jvm_name="[B", jvm_super=Array):
         return f"ByteArray({short_byte_repr(self._pyitems)})"
 
 
-# 外面用到，因为与Array jvm name不同，所以暂时手动定义，与Array作用一样
 class ObjectArray(
     Array,
     metaclass=JavaClassDef,

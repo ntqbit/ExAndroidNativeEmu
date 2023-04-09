@@ -45,13 +45,13 @@ class WifiConfiguration(
     metaclass=JavaClassDef,
     jvm_name="android/net/wifi/WifiConfiguration",
     jvm_fields=[
-        JavaFieldDef("SSID", "Ljava/lang/String;", False),
-        JavaFieldDef("hiddenSSID", "Z", False),
-        JavaFieldDef("BSSID", "Ljava/lang/String;", False),
-        JavaFieldDef("FQDN", "Ljava/lang/String;", False),
-        JavaFieldDef("networkId", "I", False),
-        JavaFieldDef("priority", "I", False),
-        JavaFieldDef("providerFriendlyName", "Ljava/lang/String;", False),
+        JavaFieldDef("SSID", "Ljava/lang/String;"),
+        JavaFieldDef("hiddenSSID", "Z"),
+        JavaFieldDef("BSSID", "Ljava/lang/String;"),
+        JavaFieldDef("FQDN", "Ljava/lang/String;"),
+        JavaFieldDef("networkId", "I"),
+        JavaFieldDef("priority", "I"),
+        JavaFieldDef("providerFriendlyName", "Ljava/lang/String;"),
     ],
 ):
     def __init__(self):

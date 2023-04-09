@@ -4,7 +4,7 @@ import posixpath
 import sys
 from androidemu.const.linux import *
 from androidemu import config
-from androidemu.config import WRITE_FSTAT_TIMES
+from androidemu.const.emu_const import WRITE_FSTAT_TIMES
 from androidemu.cpu.syscall_handlers import SyscallHandlers
 from androidemu.utils import memory_helpers, misc_utils
 from androidemu.const import emu_const

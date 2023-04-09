@@ -1,18 +1,12 @@
-import verboselogs
 import os
-import time
-import importlib
-import inspect
-import pkgutil
 import sys
-import os.path
 
-from random import randint
+import verboselogs
 
 from unicorn import *
 from unicorn.arm_const import *
 from unicorn.arm64_const import *
-from androidemu import config
+
 from androidemu import pcb
 from androidemu.const import emu_const
 from androidemu.cpu.syscall_handlers import SyscallHandlers
@@ -29,9 +23,18 @@ from androidemu.vfs.file_system import VirtualFileSystem
 from androidemu.vfs.virtual_file import VirtualFile
 from androidemu.utils import misc_utils
 from androidemu.scheduler import Scheduler
-
-from androidemu.java.java_class_def import JavaClassDef
-from androidemu.java.constant_values import JAVA_NULL
+from androidemu.config import Config
+from androidemu.environment import Environment
+from androidemu.const.emu_const import (
+    MAP_ALLOC_BASE,
+    MAP_ALLOC_SIZE,
+    BRIDGE_MEMORY_BASE,
+    BRIDGE_MEMORY_SIZE,
+    JMETHOD_ID_BASE,
+    STACK_ADDR,
+    STACK_SIZE,
+    Arch
+)
 
 import androidemu.java.classes.application
 import androidemu.java.classes.debug
@@ -65,11 +68,193 @@ import androidemu.java.classes.string
 import androidemu.java.classes.activity_thread
 import androidemu.java.classes.settings
 import androidemu.java.classes.bundle
+import androidemu.java.classes.arrays
 
 logger = verboselogs.VerboseLogger(__name__)
 
 
 class Emulator:
+    def __init__(
+        self,
+        vfs_root="vfs",
+        config: Config = None,
+        environment: Environment = None,
+        vfp_inst_set=True,
+        arch=emu_const.Arch.ARM32,
+        muti_task=False,
+    ):
+        if not config:
+            logger.warning('Config is not set. Will use default config.')
+
+        if not environment:
+            logger.warning('Environment is not set. Will use default environment.')
+
+        self.config = config or Config()
+        self.environment = environment or Environment()
+
+        self._arch = arch
+        self._support_muti_task = muti_task
+        self._pcb = pcb.Pcb()
+
+        logger.info("process pid:%d" % self._pcb.get_pid())
+
+        sp_reg = 0
+        if arch == emu_const.Arch.ARM32:
+            self._ptr_sz = 4
+            self.mu = Uc(UC_ARCH_ARM, UC_MODE_ARM)
+            if vfp_inst_set:
+                self._enable_vfp32()
+
+            sp_reg = UC_ARM_REG_SP
+            self.call_native = self._call_native32
+            self.call_native_return_2reg = self._call_native_return_2reg32
+
+        elif arch == emu_const.Arch.ARM64:
+            self._ptr_sz = 8
+            self.mu = Uc(UC_ARCH_ARM64, UC_MODE_ARM)
+            if vfp_inst_set:
+                self._enable_vfp64()
+
+            sp_reg = UC_ARM64_REG_SP
+
+            self.call_native = self._call_native64
+            self.call_native_return_2reg = self._call_native_return_2reg64
+
+        else:
+            raise ValueError("emulator arch=%d not support" % arch)
+
+        self._vfs_root = vfs_root
+
+        if arch == emu_const.Arch.ARM32:
+            self.system_properties = {
+                "libc.debug.malloc.options": "",
+                "ro.build.version.sdk": "19",
+                "ro.build.version.release": "4.4.4",
+                "persist.sys.dalvik.vm.lib": "libdvm.so",
+                "ro.product.cpu.abi": "armeabi-v7a",
+                "ro.product.cpu.abi2": "armeabi",
+                "ro.product.manufacturer": "LGE",
+                "ro.product.manufacturer": "LGE",
+                "ro.debuggable": "0",
+                "ro.product.model": "AOSP on HammerHead",
+                "ro.hardware": "hammerhead",
+                "ro.product.board": "hammerhead",
+                "ro.product.device": "hammerhead",
+                "ro.build.host": "833d1eed3ea3",
+                "ro.build.type": "user",
+                "ro.secure": "1",
+                "wifi.interface": "wlan0",
+                "ro.product.brand": "Android",
+            }
+
+        else:
+            self.system_properties = {
+                "libc.debug.malloc.options": "",
+                "ro.build.version.sdk": "23",
+                "ro.build.version.release": "6.0.1",
+                "persist.sys.dalvik.vm.lib2": "libart.so",
+                "ro.product.cpu.abi": "arm64-v8a",
+                "ro.product.manufacturer": "LGE",
+                "ro.product.manufacturer": "LGE",
+                "ro.debuggable": "0",
+                "ro.product.model": "AOSP on HammerHead",
+                "ro.hardware": "hammerhead",
+                "ro.product.board": "hammerhead",
+                "ro.product.device": "hammerhead",
+                "ro.build.host": "833d1eed3ea3",
+                "ro.build.type": "user",
+                "ro.secure": "1",
+                "wifi.interface": "wlan0",
+                "ro.product.brand": "Android",
+            }
+
+        self.memory = MemoryMap(
+            self.mu,
+            MAP_ALLOC_BASE,
+            MAP_ALLOC_BASE + MAP_ALLOC_SIZE,
+        )
+
+        # Stack.
+        addr = self.memory.map(
+            STACK_ADDR, STACK_SIZE, UC_PROT_READ | UC_PROT_WRITE
+        )
+        self.mu.reg_write(sp_reg, STACK_ADDR + STACK_SIZE)
+        # sp = self.mu.reg_read(sp_reg)
+        # print ("stack addr %x"%sp)
+
+        self._sch = Scheduler(self)
+        # CPU
+        self._syscall_handler = SyscallHandlers(
+            self.mu, self._sch, self.get_arch()
+        )
+
+        # Hooker
+        self.memory.map(
+            BRIDGE_MEMORY_BASE,
+            BRIDGE_MEMORY_SIZE,
+            UC_PROT_READ | UC_PROT_WRITE | UC_PROT_EXEC,
+        )
+        self._hooker = Hooker(
+            self, BRIDGE_MEMORY_BASE, BRIDGE_MEMORY_SIZE
+        )
+
+        # syscalls
+        self._mem_handler = MemorySyscallHandler(
+            self, self.memory, self._syscall_handler
+        )
+        self._syscall_hooks = SyscallHooks(self, self._syscall_handler)
+        self._vfs = VirtualFileSystem(
+            self, vfs_root, self.config, self._syscall_handler, self.memory
+        )
+
+        # JavaVM
+        self.java_classloader = JavaClassLoader()
+        self.java_vm = JavaVM(self, self.java_classloader, self._hooker)
+
+        # linker
+        self.modules = Modules(self, self._vfs_root)
+        # Native
+        self._sym_hooks = SymbolHooks(
+            self, self.modules, self._hooker, self._vfs_root
+        )
+
+        self._add_classes()
+
+        # Hack 为jmethod_id指向的内存分配一块空间，抖音会将jmethodID强转，为的是绕过去
+        self.memory.map(
+            JMETHOD_ID_BASE,
+            0x2000,
+            UC_PROT_READ | UC_PROT_WRITE | UC_PROT_EXEC,
+        )
+
+        if arch == emu_const.Arch.ARM32:
+            # 映射app_process，android系统基本特征
+            path = "%s/system/bin/app_process32" % vfs_root
+            sz = os.path.getsize(path)
+            vf = VirtualFile(
+                "/system/bin/app_process32",
+                misc_utils.platform_open(path, os.O_RDONLY),
+                path,
+            )
+            self.memory.map(0xAB006000, sz, UC_PROT_EXEC | UC_PROT_READ, vf, 0)
+
+        else:
+            # 映射app_process，android系统基本特征
+            path = "%s/system/bin/app_process64" % vfs_root
+            sz = os.path.getsize(path)
+            vf = VirtualFile(
+                "/system/bin/app_process64",
+                misc_utils.platform_open(path, os.O_RDONLY),
+                path,
+            )
+            self.memory.map(0xAB006000, sz, UC_PROT_EXEC | UC_PROT_READ, vf, 0)
+
+    def get_pc(self):
+        if self.get_arch() == Arch.ARM32:
+            return self.mu.reg_read(UC_ARM_REG_PC)
+        else:
+            return self.mu.reg_read(UC_ARM64_REG_PC)
+
     # https://github.com/unicorn-engine/unicorn/blob/8c6cbe3f3cabed57b23b721c29f937dd5baafc90/tests/regress/arm_fp_vfp_disabled.py#L15
     # 关于arm32 64 fp https://www.raspberrypi.org/forums/viewtopic.php?t=259802
     # https://www.cnblogs.com/pengdonglin137/p/3727583.html
@@ -199,6 +384,7 @@ class Emulator:
             androidemu.java.classes.settings.Secure,
             androidemu.java.classes.settings.Settings,
             androidemu.java.classes.bundle.Bundle,
+            androidemu.java.classes.arrays.Arrays,
         ]
 
         for clz in defualt_classes:
@@ -206,204 +392,6 @@ class Emulator:
 
         # also add classloader as java class
         self.java_classloader.add_class(JavaClassLoader)
-
-    """
-    :type mu Uc
-    :type modules Modules
-    :type memory Memory
-    """
-
-    def __init__(
-        self,
-        vfs_root="vfs",
-        config_path="emu_cfg/default.json",
-        vfp_inst_set=True,
-        arch=emu_const.Arch.ARM32,
-        muti_task=False,
-    ):
-        # Unicorn.
-        sys.stdout = sys.stderr
-        # 由于这里的stream只能改一次，为避免与fork之后的子进程写到stdout混合，将这些log写到stderr
-        # FIXME:解除这种特殊的依赖
-        self.config = config.Config(config_path)
-        self._arch = arch
-        self._support_muti_task = muti_task
-        self._pcb = pcb.Pcb()
-
-        logger.info("process pid:%d" % self._pcb.get_pid())
-
-        sp_reg = 0
-        if arch == emu_const.Arch.ARM32:
-            self._ptr_sz = 4
-            self.mu = Uc(UC_ARCH_ARM, UC_MODE_ARM)
-            if vfp_inst_set:
-                self._enable_vfp32()
-
-            sp_reg = UC_ARM_REG_SP
-            self.call_native = self._call_native32
-            self.call_native_return_2reg = self._call_native_return_2reg32
-
-        elif arch == emu_const.Arch.ARM64:
-            self._ptr_sz = 8
-            self.mu = Uc(UC_ARCH_ARM64, UC_MODE_ARM)
-            if vfp_inst_set:
-                self._enable_vfp64()
-
-            sp_reg = UC_ARM64_REG_SP
-
-            self.call_native = self._call_native64
-            self.call_native_return_2reg = self._call_native_return_2reg64
-
-        else:
-            raise ValueError("emulator arch=%d not support" % arch)
-
-        self._vfs_root = vfs_root
-
-        # 注意，原有缺陷，原来linker初始化没有完成init_tls部分，导致libc初始化有访问空指针而无法正常完成
-        # 而这里直接将0映射空间，,强行运行过去，因为R1刚好为0,否则会报memory unmap异常
-        # 最新版本已经解决这个问题，无需再这么映射
-        # self.mu.mem_map(0x0, 0x00001000, UC_PROT_READ | UC_PROT_WRITE)
-
-        # Android 4.4
-        if arch == emu_const.Arch.ARM32:
-            self.system_properties = {
-                "libc.debug.malloc.options": "",
-                "ro.build.version.sdk": "19",
-                "ro.build.version.release": "4.4.4",
-                "persist.sys.dalvik.vm.lib": "libdvm.so",
-                "ro.product.cpu.abi": "armeabi-v7a",
-                "ro.product.cpu.abi2": "armeabi",
-                "ro.product.manufacturer": "LGE",
-                "ro.product.manufacturer": "LGE",
-                "ro.debuggable": "0",
-                "ro.product.model": "AOSP on HammerHead",
-                "ro.hardware": "hammerhead",
-                "ro.product.board": "hammerhead",
-                "ro.product.device": "hammerhead",
-                "ro.build.host": "833d1eed3ea3",
-                "ro.build.type": "user",
-                "ro.secure": "1",
-                "wifi.interface": "wlan0",
-                "ro.product.brand": "Android",
-            }
-
-        else:
-            # FIXME 这里arm64用 6.0，应该arm32也统一使用6.0
-            # Android 6.0
-            self.system_properties = {
-                "libc.debug.malloc.options": "",
-                "ro.build.version.sdk": "23",
-                "ro.build.version.release": "6.0.1",
-                "persist.sys.dalvik.vm.lib2": "libart.so",
-                "ro.product.cpu.abi": "arm64-v8a",
-                "ro.product.manufacturer": "LGE",
-                "ro.product.manufacturer": "LGE",
-                "ro.debuggable": "0",
-                "ro.product.model": "AOSP on HammerHead",
-                "ro.hardware": "hammerhead",
-                "ro.product.board": "hammerhead",
-                "ro.product.device": "hammerhead",
-                "ro.build.host": "833d1eed3ea3",
-                "ro.build.type": "user",
-                "ro.secure": "1",
-                "wifi.interface": "wlan0",
-                "ro.product.brand": "Android",
-            }
-
-        self.memory = MemoryMap(
-            self.mu,
-            config.MAP_ALLOC_BASE,
-            config.MAP_ALLOC_BASE + config.MAP_ALLOC_SIZE,
-        )
-
-        # Stack.
-        addr = self.memory.map(
-            config.STACK_ADDR, config.STACK_SIZE, UC_PROT_READ | UC_PROT_WRITE
-        )
-        self.mu.reg_write(sp_reg, config.STACK_ADDR + config.STACK_SIZE)
-        # sp = self.mu.reg_read(sp_reg)
-        # print ("stack addr %x"%sp)
-
-        self._sch = Scheduler(self)
-        # CPU
-        self._syscall_handler = SyscallHandlers(
-            self.mu, self._sch, self.get_arch()
-        )
-
-        # Hooker
-        self.memory.map(
-            config.BRIDGE_MEMORY_BASE,
-            config.BRIDGE_MEMORY_SIZE,
-            UC_PROT_READ | UC_PROT_WRITE | UC_PROT_EXEC,
-        )
-        self._hooker = Hooker(
-            self, config.BRIDGE_MEMORY_BASE, config.BRIDGE_MEMORY_SIZE
-        )
-
-        # syscalls
-        self._mem_handler = MemorySyscallHandler(
-            self, self.memory, self._syscall_handler
-        )
-        self._syscall_hooks = SyscallHooks(
-            self, self.config, self._syscall_handler
-        )
-        self._vfs = VirtualFileSystem(
-            self, vfs_root, self.config, self._syscall_handler, self.memory
-        )
-
-        # JavaVM
-        self.java_classloader = JavaClassLoader()
-        self.java_vm = JavaVM(self, self.java_classloader, self._hooker)
-
-        # linker
-        self.modules = Modules(self, self._vfs_root)
-        # Native
-        self._sym_hooks = SymbolHooks(
-            self, self.modules, self._hooker, self._vfs_root
-        )
-
-        self._add_classes()
-
-        # Hack 为jmethod_id指向的内存分配一块空间，抖音会将jmethodID强转，为的是绕过去
-        self.memory.map(
-            config.JMETHOD_ID_BASE,
-            0x2000,
-            UC_PROT_READ | UC_PROT_WRITE | UC_PROT_EXEC,
-        )
-
-        if arch == emu_const.Arch.ARM32:
-            # 映射常用的文件，cpu一些原子操作的函数实现地方
-            # path = "%s/system/lib/vectors" % vfs_root
-            # vf = VirtualFile(
-            #     "[vectors]", misc_utils.platform_open(
-            #         path, os.O_RDONLY), path)
-            # self.memory.map(
-            #     0xffff0000,
-            #     0x1000,
-            #     UC_PROT_EXEC | UC_PROT_READ,
-            #     vf,
-            #     0)
-
-            # 映射app_process，android系统基本特征
-            path = "%s/system/bin/app_process32" % vfs_root
-            sz = os.path.getsize(path)
-            vf = VirtualFile(
-                "/system/bin/app_process32",
-                misc_utils.platform_open(path, os.O_RDONLY),
-                path,
-            )
-            self.memory.map(0xAB006000, sz, UC_PROT_EXEC | UC_PROT_READ, vf, 0)
-
-        else:
-            # 映射app_process，android系统基本特征
-            path = "%s/system/bin/app_process64" % vfs_root
-            sz = os.path.getsize(path)
-            vf = VirtualFile(
-                "/system/bin/app_process64",
-                misc_utils.platform_open(path, os.O_RDONLY),
-                path,
-            )
-            self.memory.map(0xAB006000, sz, UC_PROT_EXEC | UC_PROT_READ, vf, 0)
 
     def get_vfs_root(self):
         return self._vfs_root

@@ -127,12 +127,12 @@ class ContextImpl(
     jvm_name="android/app/ContextImpl",
     jvm_super=Context,
 ):
-    def __init__(self, pyPkgName):
+    def __init__(self, package_name):
         Context.__init__(self)
 
-        self._pkgName = String(pyPkgName)
-        self._pkg_mgr = PackageManager(pyPkgName)
-        self._resolver = ContentResolver()
+        self._package_name = String(package_name)
+        self._package_manager = PackageManager()
+        self._content_resolver = ContentResolver()
         self._asset_mgr = None
         self._sp_map = {}
 
@@ -142,7 +142,7 @@ class ContextImpl(
         native=False,
     )
     def getPackageManager(self, emu):
-        return self._pkg_mgr
+        return self._package_manager
 
     @java_method_def(
         name="getAssets",
@@ -153,8 +153,8 @@ class ContextImpl(
         if not self._asset_mgr:
             # 调用getAssets才初始化assert_manager
             # 因为不是每个so模拟执行都需要打开apk
-            pyapk_path = self._pkg_mgr.getPackageInfo(
-                emu, self._pkgName, 0
+            pyapk_path = self._package_manager.getPackageInfo(
+                emu, self._package_name, 0
             ).applicationInfo.sourceDir.get_py_string()
             self._asset_mgr = AssetManager(emu, pyapk_path)
 
@@ -166,7 +166,7 @@ class ContextImpl(
         native=False,
     )
     def getContentResolver(self, emu):
-        return self._resolver
+        return self._content_resolver
 
     @java_method_def(
         name="getSystemService",
@@ -194,15 +194,15 @@ class ContextImpl(
         native=False,
     )
     def getApplicationInfo(self, emu):
-        pkgMgr = self._pkg_mgr
-        pkgInfo = pkgMgr.getPackageInfo(emu, self._pkgName, 0)
+        pkgMgr = self._package_manager
+        pkgInfo = pkgMgr.getPackageInfo(emu, self._package_name, 0)
         return pkgInfo.applicationInfo
 
     @java_method_def(
         name="getPackageName", signature="()Ljava/lang/String;", native=False
     )
     def getPackageName(self, emu):
-        return self._pkgName
+        return self._package_name
 
     @java_method_def(
         name="checkSelfPermission",
@@ -226,7 +226,7 @@ class ContextImpl(
         native=False,
     )
     def getPackageCodePath(self, emu):
-        pkgName = emu.config.get("pkg_name")
+        pkgName = emu.environment.get_package_name()
         path = "/data/app/%s-1.apk" % (pkgName,)
         return String(path)
 
@@ -234,7 +234,7 @@ class ContextImpl(
         name="getFilesDir", signature="()Ljava/io/File;", native=False
     )
     def getFilesDir(self, emu):
-        pkgName = emu.config.get("pkg_name")
+        pkgName = emu.environment.get_package_name()
         fdir = "/data/data/%s/files" % (pkgName,)
         return File(fdir)
 
@@ -242,7 +242,7 @@ class ContextImpl(
         name="getCacheDir", signature="()Ljava/io/File;", native=False
     )
     def getCacheDir(self, emu):
-        pkgName = emu.config.get("pkg_name")
+        pkgName = emu.environment.get_package_name()
         return File("/data/user/0/%s/cache" % pkgName)
 
     @java_method_def(
@@ -252,7 +252,7 @@ class ContextImpl(
         native=False,
     )
     def getSharedPreferences(self, emu, name, mode):
-        pkgName = emu.config.get("pkg_name")
+        pkgName = emu.environment.get_package_name()
         pyName = name.get_py_string()
         if pyName in self._sp_map:
             return self._sp_map[pyName]

@@ -402,10 +402,8 @@ class JNIEnv:
     # args is a tuple or list
 
     def _read_args32(self, mu, args, args_type_list):
-        # 在这里处理八个字节参数问题，
-        # 1.第一个参数为jlong jdouble 直接跳过列表第一个成员，因为第一个成员刚好是call_xxx的第三个参数，根据调用约定，如果这个参数是8个字节，则直接跳过R3寄存器使用栈
-        # 2.jlong或者jdouble需要两个arg成一个参数，对应用层透明
         if args_type_list is None:
+            logger.warning('Argument type list is not defined')
             return []
 
         result = []
@@ -413,10 +411,10 @@ class JNIEnv:
         n = len(args_type_list)
         nargs = len(args)
         args_list_index = 0
+
         while args_list_index < n:
             arg_name = args_type_list[args_list_index]
             if args_index == 0 and arg_name in ("jlong", "jdouble"):
-                # 处理第一个参数(call_xxx第四个参数)跳过问题
                 args_index = args_index + 1
                 continue
 
@@ -456,8 +454,8 @@ class JNIEnv:
         return result
 
     def _read_args64(self, mu, args, args_type_list):
-        # 64w位情况简单得多，因为寄存器的大小为8字节，因此jlong，jdouble直接一个寄存器能装下，直接读即可
         if args_type_list is None:
+            logger.warning('Argument type list is not defined')
             return []
 
         result = []
@@ -497,12 +495,14 @@ class JNIEnv:
 
     def _read_args_v32(self, mu, args_ptr, args_type_list):
         result = []
+
         if args_type_list is None:
+            logger.warning('Argument type list is not defined')
             return result
 
         for arg_name in args_type_list:
-            # 使用指针arg_ptr的作为call_xxx_v第四个参数,不会出现跳过第四个参数的情况,因为arg_ptr总是四个字节
             v = int.from_bytes(mu.mem_read(args_ptr, 4), byteorder="little")
+
             if arg_name in ("jint", "jchar", "jbyte", "jboolean"):
                 result.append(v)
             elif arg_name in ("jlong", "jdouble"):
@@ -536,6 +536,7 @@ class JNIEnv:
     def _read_args_v64(self, mu, args_ptr, args_type_list):
         result = []
         if args_type_list is None:
+            logger.warning('Argument type list is not defined')
             return result
 
         ptr_size = self._emu.get_ptr_size()
@@ -573,15 +574,50 @@ class JNIEnv:
 
         return result
 
+    def _read_args_a(self, mu, args_ptr, args_type_list):
+        assert self._emu.get_arch() == emu_const.Arch.ARM32
+
+        result = []
+
+        if args_type_list is None:
+            logger.warning('Argument type list is not defined')
+            return result
+
+        for arg_name in args_type_list:
+            if arg_name in ('jchar', 'jbyte', 'jboolean'):
+                result.append(int.from_bytes(mu.mem_read(args_ptr, 1), byteorder="little"))
+            if arg_name == 'jint':
+                result.append(int.from_bytes(mu.mem_read(args_ptr, 4), byteorder="little"))
+            elif arg_name in ("jlong", "jdouble"):
+                result.append(int.from_bytes(mu.mem_read(args_ptr, 8), byteorder="little"))
+            elif arg_name in ("jstring", "jobject"):
+                ref = int.from_bytes(mu.mem_read(args_ptr, 4), byteorder="little")
+                jobj = self.get_reference(ref)
+                obj = None
+
+                if jobj is None:
+                    logger.warning("arg_name %s ref %d is not vaild maybe wrong arglist",
+                                   arg_name, ref)
+                    obj = JAVA_NULL
+                else:
+                    obj = jobj.value
+                result.append(obj)
+            else:
+                raise NotImplementedError(f"Unknown arg name {arg_name}")
+
+            args_ptr = args_ptr + 8
+
+        return result
+
     # arg_type = 0 tuple or list, 1 arg_v, 2 array
 
     def _read_args_common(self, mu, args, args_type_list, arg_type):
         if arg_type == 0:
-            args_items = args
-            return self._read_args(mu, args_items, args_type_list)
+            return self._read_args(mu, args, args_type_list)
         elif arg_type == 1:
-            args_ptr = args
-            return self._read_args_v(mu, args_ptr, args_type_list)
+            return self._read_args_v(mu, args, args_type_list)
+        elif arg_type == 2:
+            return self._read_args_a(mu, args, args_type_list)
         else:
             raise RuntimeError("arg_type %d not support" % arg_type)
 
@@ -955,9 +991,7 @@ class JNIEnv:
         )
         return method.jvm_id
 
-    def _call_xxx_method(
-        self, mu, env, obj_idx, method_id, args, args_type, is_wide=False
-    ):
+    def _call_xxx_method(self, mu, env, obj_idx, method_id, args, args_type, is_wide=False):
         obj = self.get_reference(obj_idx)
 
         if not isinstance(obj, jobject):
@@ -967,142 +1001,98 @@ class JNIEnv:
 
         method = pyobj.__class__.find_method_by_id(method_id)
         if method is None:
-            # TODO: Proper Java error?
-            raise RuntimeError(
-                "Could not find method %d in object %s by id."
-                % (method_id, pyobj.jvm_name)
-            )
-
-        logger.debug(
-            "JNIEnv->CallXXXMethodX(%s, %s <%s>, %r) was called"
-            % (pyobj.jvm_name, method.name, method.signature, args)
-        )
-
-        # Parse arguments.
-        constructor_args = self._read_args_common(
-            mu, args, method.args_list, args_type
-        )
+            raise RuntimeError("Could not find method %d in object %s by id." % (method_id, pyobj.jvm_name))
 
         sig = method.signature
         name = method.name
-        # 因为要支持多态,通过method_id找到的方法可能是基类的方法,不可以直接调用,需要获取签名和名字,通过子类的find_method才可以找到真正的实现方法.
 
         real_method = pyobj.__class__.find_method(name, sig)
+
+        constructor_args = self._read_args_common(mu, args, method.args_list, args_type)
+
+        logger.log(JNICALL, "JNIEnv->CallXXXMethodX(%s, %s <%s>, %s) was called" %
+                   (pyobj.jvm_name, method.name, method.signature, constructor_args))
+
         v = real_method.func(pyobj, self._emu, *constructor_args)
 
-        if not is_wide:
-            return v
-        else:
+        if is_wide:
             rhigh = v >> 32
             rlow = v & 0x0FFFFFFFF
             return (rlow, rhigh)
 
-    def call_object_method(
-        self, mu, env, obj_idx, method_id, arg1, arg2, arg3, arg4
-    ):
-        return self._call_xxx_method(
-            mu, env, obj_idx, method_id, (arg1, arg2, arg3, arg4), 0
-        )
+        return v
+
+    def call_object_method(self, mu, env, obj_idx, method_id, arg1, arg2, arg3, arg4):
+        return self._call_xxx_method(mu, env, obj_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
     def call_object_method_v(self, mu, env, obj_idx, method_id, args):
         return self._call_xxx_method(mu, env, obj_idx, method_id, args, 1)
 
     def call_object_method_a(self, mu, env, obj_idx, method_id, args):
-        return self._call_xxx_method(mu, env, obj_idx, method_id, args, 0)
+        return self._call_xxx_method(mu, env, obj_idx, method_id, args, 2)
 
-    def call_boolean_method(
-        self, mu, env, obj_idx, method_id, arg1, arg2, arg3, arg4
-    ):
-        return self._call_xxx_method(
-            mu, env, obj_idx, method_id, (arg1, arg2, arg3, arg4), 0
-        )
+    def call_boolean_method(self, mu, env, obj_idx, method_id, arg1, arg2, arg3, arg4):
+        return self._call_xxx_method(mu, env, obj_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
     def call_boolean_method_v(self, mu, env, obj_idx, method_id, args):
         return self._call_xxx_method(mu, env, obj_idx, method_id, args, 1)
 
     def call_boolean_method_a(self, mu, env):
-        raise NotImplementedError()
+        return self._call_xxx_method(mu, env, obj_idx, method_id, args, 2)
 
-    def call_byte_method(
-        self, mu, env, obj_idx, method_id, arg1, arg2, arg3, arg4
-    ):
-        return self._call_xxx_method(
-            mu, env, obj_idx, method_id, (arg1, arg2, arg3, arg4), 0
-        )
+    def call_byte_method(self, mu, env, obj_idx, method_id, arg1, arg2, arg3, arg4):
+        return self._call_xxx_method(mu, env, obj_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
     def call_byte_method_v(self, mu, env, obj_idx, method_id, args):
         return self._call_xxx_method(mu, env, obj_idx, method_id, args, 1)
 
     def call_byte_method_a(self, mu, env):
-        raise NotImplementedError()
+        return self._call_xxx_method(mu, env, obj_idx, method_id, args, 2)
 
-    def call_char_method(
-        self, mu, env, obj_idx, method_id, arg1, arg2, arg3, arg4
-    ):
-        return self._call_xxx_method(
-            mu, env, obj_idx, method_id, (arg1, arg2, arg3, arg4), 0
-        )
+    def call_char_method(self, mu, env, obj_idx, method_id, arg1, arg2, arg3, arg4):
+        return self._call_xxx_method(mu, env, obj_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
     def call_char_method_v(self, mu, env, obj_idx, method_id, args):
         return self._call_xxx_method(mu, env, obj_idx, method_id, args, 1)
 
     def call_char_method_a(self, mu, env):
-        raise NotImplementedError()
+        return self._call_xxx_method(mu, env, obj_idx, method_id, args, 2)
 
-    def call_short_method(
-        self, mu, env, obj_idx, method_id, arg1, arg2, arg3, arg4
-    ):
-        return self._call_xxx_method(
-            mu, env, obj_idx, method_id, (arg1, arg2, arg3, arg4), 0
-        )
+    def call_short_method(self, mu, env, obj_idx, method_id, arg1, arg2, arg3, arg4):
+        return self._call_xxx_method(mu, env, obj_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
     def call_short_method_v(self, mu, env, obj_idx, method_id, args):
         return self._call_xxx_method(mu, env, obj_idx, method_id, args, 1)
 
     def call_short_method_a(self, mu, env):
-        raise NotImplementedError()
+        return self._call_xxx_method(mu, env, obj_idx, method_id, args, 2)
 
-    # 上层不知道个数，暂时读四个寄存器，不会错
-    def call_int_method(
-        self, mu, env, obj_idx, method_id, arg1, arg2, arg3, arg4
-    ):
-        return self._call_xxx_method(
-            mu, env, obj_idx, method_id, (arg1, arg2, arg3, arg4), 0
-        )
+    def call_int_method(self, mu, env, obj_idx, method_id, arg1, arg2, arg3, arg4):
+        return self._call_xxx_method(mu, env, obj_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
     def call_int_method_v(self, mu, env, obj_idx, method_id, args):
         return self._call_xxx_method(mu, env, obj_idx, method_id, args, 1)
 
-    def call_int_method_a(self, mu, env):
-        raise NotImplementedError()
+    def call_int_method_a(self, mu, env, obj_idx, method_id, args):
+        return self._call_xxx_method(mu, env, obj_idx, method_id, args, 2)
 
-    def call_long_method(
-        self, mu, env, obj_idx, method_id, arg1, arg2, arg3, arg4
-    ):
-        return self._call_xxx_method(
-            mu, env, obj_idx, method_id, (arg1, arg2, arg3, arg4), 0, True
-        )
+    def call_long_method(self, mu, env, obj_idx, method_id, arg1, arg2, arg3, arg4):
+        return self._call_xxx_method(mu, env, obj_idx, method_id, (arg1, arg2, arg3, arg4), 0, True)
 
     def call_long_method_v(self, mu, env, obj_idx, method_id, args):
-        return self._call_xxx_method(
-            mu, env, obj_idx, method_id, args, 1, True
-        )
+        return self._call_xxx_method(mu, env, obj_idx, method_id, args, 1, True)
 
-    def call_long_method_a(self, mu, env):
-        raise NotImplementedError()
+    def call_long_method_a(self, mu, env, obj_idx, method_id, args):
+        return self._call_xxx_method(mu, env, obj_idx, method_id, args, 2)
 
-    def call_float_method(
-        self, mu, env, obj_idx, method_id, arg1, arg2, arg3, arg4
-    ):
-        return self._call_xxx_method(
-            mu, env, obj_idx, method_id, (arg1, arg2, arg3, arg4), 0
-        )
+    def call_float_method(self, mu, env, obj_idx, method_id, arg1, arg2, arg3, arg4):
+        return self._call_xxx_method(mu, env, obj_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
     def call_float_method_v(self, mu, env, obj_idx, method_id, args):
         return self._call_xxx_method(mu, env, obj_idx, method_id, args, 1)
 
-    def call_float_method_a(self, mu, env):
-        raise NotImplementedError()
+    def call_float_method_a(self, mu, env, obj_idx, method_id, args):
+        return self._call_xxx_method(mu, env, obj_idx, method_id, args, 2)
 
     def call_double_method(
         self, mu, env, obj_idx, method_id, arg1, arg2, arg3, arg4
@@ -1125,8 +1115,8 @@ class JNIEnv:
             mu, env, obj_idx, method_id, (arg1, arg2, arg3, arg4), 0
         )
 
-    def call_void_method_a(self, mu, env):
-        raise NotImplementedError()
+    def call_void_method_a(self, mu, env, obj_idx, method_id, args):
+        return self._call_xxx_method(mu, env, obj_idx, method_id, args, 2)
 
     def call_void_method_v(self, mu, env, obj_idx, method_id, args):
         self._call_xxx_method(mu, env, obj_idx, method_id, args, 1)
@@ -1407,9 +1397,7 @@ class JNIEnv:
 
         return method.jvm_id
 
-    def _call_static_xxx_method(
-        self, mu, env, clazz_idx, method_id, args, args_type, is_wide=False
-    ):
+    def _call_static_xxx_method(self, mu, env, clazz_idx, method_id, args, args_type, is_wide=False):
         clazz = self.get_reference(clazz_idx)
 
         if not isinstance(clazz, jclass):
@@ -1422,24 +1410,15 @@ class JNIEnv:
         method = pyclazz.find_method_by_id(method_id)
 
         if method is None:
-            # TODO: Proper Java error?
-            raise RuntimeError(
-                "Could not find method %d in class %s by id."
-                % (method_id, pyclazz.jvm_name)
-            )
+            raise RuntimeError("Could not find method %d in class %s by id." % (method_id, pyclazz.jvm_name))
 
-        logger.debug(
-            "JNIEnv->CallStaticXXXMethodX(%s, %s <%s>, %r) was called"
-            % (pyclazz.jvm_name, method.name, method.signature, args)
-        )
+        constructor_args = self._read_args_common(mu, args, method.args_list, args_type)
 
-        # Parse arguments.
-        constructor_args = self._read_args_common(
-            mu, args, method.args_list, args_type
-        )
+        logger.log(JNICALL, "JNIEnv->CallStaticXXXMethodX(%s, %s <%s>, %r) was called",
+                   pyclazz.jvm_name, method.name, method.signature, constructor_args)
 
         v = method.func(self._emu, *constructor_args)
-        # FIXME python的double怎么办？？？
+
         if not is_wide:
             return v
         else:
@@ -1447,20 +1426,14 @@ class JNIEnv:
             rlow = v & 0x0FFFFFFFF
             return (rlow, rhigh)
 
-    def call_static_object_method(
-        self, mu, env, clazz_idx, method_id, arg1, arg2, arg3, arg4
-    ):
-        return self._call_static_xxx_method(
-            mu, env, clazz_idx, method_id, (arg1, arg2, arg3, arg4), 0
-        )
+    def call_static_object_method(self, mu, env, clazz_idx, method_id, arg1, arg2, arg3, arg4):
+        return self._call_static_xxx_method(mu, env, clazz_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
     def call_static_object_method_v(self, mu, env, clazz_idx, method_id, args):
-        return self._call_static_xxx_method(
-            mu, env, clazz_idx, method_id, args, 1
-        )
+        return self._call_static_xxx_method(mu, env, clazz_idx, method_id, args, 1)
 
-    def call_static_object_method_a(self, mu, env):
-        raise NotImplementedError()
+    def call_static_object_method_a(self, mu, env, clazz_idx, method_id, args):
+        return self._call_static_xxx_method(mu, env, clazz_idx, method_id, args, 2)
 
     def call_static_boolean_method(
         self, mu, env, clazz_idx, method_id, arg1, arg2, arg3, arg4
@@ -2008,7 +1981,7 @@ class JNIEnv:
         """
         pyobj = JNIEnv.jobject_to_pyobject(obj)
         barr = pyobj.get_py_items()
-        mu.mem_write(buf_ptr, bytes(barr[start : start + len_in]))
+        mu.mem_write(buf_ptr, bytes(barr[start: start + len_in]))
 
         return None
 
