@@ -84,21 +84,14 @@ def native_translate_arg(emu, val):
         return val
     elif isinstance(val, bytearray):
         return emu.java_vm.jni_env.add_local_reference(jobject(val))
-    elif isinstance(type(val), JavaClassDef):
-        # TODO: Look into this, seems wrong..
-        return emu.java_vm.jni_env.add_local_reference(jobject(val))
     elif isinstance(val, JavaClassDef):
         return emu.java_vm.jni_env.add_local_reference(jobject(val))
     else:
-        raise NotImplementedError(
-            "Unable to write response '%s' type '%s' to emulator." %
-            (str(val), type(val)))
+        raise NotImplementedError(f"Unable to write response '{str(val)}' type '{type(val)}' to emulator.")
 
 
 def native_write_arg_register(emu, reg, val):
     emu.mu.reg_write(reg, native_translate_arg(emu, val))
-
-# 定义native层回调到python的方法
 
 
 def create_native_method_wrapper(func, args_count):

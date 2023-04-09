@@ -180,7 +180,7 @@ class SymbolHooks:
     @native_method
     def abort(self, uc):
         raise RuntimeError("abort called")
-        sys.exit(-1)
+        self._mu.emu_stop()
 
     @native_method
     def dl_unwind_find_exidx(self, uc, pc, pcount_ptr):

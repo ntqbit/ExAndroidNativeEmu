@@ -224,7 +224,7 @@ class SyscallHooks:
             logger.error(
                 "process 0x%x is killing self maybe encounter anti-debug" %
                 pid)
-            sys.exit(-10)
+            self._mu.emu_stop()
 
     def _pipe_common(self, mu, files_ptr, flags):
         # logger.warning("skip syscall pipe files [0x%08X]"%files_ptr)

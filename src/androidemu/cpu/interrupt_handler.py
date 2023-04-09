@@ -42,10 +42,9 @@ class InterruptHandler:
                 logger.error("catch error in _hook_interrupt")
                 logger.error(stack_trace[:-1])
                 self._mu.emu_stop()
-                sys.exit(-1)
         except Exception as e:
             logger.exception("exception in _hook_interrupt intno:[%d]" % intno)
-            sys.exit(-1)
+            self._mu.emu_stop()
 
     def set_handler(self, intno, handler):
         self._handlers[intno] = handler

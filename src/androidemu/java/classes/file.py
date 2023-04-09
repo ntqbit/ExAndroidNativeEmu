@@ -31,3 +31,10 @@ class File(metaclass=JavaClassDef, jvm_name='java/io/File'):
         raise NotImplementedError()
         # FIXME return abspath...
         return String(self._path)
+    
+    @java_method_def(name='toString',
+                     signature='()Ljava/lang/String;',
+                     native=False)
+    def toString(self, emu):
+        logger.debug('File.toString: [path=%s]', self._path)
+        return String(self._path)

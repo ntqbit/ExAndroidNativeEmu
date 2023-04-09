@@ -1,16 +1,12 @@
 import verboselogs
 
-from androidemu.java.jni_ref import *
+from androidemu.java.jni_ref import jobject
 
 
 logger = verboselogs.VerboseLogger(__name__)
 
 
 class ReferenceTable:
-    """
-    :type _table dict[int, jobject|None]
-    """
-
     def __init__(self, start=1, max_entries=1024):
         self._table = dict()
         self._start = start
@@ -30,12 +26,10 @@ class ReferenceTable:
         if not isinstance(obj, jobject):
             raise ValueError('Expected a jobject.')
 
-        # Search a free index.
         index = self._start
         while index in self._table:
             index += 1
 
-        # Add to table.
         self._table[index] = obj
         logger.debug('reference: add: %s = %d', obj, index)
 

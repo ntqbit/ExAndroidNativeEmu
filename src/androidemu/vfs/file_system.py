@@ -11,6 +11,7 @@ from androidemu.const import emu_const
 from androidemu.vfs import file_helpers
 from androidemu import pcb
 from androidemu.const import linux
+from androidemu.logging import SYSCALL
 import platform
 import shutil
 import random
@@ -105,27 +106,21 @@ class VirtualFileSystem:
             syscall_handler.set_handler(0x36, "ioctl", 6, self._ioctl)
             syscall_handler.set_handler(0x37, "fcntl", 6, self._fcntl64)
             syscall_handler.set_handler(0x6C, "fstat", 2, self._handle_fstat64)
-            syscall_handler.set_handler(
-                0x8c, "_llseek", 5, self._handle_llseek)
+            syscall_handler.set_handler(0x8c, "_llseek", 5, self._handle_llseek)
             syscall_handler.set_handler(0x92, "writev", 3, self._handle_writev)
             syscall_handler.set_handler(0xA8, "poll", 3, self._handle_poll)
             syscall_handler.set_handler(0xC3, "stat64", 2, self._handle_stat64)
-            syscall_handler.set_handler(
-                0xC4, "lstat64", 2, self._handle_lstat64)
-            syscall_handler.set_handler(
-                0xC5, "fstat64", 2, self._handle_fstat64)
-            syscall_handler.set_handler(
-                0xD9, "getdents64", 3, self._handle_getdents64)
+            syscall_handler.set_handler(0xC4, "lstat64", 2, self._handle_lstat64)
+            syscall_handler.set_handler(0xC5, "fstat64", 2, self._handle_fstat64)
+            syscall_handler.set_handler(0xD9, "getdents64", 3, self._handle_getdents64)
+            syscall_handler.set_handler(0xE4, "fsetxattr", 5, self._handle_fsetxattr)
             syscall_handler.set_handler(0xDD, "fcntl64", 6, self._fcntl64)
             syscall_handler.set_handler(0x10A, "statfs64", 3, self._statfs64)
-            syscall_handler.set_handler(
-                0x142, "openat", 4, self._handle_openat)
+            syscall_handler.set_handler(0x142, "openat", 4, self._handle_openat)
             syscall_handler.set_handler(0x143, "mkdirat", 3, self._mkdirat)
-            syscall_handler.set_handler(
-                0x147, "fstatat64", 4, self._handle_fstatat64)
+            syscall_handler.set_handler(0x147, "fstatat64", 4, self._handle_fstatat64)
             syscall_handler.set_handler(0x148, "unlinkat", 3, self._unlinkat)
-            syscall_handler.set_handler(
-                0x14c, "readlinkat", 4, self._readlinkat)
+            syscall_handler.set_handler(0x14c, "readlinkat", 4, self._readlinkat)
             syscall_handler.set_handler(0x14e, "faccessat", 4, self._faccessat)
             syscall_handler.set_handler(0x150, "ppoll", 4, self._ppoll)
 
@@ -149,8 +144,7 @@ class VirtualFileSystem:
             # no stat64
             # no lstat64
             # no fstat64 use fstat
-            syscall_handler.set_handler(
-                0x3D, "getdents64", 3, self._handle_getdents64)
+            syscall_handler.set_handler(0x3D, "getdents64", 3, self._handle_getdents64)
             # no fcntl64
             # no statfs64
 
@@ -160,13 +154,10 @@ class VirtualFileSystem:
             # no fstatat64
 
             syscall_handler.set_handler(0x23, "unlinkat", 3, self._unlinkat)
-            syscall_handler.set_handler(
-                0x4E, "readlinkat", 4, self._readlinkat)
+            syscall_handler.set_handler(0x4E, "readlinkat", 4, self._readlinkat)
             syscall_handler.set_handler(0x30, "faccessat", 4, self._faccessat)
             syscall_handler.set_handler(0x49, "ppoll", 4, self._ppoll)
-
-            syscall_handler.set_handler(
-                0x4F, "newfstatat", 4, self._handle_fstatat64)
+            syscall_handler.set_handler(0x4F, "newfstatat", 4, self._handle_fstatat64)
 
     def _create_fd_link(self, fd, target):
         global g_isWin
@@ -598,6 +589,12 @@ class VirtualFileSystem:
             "syscall _handle_getdents64 %u %u %u skip..." %
             (fd, linux_dirent64_ptr, count))
         return -1
+
+    def _handle_fsetxattr(self, mu, fd, name_ptr, value_ptr, size, flags):
+        name = memory_helpers.read_utf8(mu, name_ptr)
+        # value = memory_helpers.read_utf8(mu, value_ptr)
+        value = '?'
+        logger.log(SYSCALL, 'fsetxattr: [fd=%s,name=%s,value=%s,size=%d,flags=%d]', fd, name, value, size, flags)
 
     def _ioctl(self, mu, fd, cmd, arg1, arg2, arg3, arg4):
         # http://man7.org/linux/man-pages/man2/ioctl_list.2.html

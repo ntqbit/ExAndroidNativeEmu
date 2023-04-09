@@ -594,18 +594,13 @@ class JNIEnv:
 
         pyclazz = self._class_loader.find_class_by_name(name)
         if pyclazz is None:
-            # TODO: Proper Java error?
-            raise RuntimeError(
-                'Could not find class \'%s\' for JNIEnv.' %
-                name)
+            raise RuntimeError('Could not find class \'%s\' for JNIEnv.' % name)
 
         if pyclazz.jvm_ignore:
             logger.debug("FindClass %s return 0 because of ignored")
             return 0
 
-        # jclass包裹的都是Class的对象(Java Class Object)
-        jvm_clazz = pyclazz.class_object
-        return self.add_local_reference(jclass(jvm_clazz))
+        return self.add_local_reference(jclass(pyclazz.class_object))
 
     def from_reflected_method(self, mu, env):
         raise NotImplementedError()
@@ -784,6 +779,9 @@ class JNIEnv:
         if ref1 == 0 and ref2 == 0:
             return JNI_TRUE
 
+        if ref1 == 0 or ref2 == 0:
+            return JNI_FALSE
+
         obj1 = self.get_reference(ref1)
         obj2 = self.get_reference(ref2)
         pyobj1 = self.jobject_to_pyobject(obj1)
@@ -809,8 +807,6 @@ class JNIEnv:
         return self.add_local_reference(obj)
 
     def ensure_local_capacity(self, mu, env):
-        #raise NotImplementedError()
-        # ignore
         return JNIEnv.JNI_OK
 
     def alloc_object(self, mu, env):
@@ -832,8 +828,7 @@ class JNIEnv:
         # Get constructor method.
         method = pyclazz.find_method_by_id(method_id)
         if method.name != '<init>' or not method.signature.endswith('V'):
-            raise ValueError(
-                'Class constructor has the wrong name or does not return void.')
+            raise ValueError(                'Class constructor has the wrong name or does not return void.')
 
         logger.debug(
             "JNIEnv->NewObjectX(%s, %s, %r) was called" %
@@ -847,8 +842,6 @@ class JNIEnv:
         method.func(obj, self._emu, *constructor_args)
 
         return self.add_local_reference(jobject(obj))
-
-    # FIXME*args 无法确定参数个数，强行读取四个参数，未完善。
 
     def new_object(
             self,
@@ -873,10 +866,7 @@ class JNIEnv:
 
         obj = self.get_reference(obj_idx)
         if obj is None:
-            # TODO: Proper Java error?
-            raise RuntimeError(
-                'get_object_class can not get class for object id %d for JNIEnv.' %
-                obj_idx)
+            raise RuntimeError('get_object_class can not get class for object id %d for JNIEnv.' % obj_idx)
 
         pyobj = JNIEnv.jobject_to_pyobject(obj)
         logger.debug("JNIEnv->GetObjectClass(%r) was called" % (pyobj, ))
@@ -931,10 +921,8 @@ class JNIEnv:
         method = pyclazz.find_method(name, sig)
 
         if method is None:
-            # TODO: Proper Java error?
-            raise RuntimeError(
-                "Could not find method ('%s', '%s') in class %s." %
-                (name, sig, pyclazz.jvm_name))
+            raise RuntimeError("Could not find method ('%s', '%s') in class %s." % (name, sig, pyclazz.jvm_name))
+
         logger.debug(
             "JNIEnv->GetMethodId(%d, %s, %s) return 0x%08X" %
             (clazz_idx, name, sig, method.jvm_id))
@@ -953,6 +941,7 @@ class JNIEnv:
 
         if not isinstance(obj, jobject):
             raise ValueError('Expected a jobject.')
+
         pyobj = JNIEnv.jobject_to_pyobject(obj)
 
         method = pyobj.__class__.find_method_by_id(method_id)
@@ -995,14 +984,13 @@ class JNIEnv:
             arg2,
             arg3,
             arg4):
-        return self._call_xxx_method(
-            mu, env, obj_idx, method_id, (arg1, arg2, arg3, arg4), 0)
+        return self._call_xxx_method(mu, env, obj_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
     def call_object_method_v(self, mu, env, obj_idx, method_id, args):
         return self._call_xxx_method(mu, env, obj_idx, method_id, args, 1)
 
-    def call_object_method_a(self, mu, env):
-        raise NotImplementedError()
+    def call_object_method_a(self, mu, env, obj_idx, method_id, args):
+        return self._call_xxx_method(mu, env, obj_idx, method_id, args, 0)
 
     def call_boolean_method(
             self,
