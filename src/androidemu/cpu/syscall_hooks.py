@@ -12,7 +12,7 @@ import calendar
 from random import randint
 
 from unicorn import Uc
-from unicorn.arm_const import *
+from unicorn.arm_const import UC_ARM_REG_C13_C0_3
 
 from androidemu.utils import debug_utils, misc_utils
 from androidemu import pcb
