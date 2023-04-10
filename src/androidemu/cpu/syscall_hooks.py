@@ -1,23 +1,27 @@
-from androidemu.utils import debug_utils, misc_utils
-from androidemu import pcb
-from androidemu import config
-from androidemu.utils import memory_helpers
-import calendar
-import verboselogs
+
 import math
 import os
 import time
 import sys
 import ctypes
 import socket
+
+import verboselogs
+import calendar
+
 from random import randint
 
 from unicorn import Uc
 from unicorn.arm_const import *
 
+from androidemu.utils import debug_utils, misc_utils
+from androidemu import pcb
+from androidemu import config
+from androidemu.utils import memory_helpers
+
 from androidemu.const.android import *
 from androidemu.const.linux import *
-from androidemu.const import emu_const
+from androidemu.const.emu_const import Arch
 from androidemu.cpu.syscall_handlers import SyscallHandlers
 
 OVERRIDE_TIMEOFDAY = False
@@ -43,7 +47,7 @@ class SyscallHooks:
         self._ptr_sz = emu.get_ptr_size()
         self._syscall_handler = syscall_handler
 
-        if self._emu.get_arch() == emu_const.Arch.ARM32:
+        if self._emu.get_arch() == Arch.ARM32:
             self._syscall_handler.set_handler(0x1, "exit", 1, self._exit)
             self._syscall_handler.set_handler(0x2, "fork", 0, self._fork)
             self._syscall_handler.set_handler(0x0B, "execve", 3, self._execve)
@@ -389,7 +393,7 @@ class SyscallHooks:
         f = 0 char[8]
         """
         uptime = int(self._clock_offset + time.time() - self._clock_start)
-        if self._emu.get_arch() == emu_const.Arch.ARM32:
+        if self._emu.get_arch() == Arch.ARM32:
             mu.mem_write(
                 info_ptr + 0, int(uptime).to_bytes(4, byteorder="little")
             )
@@ -885,7 +889,7 @@ class SyscallHooks:
 
     def _ARM_set_tls(self, mu, tls_ptr):
         assert (
-            self._emu.get_arch() == emu_const.Arch.ARM32
+            self._emu.get_arch() == Arch.ARM32
         ), "error only arm32 has _ARM_set_tls syscall"
         self._emu.mu.reg_write(UC_ARM_REG_C13_C0_3, tls_ptr)
 

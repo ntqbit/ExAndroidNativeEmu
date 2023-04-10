@@ -1,21 +1,21 @@
 import os
+
 import verboselogs
 
 from typing import List
 
 from unicorn import UC_PROT_ALL, UC_PROT_WRITE, UC_PROT_READ
-
-from androidemu.internal import arm
 from unicorn.arm_const import *
 from unicorn.arm64_const import *
+
+from androidemu.internal import arm
 from androidemu.utils.misc_utils import get_segment_protection
 from androidemu.utils.alignment import page_start, page_end
 from androidemu.utils.stack_helpers import StackHelper
 from androidemu.internal.module import Module
-from androidemu.const import emu_const
+from androidemu.const.emu_const import Arch
 from androidemu.utils import memory_helpers, misc_utils
 from androidemu.vfs.virtual_file import VirtualFile
-from androidemu import config
 from androidemu.internal import elf_reader
 from androidemu.const import linux
 from androidemu.const.emu_const import BASE_ADDR, TLS_BASE, TLS_SIZE
@@ -154,7 +154,7 @@ class Modules:
         )
         arch = self.emu.get_arch()
 
-        if arch == emu_const.Arch.ARM32:
+        if arch == Arch.ARM32:
             mu.reg_write(UC_ARM_REG_C13_C0_3, tls_ptr)
         else:
             mu.reg_write(UC_ARM64_REG_TPIDR_EL0, tls_ptr)
@@ -180,7 +180,7 @@ class Modules:
         self._tls_init()
 
     def _get_ld_library_path(self):
-        if self.emu.get_arch() == emu_const.Arch.ARM32:
+        if self.emu.get_arch() == Arch.ARM32:
             return ["/system/lib/"]
         else:
             return ["/system/lib64/"]
@@ -247,13 +247,13 @@ class Modules:
         # do sth like linker
         reader = elf_reader.ELFReader(filename)
         if (
-            self.emu.get_arch() == emu_const.Arch.ARM32
+            self.emu.get_arch() == Arch.ARM32
             and not reader.is_elf32()
         ):
             raise RuntimeError(
                 "arch is ARCH_ARM32 but so %s is not elf32" % filename
             )
-        elif self.emu.get_arch() == emu_const.Arch.ARM64 and reader.is_elf32():
+        elif self.emu.get_arch() == Arch.ARM64 and reader.is_elf32():
             raise RuntimeError(
                 "arch is ARCH_ARM64 but so %s is elf32" % filename
             )

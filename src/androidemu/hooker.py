@@ -1,5 +1,5 @@
 from unicorn import UC_HOOK_CODE
-from androidemu.const import emu_const
+from androidemu.const.emu_const import Arch
 
 import verboselogs
 
@@ -39,7 +39,7 @@ class Hooker:
         self._hook_current += 4
 
         hook_addr = self._hook_current
-        if self._emu.get_arch() == emu_const.Arch.ARM32:
+        if self._emu.get_arch() == Arch.ARM32:
             # Create the ARM assembly code.
             self._emu.mu.mem_write(
                 self._hook_current, b"\x1E\xFF\x2F\xE1"

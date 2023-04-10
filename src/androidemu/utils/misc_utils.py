@@ -11,7 +11,7 @@ from unicorn.unicorn_const import (
 from unicorn.arm_const import UC_ARM_REG_C13_C0_3
 from unicorn.arm64_const import UC_ARM64_REG_TPIDR_EL0
 
-from androidemu.const import emu_const
+from androidemu.const.emu_const import Arch
 
 
 IS_WINDOWS = platform.system() == "Windows"
@@ -61,7 +61,7 @@ def platform_open(fd, flag):
 
 def set_errno(emu, errno):
     mu = emu.mu
-    if emu.get_arch() == emu_const.Arch.ARM32:
+    if emu.get_arch() == Arch.ARM32:
         err_ptr = mu.reg_reg(UC_ARM_REG_C13_C0_3) + 8
         mu.mem_write(err_ptr, int(errno).to_bytes(4, byteorder="little"))
 

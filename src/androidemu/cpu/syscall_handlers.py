@@ -17,7 +17,7 @@ from unicorn.arm64_const import (
 
 from androidemu.cpu.interrupt_handler import InterruptHandler
 from androidemu.cpu.syscall_handler import SyscallHandler
-from androidemu.const import emu_const
+from androidemu.const.emu_const import Arch
 from androidemu.logging import SYSCALL
 
 logger = verboselogs.VerboseLogger(__name__)
@@ -33,7 +33,7 @@ class SyscallHandlers:
         self._sch = schduler
         self._interrupt_handler = InterruptHandler(mu)
 
-        if arch == emu_const.Arch.ARM32:
+        if arch == Arch.ARM32:
             self._interrupt_handler.set_handler(2, self._handle_syscall)
         else:
             # arm64

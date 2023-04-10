@@ -3,7 +3,7 @@ import random
 import verboselogs
 
 from androidemu.java.helpers.native_method import native_method
-from androidemu.const import emu_const
+from androidemu.const.emu_const import Arch
 from androidemu.native.asset_mgr_hooks import AssetManagerHooks
 from androidemu.utils import memory_helpers
 
@@ -122,7 +122,7 @@ class SymbolHooks:
         logger.debug("Called dlsym(0x%x, %s)", handle, symbol_str)
 
         global_handle = 0xFFFFFFFF
-        if self._emu.get_arch() == emu_const.Arch.ARM64:
+        if self._emu.get_arch() == Arch.ARM64:
             global_handle = 0
 
         if handle == global_handle:
@@ -131,7 +131,7 @@ class SymbolHooks:
             soinfo = handle
             base = -1
 
-            if self._emu.get_arch() == emu_const.Arch.ARM64:
+            if self._emu.get_arch() == Arch.ARM64:
                 base = memory_helpers.read_ptr_sz(
                     mu, soinfo + 152, self._emu.get_ptr_size()
                 )

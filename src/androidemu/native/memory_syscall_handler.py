@@ -1,6 +1,6 @@
-from androidemu.const import emu_const
-
 import verboselogs
+
+from androidemu.const.emu_const import Arch
 
 logger = verboselogs.VerboseLogger(__name__)
 
@@ -16,7 +16,7 @@ class MemorySyscallHandler:
         self._pcb = emu.get_pcb()
         self._memory = memory
         self._syscall_handler = syscall_handler
-        if self._emu.get_arch() == emu_const.Arch.ARM32:
+        if self._emu.get_arch() == Arch.ARM32:
             self._syscall_handler.set_handler(0x2D, "brk", 1, self._handle_brk)
             self._syscall_handler.set_handler(
                 0x5B, "munmap", 2, self._handle_munmap

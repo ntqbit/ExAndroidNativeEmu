@@ -1,10 +1,11 @@
-import capstone
 import os
 import io
+import capstone
+
 from unicorn import *
 from unicorn.arm_const import *
 from unicorn.arm64_const import *
-from androidemu.const import emu_const
+from androidemu.const.emu_const import Arch
 
 
 def dump_memory(emu, fd, min_addr=0, max_addr=0xFFFFFFFF):
@@ -36,7 +37,7 @@ def dump_memory(emu, fd, min_addr=0, max_addr=0xFFFFFFFF):
 def dump_registers(emu, fd):
     regs = ""
     mu = emu.mu
-    if emu.get_arch() == emu_const.Arch.ARM32:
+    if emu.get_arch() == Arch.ARM32:
         r0 = mu.reg_read(UC_ARM_REG_R0)
         r1 = mu.reg_read(UC_ARM_REG_R1)
         r2 = mu.reg_read(UC_ARM_REG_R2)
@@ -154,7 +155,7 @@ DUMP_REG_WRITE = 2
 
 def dump_code(emu, address, size, fd, dump_reg_type=DUMP_REG_READ):
     mu = emu.mu
-    if emu.get_arch() == emu_const.Arch.ARM32:
+    if emu.get_arch() == Arch.ARM32:
         cpsr = mu.reg_read(UC_ARM_REG_CPSR)
         if cpsr & (1 << 5):
             md = g_md_thumb
@@ -222,7 +223,7 @@ def dump_code(emu, address, size, fd, dump_reg_type=DUMP_REG_READ):
 def dump_stack(emu, fd, max_deep=512):
     mu = emu.mu
     sp = 0
-    if emu.get_arch() == emu_const.Arch.ARM32():
+    if emu.get_arch() == Arch.ARM32():
         sp = mu.reg_read(UC_ARM_REG_SP)
     else:
         sp = mu.reg_read(UC_ARM64_REG_SP)

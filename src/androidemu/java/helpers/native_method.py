@@ -2,7 +2,7 @@ import inspect
 
 from unicorn.arm_const import *
 from unicorn.arm64_const import *
-from androidemu.const import emu_const
+from androidemu.const.emu_const import Arch
 
 from androidemu.java import JavaClassDef
 from androidemu.java.jni_ref import jobject
@@ -13,7 +13,7 @@ def native_write_args(emu, *argv):
     reg_base = UC_ARM_REG_R0
     sp_reg = UC_ARM_REG_SP
 
-    if emu.get_arch() == emu_const.Arch.ARM64:
+    if emu.get_arch() == Arch.ARM64:
         max_regs_args = 8
         reg_base = UC_ARM64_REG_X0
         sp_reg = UC_ARM64_REG_SP
@@ -52,7 +52,7 @@ def native_read_args_in_hook_code(emu, args_count):
     reg_base = UC_ARM_REG_R0
     sp_reg = UC_ARM_REG_SP
 
-    if emu.get_arch() == emu_const.Arch.ARM64:
+    if emu.get_arch() == Arch.ARM64:
         max_regs_args = 8
         reg_base = UC_ARM64_REG_X0
         sp_reg = UC_ARM64_REG_SP
@@ -119,7 +119,7 @@ def create_native_method_wrapper(func, args_count):
 
         ret_reg0 = UC_ARM_REG_R0
         ret_reg1 = UC_ARM_REG_R1
-        if emu.get_arch() == emu_const.Arch.ARM64:
+        if emu.get_arch() == Arch.ARM64:
             ret_reg0 = UC_ARM64_REG_X0
             ret_reg1 = UC_ARM64_REG_X1
 

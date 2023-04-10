@@ -23,7 +23,7 @@ from androidemu.java.const import JAVA_NULL, MODIFIER_STATIC
 from androidemu.java.jni_const import JNI_TRUE, JNI_FALSE, JNI_OK
 from androidemu.utils import memory_helpers, debug_utils
 from androidemu.utils.repr import short_bytes_repr
-from androidemu.const import emu_const
+from androidemu.const.emu_const import Arch
 from androidemu.java.jni_functions import JNI_FUNCTIONS
 from androidemu.logging import JNICALL
 
@@ -45,10 +45,10 @@ class JNIEnv:
         self._globals = ReferenceTable(start=4096, max_entries=512000)
 
         arch = emu.get_arch()
-        if arch == emu_const.Arch.ARM32:
+        if arch == Arch.ARM32:
             self._read_args = self._read_args32
             self._read_args_v = self._read_args_v32
-        elif arch == emu_const.Arch.ARM64:
+        elif arch == Arch.ARM64:
             self._read_args = self._read_args64
             self._read_args_v = self._read_args_v64
         else:
@@ -562,7 +562,7 @@ class JNIEnv:
         return result
 
     def _read_args_a(self, mu, args_ptr, args_type_list):
-        assert self._emu.get_arch() == emu_const.Arch.ARM32
+        assert self._emu.get_arch() == Arch.ARM32
 
         result = []
 

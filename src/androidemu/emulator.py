@@ -65,7 +65,7 @@ class Emulator:
         config: Config = None,
         environment: Environment = None,
         vfp_inst_set=True,
-        arch=emu_const.Arch.ARM32,
+        arch=Arch.ARM32,
         muti_task=False,
     ):
         if not config:
@@ -84,7 +84,7 @@ class Emulator:
         logger.info("process pid:%d", self._pcb.get_pid())
 
         sp_reg = 0
-        if arch == emu_const.Arch.ARM32:
+        if arch == Arch.ARM32:
             self._ptr_sz = 4
             self.mu = Uc(UC_ARCH_ARM, UC_MODE_ARM)
             if vfp_inst_set:
@@ -94,7 +94,7 @@ class Emulator:
             self.call_native = self._call_native32
             self.call_native_return_2reg = self._call_native_return_2reg32
 
-        elif arch == emu_const.Arch.ARM64:
+        elif arch == Arch.ARM64:
             self._ptr_sz = 8
             self.mu = Uc(UC_ARCH_ARM64, UC_MODE_ARM)
             if vfp_inst_set:
@@ -110,7 +110,7 @@ class Emulator:
 
         self._vfs_root = vfs_root
 
-        if arch == emu_const.Arch.ARM32:
+        if arch == Arch.ARM32:
             self.system_properties = {
                 "libc.debug.malloc.options": "",
                 "ro.build.version.sdk": "19",
@@ -208,7 +208,7 @@ class Emulator:
             UC_PROT_READ | UC_PROT_WRITE | UC_PROT_EXEC,
         )
 
-        if arch == emu_const.Arch.ARM32:
+        if arch == Arch.ARM32:
             # 映射app_process，android系统基本特征
             path = "%s/system/bin/app_process32" % vfs_root
             sz = os.path.getsize(path)
