@@ -1,4 +1,4 @@
-def short_byte_repr(b):
+def short_bytes_repr(b):
     if len(b) <= 20:
         return b.hex()
     else:

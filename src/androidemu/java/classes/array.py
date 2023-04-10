@@ -1,5 +1,5 @@
 from androidemu.java import JavaClassDef, java_method_def
-from androidemu.utils.repr import short_byte_repr
+from androidemu.utils.repr import short_bytes_repr
 
 
 class Array(metaclass=JavaClassDef, jvm_name="java/lang/reflect/Array"):
@@ -44,7 +44,7 @@ class ByteArray(Array, metaclass=JavaClassDef, jvm_name="[B", jvm_super=Array):
         Array.__init__(self, item_list)
 
     def __repr__(self):
-        return f"ByteArray({short_byte_repr(self._pyitems)})"
+        return f"ByteArray({short_bytes_repr(self._pyitems)})"
 
 
 class ObjectArray(

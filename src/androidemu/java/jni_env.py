@@ -1,5 +1,6 @@
-import verboselogs
 import sys
+
+import verboselogs
 
 from androidemu.hooker import Hooker
 from androidemu.java.classes.constructor import Constructor
@@ -9,18 +10,16 @@ from androidemu.java.helpers.native_method import (
     create_native_method_wrapper,
     native_translate_arg,
 )
-from androidemu.java.jni_const import *
 from androidemu.java.jni_ref import jclass, jobject, jthrowable
 from androidemu.java.reference_table import ReferenceTable
 from androidemu.java.classes.string import String
 from androidemu.java.classes.array import Array
 from androidemu.java.const import JAVA_NULL, MODIFIER_STATIC
-from androidemu.utils import memory_helpers
-from unicorn import *
-from androidemu.utils import debug_utils
+from androidemu.java.jni_const import JNI_TRUE, JNI_FALSE
+from androidemu.utils import memory_helpers, debug_utils
+from androidemu.utils.repr import short_bytes_repr
 from androidemu.const import emu_const
 from androidemu.java.jni_functions import JNI_FUNCTIONS
-from androidemu.utils.repr import short_byte_repr
 from androidemu.logging import JNICALL
 
 logger = verboselogs.VerboseLogger(__name__)
@@ -437,7 +436,7 @@ class JNIEnv:
             elif arg_name in ("jstring", "jobject", "jthrowable"):
                 ref = v
                 jobj = self.get_reference(ref)
-                
+
                 if jobj is None:
                     obj = None
                 else:
@@ -509,7 +508,7 @@ class JNIEnv:
             elif arg_name in ("jstring", "jobject", "jthrowable"):
                 ref = v
                 jobj = self.get_reference(ref)
-                
+
                 if jobj is None:
                     obj = None
                 else:
@@ -582,7 +581,7 @@ class JNIEnv:
                     obj = None
                 else:
                     obj = jobj.value
-                
+
                 result.append(obj)
             else:
                 raise NotImplementedError(f"Unknown arg name {arg_name}")
@@ -1894,7 +1893,7 @@ class JNIEnv:
             0, extra_n + items_len, UC_PROT_READ | UC_PROT_WRITE
         )
 
-        logger.debug(f"=> {short_byte_repr(items)}")
+        logger.debug(f"=> {short_bytes_repr(items)}")
 
         # 协议约定前四个字节必定是长度
         mu.mem_write(buf, items_len.to_bytes(extra_n, "little"))
