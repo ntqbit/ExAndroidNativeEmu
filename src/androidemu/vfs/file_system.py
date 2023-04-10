@@ -376,11 +376,11 @@ class VirtualFileSystem:
         data = mu.mem_read(buf_addr, count)
         if fd == 1:
             s = bytes(data).decode("utf-8")
-            logger.debug("stdout:[%s]" % s)
+            logger.info("stdout: [%s]" % s)
             return len(data)
         elif fd == 2:
             s = bytes(data).decode("utf-8")
-            logger.warning("stderr:[%s]" % s)
+            logger.error("stderr: [%s]" % s)
             return len(data)
 
         try:
@@ -469,7 +469,7 @@ class VirtualFileSystem:
                 mu, vec + (i * vec_sz) + ptr_sz, ptr_sz
             )
             data = bytes(mu.mem_read(addr, size))
-            logger.debug("Writev %r" % data)
+            logger.debug("Writev: %r" % data)
             n += os.write(fd, data)
 
         return n

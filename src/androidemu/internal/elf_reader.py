@@ -43,9 +43,16 @@ DT_PLTREL = 20
 DT_DEBUG = 21
 DT_TEXTREL = 22
 DT_JMPREL = 23
+DT_RELRSZ = 35
+DT_RELR = 36
+DT_RELRENT = 37
 DT_GNU_HASH = 0x6FFFFEF5
 DT_LOPROC = 0x70000000
 DT_HIPROC = 0x7FFFFFFF
+DT_ANDROID_RELR = 0x6fffe000
+DT_ANDROID_RELRSZ = 0x6fffe001
+DT_ANDROID_RELRENT = 0x6fffe003
+DT_ANDROID_RELRCOUNT = 0x6fffe005
 
 SHN_UNDEF = 0
 SHN_LORESERVE = 0xFF00
@@ -167,27 +174,25 @@ class ELFReader:
         with open(filename, "rb") as f:
             is_elf32 = ELFReader.check_elf32(filename)
             self._is_elf32 = is_elf32
-            elf_r_sym = ELFReader._elf32_r_sym
-            elf_r_type = ELFReader._elf32_r_type
 
-            ehdr_sz = 52
-            phdr_sz = 32
-            elf_dyn_sz = 8
-            elf_sym_sz = 16
-            elf_rel_sz = 8
-            edhr_pattern = "<16sHHIIIIIHHHHHH"
-            phdr_pattern = "<IIIIIIII"
-            dyn_pattern = "<II"
-            sym_pattern = "<IIIccH"
-            rel_pattern = "<II"
-
-            if not is_elf32:
-                # elf64
+            if is_elf32:
+                ehdr_sz = 52
+                phdr_sz = 32
+                elf_dyn_sz = 8
+                elf_sym_sz = 16
+                elf_rel_sz = 8
+                elf_r_sym = ELFReader._elf32_r_sym
+                elf_r_type = ELFReader._elf32_r_type
+                edhr_pattern = "<16sHHIIIIIHHHHHH"
+                phdr_pattern = "<IIIIIIII"
+                dyn_pattern = "<II"
+                sym_pattern = "<IIIccH"
+                rel_pattern = "<II"
+            else:
                 ehdr_sz = 64
                 phdr_sz = 56
                 elf_dyn_sz = 16
                 elf_sym_sz = 24
-                # 实际上是rela
                 elf_rel_sz = 24
                 elf_r_sym = ELFReader._elf64_r_sym
                 elf_r_type = ELFReader._elf64_r_type
@@ -294,6 +299,9 @@ class ELFReader:
             nsymbol = -1
             rel_addr = 0
             rel_count = 0
+            relr_addr = 0
+            relr_size = 0
+            elf_relr_ent_sz = 0
             relplt_addr = 0
             relplt_count = 0
             dt_needed = []
@@ -304,28 +312,34 @@ class ELFReader:
                 d_tag, d_val_ptr = struct.unpack(dyn_pattern, dyn_item_bytes)
                 if d_tag == DT_NULL:
                     break
+
+                # REL
                 if d_tag == DT_RELA:
                     # 根据linker源码 rela只出现在arm64中
-                    assert (
-                        is_elf32 == False
-                    ), "get DT_RELA when parsing elf64 impossible in android"
+                    assert not is_elf32, "get DT_RELA when parsing elf64 impossible in android"
                     rel_addr = d_val_ptr
                 elif d_tag == DT_RELASZ:
                     rel_count = int(d_val_ptr / elf_rel_sz)
 
+                # REL
                 elif d_tag == DT_REL:
                     # rel只出现在arm中
-                    assert (
-                        is_elf32
-                    ), "get DT_REL when parsing elf32 impossible in android"
+                    assert is_elf32, "get DT_REL when parsing elf32 impossible in android"
                     rel_addr = d_val_ptr
-
                 elif d_tag == DT_RELSZ:
                     rel_count = int(d_val_ptr / elf_rel_sz)
 
+                # RELR
+                elif d_tag in (DT_RELR, DT_ANDROID_RELR):
+                    relr_addr = d_val_ptr
+                elif d_tag in (DT_RELRSZ, DT_ANDROID_RELRSZ):
+                    relr_size = d_val_ptr
+                elif d_tag in (DT_RELRENT, DT_ANDROID_RELRENT):
+                    elf_relr_ent_sz = d_val_ptr
+
+                # JMPREL
                 elif d_tag == DT_JMPREL:
                     relplt_addr = d_val_ptr
-
                 elif d_tag == DT_PLTRELSZ:
                     relplt_count = int(d_val_ptr / elf_rel_sz)
 
@@ -339,38 +353,17 @@ class ELFReader:
                     dyn_str_sz = d_val_ptr
 
                 elif d_tag == DT_HASH:
-                    """
-                    nbucket_ = reinterpret_cast<uint32_t*>(load_bias + d->d_un.d_ptr)[0];
-                    nchain_ = reinterpret_cast<uint32_t*>(load_bias + d->d_un.d_ptr)[1];
-                    bucket_ = reinterpret_cast<uint32_t*>(load_bias + d->d_un.d_ptr + 8);
-                    chain_ = reinterpret_cast<uint32_t*>(load_bias + d->d_un.d_ptr + 8 + nbucket_ * 4);
-                    """
                     n = f.tell()
                     f.seek(d_val_ptr - bias, 0)
                     hash_heads = f.read(8)
                     f.seek(n, 0)
-                    self._nbucket, self._nchain = struct.unpack(
-                        "<II", hash_heads
-                    )
+                    self._nbucket, self._nchain = struct.unpack("<II", hash_heads)
                     self._bucket_addr = d_val_ptr + 8
                     self._chain_addr = d_val_ptr + 8 + self._nbucket * 4
                     nsymbol = self._nchain
 
                 elif d_tag == DT_GNU_HASH:
-                    """
-                    struct gnu_hash_table {
-                        uint32_t nbuckets;
-                        uint32_t symoffset;
-                        uint32_t bloom_size;
-                        uint32_t bloom_shift;
-                        uint32_t bloom[bloom_size]; /* uint32_t for 32-bit binaries */
-                        //uint64_t bloom[bloom_size]; /* uint64_t in 64-bit */
-
-                        uint32_t buckets[nbuckets];
-                        uint32_t chain[];
-                    };
-                    """
-                    # 参考https://flapenguin.me/elf-dt-gnu-hash
+                    # https://flapenguin.me/elf-dt-gnu-hash
                     ori = f.tell()
                     f.seek(d_val_ptr - bias, 0)
                     hash_heads = f.read(16)
@@ -389,9 +382,7 @@ class ELFReader:
 
                     gnu_chain_ = gnu_bucket_ + 4 * gnu_nbucket_ - 4 * symoffset
 
-                    # 遍历bucket列表，找最大的symbolid
-                    # 注意，最大的symbolid不一定就是最后一个bucket,6.0的libart.so就是例外
-                    # 获取符号数量的正确方式参考https://flapenguin.me/elf-dt-gnu-hash
+                    # https://flapenguin.me/elf-dt-gnu-hash
                     maxbucket_symidx = 0
                     for bucket_id in range(0, gnu_nbucket_):
                         f.seek(gnu_bucket_ + 4 * bucket_id, 0)
@@ -400,17 +391,12 @@ class ELFReader:
                         if symidx > maxbucket_symidx:
                             maxbucket_symidx = symidx
 
-                    # 实际上bucket存的是chain里面第一个symbolId
-                    # 沿着bucket找到最大的symid，并不是最大的id，最大的id需要从这个id开始
-                    # 在chain里面继续顺序找下去，直到chain结束，就是symbol的个数
                     max_symid = maxbucket_symidx
                     while True:
-                        # 从bucket里找到的最大symid开始遍历,找到chain结尾就是符号数量
                         f.seek(gnu_chain_ + 4 * max_symid, 0)
                         cbytes = f.read(4)
                         c = int.from_bytes(cbytes, "little")
-                        # Chain ends with an element with the lowest bit set to
-                        # 1.
+
                         if (c & 1) == 1:
                             break
 
@@ -432,9 +418,7 @@ class ELFReader:
                 elif d_tag == DT_PLTGOT:
                     self._plt_got_addr = d_val_ptr
 
-            assert (
-                nsymbol > -1
-            ), "can not detect nsymbol by DT_HASH or DT_GNU_HASH, make sure their exist in so"
+            assert nsymbol > -1, "can not detect nsymbol by DT_HASH or DT_GNU_HASH, make sure their exist in so"
             self._dyn_str_addr = dyn_str_addr
             self._dyn_str_addr = dyn_sym_addr
 
@@ -462,7 +446,6 @@ class ELFReader:
                         st_shndx,
                     ) = struct.unpack(sym_pattern, sym_bytes)
                 else:
-                    # 64排布有改变
                     (
                         st_name,
                         st_info,
@@ -499,6 +482,7 @@ class ELFReader:
                 }
                 self._dynsymols.append(d)
 
+            # Read reloactions
             rel_table = []
             if rel_count > 0:
                 # rel不一定有
@@ -530,6 +514,20 @@ class ELFReader:
                     rel_table.append(d)
 
             self._rels["dynrel"] = rel_table
+
+            # RELR
+            relr_table = []
+
+            if relr_size > 0:
+                f.seek(relr_addr - bias, 0)
+                relocations = f.read(relr_size)
+                relr_table = [
+                    int.from_bytes(relocations[i * elf_relr_ent_sz:(i + 1) * elf_relr_ent_sz], 'little')
+                    for i in range(relr_size // elf_relr_ent_sz)
+                ]
+
+            self._rels["relr"] = relr_table
+
             relplt_table = []
             if relplt_count > 0:
                 f.seek(relplt_addr - bias, 0)
