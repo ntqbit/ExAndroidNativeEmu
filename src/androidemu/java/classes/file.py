@@ -17,22 +17,21 @@ class File(metaclass=JavaClassDef, jvm_name="java/io/File"):
         return f'File("{self._path}")'
 
     @java_method_def(
-        name="getPath", signature="()Ljava/lang/String;", native=False
+        "getPath", "()Ljava/lang/String;", native=False
     )
     def getPath(self, emu):
         logger.debug("File.getPath: [path=%s]", self._path)
         return String(self._path)
 
     @java_method_def(
-        name="getAbsolutePath", signature="()Ljava/lang/String;", native=False
+        "getAbsolutePath", "()Ljava/lang/String;", native=False
     )
     def getAbsolutePath(self, emu):
-        raise NotImplementedError()
-        # FIXME return abspath...
+        logger.debug("File.getAbsolutePath: [path=%s]", self._path)
         return String(self._path)
 
     @java_method_def(
-        name="toString", signature="()Ljava/lang/String;", native=False
+        "toString", "()Ljava/lang/String;", native=False
     )
     def toString(self, emu):
         logger.debug("File.toString: [path=%s]", self._path)

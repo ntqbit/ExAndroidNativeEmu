@@ -19,7 +19,6 @@ class Secure(
         native=False,
     )
     def getString(emu, resolver, s1):
-        print("call getString %r %r" % (resolver, s1))
         pys1 = s1.get_py_string()
         if pys1 == "android_id":
             android_id = emu.config.get("android_id")

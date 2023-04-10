@@ -85,14 +85,14 @@ def native_read_args_in_hook_code(emu, args_count):
 def native_translate_arg(emu, val):
     if isinstance(val, int):
         return val
+    elif isinstance(val, tuple) and len(val) == 2 and all(isinstance(v, int) for v in val):
+        return val
     elif isinstance(val, bytearray):
         return emu.java_vm.jni_env.add_local_reference(jobject(val))
     elif isinstance(type(val), JavaClassDef):
         return emu.java_vm.jni_env.add_local_reference(jobject(val))
     else:
-        raise NotImplementedError(
-            f"Unable to write response '{str(val)}' type '{type(val)}' to emulator."
-        )
+        raise NotImplementedError(f"Unable to write response '{str(val)}' type '{type(val)}' to emulator.")
 
 
 def native_write_arg_register(emu, reg, val):

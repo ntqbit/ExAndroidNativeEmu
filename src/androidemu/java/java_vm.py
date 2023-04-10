@@ -5,6 +5,7 @@ from androidemu.hooker import Hooker
 from androidemu.java.helpers.native_method import native_method
 from androidemu.java.jni_const import *
 from androidemu.java.jni_env import JNIEnv
+from androidemu.java.jni_ref import jthrowable
 
 logger = verboselogs.VerboseLogger(__name__)
 
@@ -28,8 +29,21 @@ class JavaVM:
             }
         )
 
-        self.jni_env = JNIEnv(emu, class_loader, hooker)
+        self.jni_env = JNIEnv(emu, self, class_loader, hooker)
+        self._exception = None
         self._emu = emu
+
+    def throw(self, exception):
+        self._exception = jthrowable(exception)
+
+    def get_exception(self):
+        return self._exception
+
+    def set_exception(self, exception):
+        self._exception = exception
+
+    def clear_exception(self):
+        self._exception = None
 
     @native_method
     def destroy_java_vm(self, mu):

@@ -643,8 +643,7 @@ class SyscallHooks:
         return self._do_fork(mu)
 
     def _get_uid(self, mu):
-        uid = self._cfg.get("uid")
-        return uid
+        return self._emu.environment.get_uid()
 
     def _set_tid_address(self, mu, tidptr):
         sch = self._emu.get_schduler
@@ -804,7 +803,6 @@ class SyscallHooks:
             logger.warning("protocol 0 not support")
             return -1
 
-        # print(family)
         s = socket.socket(family, type_in, protocol)
         socket_id = s.fileno()
         self._pcb.add_fd("[socket]", "[socket]", socket_id)
@@ -880,7 +878,6 @@ class SyscallHooks:
             has_read += len(tmp)
             off_l += 2 * self._ptr_sz
 
-        # print(b)
         return has_read
 
     def _ARM_cacheflush(self, mu):

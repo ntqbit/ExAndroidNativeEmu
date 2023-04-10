@@ -4,18 +4,17 @@ import sys
 from androidemu.hooker import Hooker
 from androidemu.java.classes.constructor import Constructor
 from androidemu.java.classes.method import Method
-from androidemu.java.java_class_def import JavaClassDef
-from androidemu.java.constant_values import MODIFIER_STATIC
+from androidemu.java import JavaClassDef
 from androidemu.java.helpers.native_method import (
     create_native_method_wrapper,
     native_translate_arg,
 )
 from androidemu.java.jni_const import *
-from androidemu.java.jni_ref import *
+from androidemu.java.jni_ref import jclass, jobject, jthrowable
 from androidemu.java.reference_table import ReferenceTable
 from androidemu.java.classes.string import String
 from androidemu.java.classes.array import Array
-from androidemu.java.constant_values import JAVA_NULL
+from androidemu.java.const import JAVA_NULL, MODIFIER_STATIC
 from androidemu.utils import memory_helpers
 from unicorn import *
 from androidemu.utils import debug_utils
@@ -36,8 +35,9 @@ class JNIEnv:
 
     JNI_OK = 0
 
-    def __init__(self, emu, class_loader, hooker):
+    def __init__(self, emu, java_vm, class_loader, hooker):
         self._emu = emu
+        self._java_vm = java_vm
         self._class_loader = class_loader
         self._locals = ReferenceTable(start=1, max_entries=2048)
         self._globals = ReferenceTable(start=4096, max_entries=512000)
@@ -296,7 +296,7 @@ class JNIEnv:
             if var_type == "jmethodID":
                 return var  # TODO: impl
 
-            if var_type in ["jobject", "jclass"]:
+            if var_type in ["jobject", "jclass", "jthrowable"]:
                 return f"ref<{var},{repr(self.get_reference(var))}>"
 
             if var_type == "jstring":
@@ -332,16 +332,16 @@ class JNIEnv:
 
                 try:
                     ret = callback(mu, *args)
+
+                    if ret is not None:
+                        ret = native_translate_arg(self._emu, ret)
+
+                        if func["ret"] != "void":
+                            log_text += f' = {map_var_type(ret, func["ret"])}'
                 except Exception as e:
                     log_text += f". Thrown {e.__class__.__name__}({str(e)})."
                     logger.log(JNICALL, log_text)
                     raise
-
-                if ret is not None:
-                    ret = native_translate_arg(self._emu, ret)
-
-                if func["ret"] != "void":
-                    log_text += f' = {map_var_type(ret, func["ret"])}'
 
                 logger.log(JNICALL, log_text)
                 return ret
@@ -368,6 +368,7 @@ class JNIEnv:
     def add_local_reference(self, obj):
         if not isinstance(obj, jobject):
             raise ValueError("Expected a jobject.")
+
         index = self._locals.add(obj)
         return index
 
@@ -433,18 +434,15 @@ class JNIEnv:
                 value = (vh << 32) | v
                 result.append(value)
 
-            elif arg_name == "jstring" or arg_name == "jobject":
+            elif arg_name in ("jstring", "jobject", "jthrowable"):
                 ref = v
                 jobj = self.get_reference(ref)
-                obj = None
+                
                 if jobj is None:
-                    logger.warning(
-                        "arg_name %s ref %d is not vaild maybe wrong arglist"
-                        % (arg_name, ref)
-                    )
-                    obj = JAVA_NULL
+                    obj = None
                 else:
                     obj = jobj.value
+
                 result.append(obj)
             else:
                 raise NotImplementedError("Unknown arg name %s" % arg_name)
@@ -475,16 +473,11 @@ class JNIEnv:
             ):
                 result.append(v)
 
-            elif arg_name == "jstring" or arg_name == "jobject":
+            elif arg_name in ("jstring", "jobject", "jthrowable"):
                 ref = v
                 jobj = self.get_reference(ref)
-                obj = None
                 if jobj is None:
-                    logger.warning(
-                        "arg_name %s ref %d is not vaild maybe wrong arglist"
-                        % (arg_name, ref)
-                    )
-                    obj = JAVA_NULL
+                    obj = None
                 else:
                     obj = jobj.value
                 result.append(obj)
@@ -513,16 +506,12 @@ class JNIEnv:
                 value = (vh << 32) | v
                 result.append(value)
 
-            elif arg_name == "jstring" or arg_name == "jobject":
+            elif arg_name in ("jstring", "jobject", "jthrowable"):
                 ref = v
                 jobj = self.get_reference(ref)
-                obj = None
+                
                 if jobj is None:
-                    logger.warning(
-                        "arg_name %s ref %d is not vaild maybe wrong arglist"
-                        % (arg_name, ref)
-                    )
-                    obj = JAVA_NULL
+                    obj = None
                 else:
                     obj = jobj.value
                 result.append(obj)
@@ -554,16 +543,11 @@ class JNIEnv:
             ):
                 result.append(v)
 
-            elif arg_name == "jstring" or arg_name == "jobject":
+            elif arg_name in ("jstring", "jobject", "jthrowable"):
                 ref = v
                 jobj = self.get_reference(ref)
-                obj = None
                 if jobj is None:
-                    logger.warning(
-                        "arg_name %s ref %d is not vaild maybe wrong arglist"
-                        % (arg_name, ref)
-                    )
-                    obj = JAVA_NULL
+                    obj = None
                 else:
                     obj = jobj.value
                 result.append(obj)
@@ -590,17 +574,15 @@ class JNIEnv:
                 result.append(int.from_bytes(mu.mem_read(args_ptr, 4), byteorder="little"))
             elif arg_name in ("jlong", "jdouble"):
                 result.append(int.from_bytes(mu.mem_read(args_ptr, 8), byteorder="little"))
-            elif arg_name in ("jstring", "jobject"):
+            elif arg_name in ("jstring", "jobject", "jthrowable"):
                 ref = int.from_bytes(mu.mem_read(args_ptr, 4), byteorder="little")
                 jobj = self.get_reference(ref)
-                obj = None
 
                 if jobj is None:
-                    logger.warning("arg_name %s ref %d is not vaild maybe wrong arglist",
-                                   arg_name, ref)
-                    obj = JAVA_NULL
+                    obj = None
                 else:
                     obj = jobj.value
+                
                 result.append(obj)
             else:
                 raise NotImplementedError(f"Unknown arg name {arg_name}")
@@ -756,15 +738,47 @@ class JNIEnv:
     def to_reflected_field(self, mu, env):
         raise NotImplementedError()
 
-    def throw(self, mu, env):
-        raise RuntimeError("throw is call, maybe bug")
+    def throw(self, mu, env, obj_idx):
+        obj = self.get_reference(obj_idx)
+        logger.debug('Thrown an exception: %s', obj)
 
-    def throw_new(self, mu, env):
-        raise RuntimeError("throw_new is call, maybe bug")
+        if not isinstance(obj, jthrowable):
+            raise ValueError("Expected a jthrowable.")
+
+        self._java_vm.set_exception(obj)
+        return 0
+
+    def throw_new(self, mu, env, clazz_idx, msg_idx):
+        logger.debug('Thrown an exception')
+
+        clazz = self.get_reference(clazz_idx)
+        msg_obj = self.get_reference(msg_idx)
+        logger.debug('Thrown a new exception: %s,%s', clazz, msg_obj)
+
+        if not isinstance(clazz, jclass):
+            raise ValueError("Expected a jclass.")
+
+        if not isinstance(msg_obj, jobject):
+            raise ValueError('Expected a jobject.')
+
+        if msg_obj.value == JAVA_NULL:
+            msg = None
+        else:
+            msg = msg_obj.value.get_py_string()
+
+        class_obj = jclazz.value
+        pyclazz = class_obj.get_py_clazz()
+        obj = jthrowable(pyclazz(msg))
+
+        self._java_vm.set_exception(obj)
+        return 0
 
     def exception_occurred(self, mu, env):
-        logger.info("exception_occurred called skip")
-        return 0
+        exc = self._java_vm.get_exception()
+        if not exc:
+            return JAVA_NULL
+
+        return self.add_local_reference(exc)
 
     def exception_describe(self, mu, env):
         raise NotImplementedError()
@@ -774,9 +788,7 @@ class JNIEnv:
         Clears any exception that is currently being thrown.
         If no exception is currently being thrown, this routine has no effect.
         """
-        logger.debug("JNIEnv->ExceptionClear() was called")
-        # TODO: Implement
-        return None
+        self._java_vm.clear_exception()
 
     def fatal_error(self, mu, env):
         raise NotImplementedError()
@@ -885,19 +897,12 @@ class JNIEnv:
         # Get constructor method.
         method = pyclazz.find_method_by_id(method_id)
         if method.name != "<init>" or not method.signature.endswith("V"):
-            raise ValueError(
-                "Class constructor has the wrong name or does not return void."
-            )
-
-        logger.debug(
-            "JNIEnv->NewObjectX(%s, %s, %r) was called"
-            % (pyclazz.jvm_name, method.name, args)
-        )
+            raise ValueError("Class constructor has the wrong name or does not return void.")
 
         # Parse arguments.
-        constructor_args = self._read_args_common(
-            mu, args, method.args_list, args_type
-        )
+        constructor_args = self._read_args_common(mu, args, method.args_list, args_type)
+
+        logger.debug("JNIEnv->NewObjectX(%s, %s, %s) was called", pyclazz.jvm_name, method.name, constructor_args)
 
         # Execute function.
         method.func(obj, self._emu, *constructor_args)
@@ -914,8 +919,8 @@ class JNIEnv:
     def new_object_v(self, mu, env, clazz_idx, method_id, args_v):
         return self._new_object(mu, env, clazz_idx, method_id, args_v, 1)
 
-    def new_object_a(self, mu, env):
-        raise NotImplementedError()
+    def new_object_a(self, mu, env, clazz_idx, method_id, args_v):
+        return self._new_object(mu, env, clazz_idx, method_id, args_v, 2)
 
     def get_object_class(self, mu, env, obj_idx):
 
@@ -1017,7 +1022,7 @@ class JNIEnv:
 
         if is_wide:
             rhigh = v >> 32
-            rlow = v & 0x0FFFFFFFF
+            rlow = v & 0xFFFFFFFF
             return (rlow, rhigh)
 
         return v
@@ -1037,7 +1042,7 @@ class JNIEnv:
     def call_boolean_method_v(self, mu, env, obj_idx, method_id, args):
         return self._call_xxx_method(mu, env, obj_idx, method_id, args, 1)
 
-    def call_boolean_method_a(self, mu, env):
+    def call_boolean_method_a(self, mu, env, obj_idx, method_id, args):
         return self._call_xxx_method(mu, env, obj_idx, method_id, args, 2)
 
     def call_byte_method(self, mu, env, obj_idx, method_id, arg1, arg2, arg3, arg4):
@@ -1046,7 +1051,7 @@ class JNIEnv:
     def call_byte_method_v(self, mu, env, obj_idx, method_id, args):
         return self._call_xxx_method(mu, env, obj_idx, method_id, args, 1)
 
-    def call_byte_method_a(self, mu, env):
+    def call_byte_method_a(self, mu, env, obj_idx, method_id, args):
         return self._call_xxx_method(mu, env, obj_idx, method_id, args, 2)
 
     def call_char_method(self, mu, env, obj_idx, method_id, arg1, arg2, arg3, arg4):
@@ -1055,7 +1060,7 @@ class JNIEnv:
     def call_char_method_v(self, mu, env, obj_idx, method_id, args):
         return self._call_xxx_method(mu, env, obj_idx, method_id, args, 1)
 
-    def call_char_method_a(self, mu, env):
+    def call_char_method_a(self, mu, env, obj_idx, method_id, args):
         return self._call_xxx_method(mu, env, obj_idx, method_id, args, 2)
 
     def call_short_method(self, mu, env, obj_idx, method_id, arg1, arg2, arg3, arg4):
@@ -1064,7 +1069,7 @@ class JNIEnv:
     def call_short_method_v(self, mu, env, obj_idx, method_id, args):
         return self._call_xxx_method(mu, env, obj_idx, method_id, args, 1)
 
-    def call_short_method_a(self, mu, env):
+    def call_short_method_a(self, mu, env, obj_idx, method_id, args):
         return self._call_xxx_method(mu, env, obj_idx, method_id, args, 2)
 
     def call_int_method(self, mu, env, obj_idx, method_id, arg1, arg2, arg3, arg4):
@@ -1269,7 +1274,7 @@ class JNIEnv:
             return v
         else:
             rhigh = v >> 32
-            rlow = v & 0x0FFFFFFFF
+            rlow = v & 0xFFFFFFFF
             return (rlow, rhigh)
 
     def get_object_field(self, mu, env, obj_idx, field_id):
@@ -1423,7 +1428,7 @@ class JNIEnv:
             return v
         else:
             rhigh = v >> 32
-            rlow = v & 0x0FFFFFFFF
+            rlow = v & 0xFFFFFFFF
             return (rlow, rhigh)
 
     def call_static_object_method(self, mu, env, clazz_idx, method_id, arg1, arg2, arg3, arg4):
@@ -1512,37 +1517,23 @@ class JNIEnv:
     def call_static_int_method_a(self, mu, env):
         raise NotImplementedError()
 
-    def call_static_long_method(
-        self, mu, env, clazz_idx, method_id, arg1, arg2, arg3, arg4
-    ):
-        # raise NotImplementedError()
-        return self._call_static_xxx_method(
-            mu, env, clazz_idx, method_id, (arg1, arg2, arg3, arg4), 0, True
-        )
+    def call_static_long_method(self, mu, env, clazz_idx, method_id, arg1, arg2, arg3, arg4):
+        return self._call_static_xxx_method(mu, env, clazz_idx, method_id, (arg1, arg2, arg3, arg4), 0, True)
 
     def call_static_long_method_v(self, mu, env, clazz_idx, method_id, args):
-        # raise NotImplementedError()
-        return self._call_static_xxx_method(
-            mu, env, clazz_idx, method_id, args, 1, True
-        )
+        return self._call_static_xxx_method(mu, env, clazz_idx, method_id, args, 1, True)
 
-    def call_static_long_method_a(self, mu, env):
-        raise NotImplementedError()
+    def call_static_long_method_a(self, mu, env,  clazz_idx, method_id, args):
+        return self._call_static_xxx_method(mu, env, clazz_idx, method_id, args, 2, True)
 
-    def call_static_float_method(
-        self, mu, env, clazz_idx, method_id, arg1, arg2, arg3, arg4
-    ):
-        return self._call_static_xxx_method(
-            mu, env, clazz_idx, method_id, (arg1, arg2, arg3, arg4), 0
-        )
+    def call_static_float_method(self, mu, env, clazz_idx, method_id, arg1, arg2, arg3, arg4):
+        return self._call_static_xxx_method(mu, env, clazz_idx, method_id, (arg1, arg2, arg3, arg4), 0)
 
     def call_static_float_method_v(self, mu, env, clazz_idx, method_id, args):
-        return self._call_static_xxx_method(
-            mu, env, clazz_idx, method_id, args, 1
-        )
+        return self._call_static_xxx_method(mu, env, clazz_idx, method_id, args, 1)
 
     def call_static_float_method_a(self, mu, env):
-        raise NotImplementedError()
+        return self._call_static_xxx_method(mu, env, clazz_idx, method_id, args, 2)
 
     def call_static_double_method(
         self, mu, env, clazz_idx, method_id, arg1, arg2, arg3, arg4
@@ -1626,11 +1617,12 @@ class JNIEnv:
         r = field.static_value
         logger.debug("JNIEnv->GetStaticXXXField return %r" % r)
         v = field.static_value
+
         if not is_wide:
             return v
         else:
             rhigh = v >> 32
-            rlow = v & 0x0FFFFFFFF
+            rlow = v & 0xFFFFFFFF
             return (rlow, rhigh)
 
     def get_static_object_field(self, mu, env, clazz_idx, field_id):
@@ -2115,9 +2107,7 @@ class JNIEnv:
         """
         Returns JNI_TRUE when there is a pending exception; otherwise, returns JNI_FALSE.
         """
-        # logger.debug("JNIEnv->ExceptionCheck() was called")
-        # TODO: Implement
-        return JNI_FALSE
+        return JNI_TRUE if self._java_vm.get_exception() else JNI_FALSE
 
     def new_direct_byte_buffer(self, mu, env):
         raise NotImplementedError()

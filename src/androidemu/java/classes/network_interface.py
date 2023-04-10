@@ -20,7 +20,6 @@ class NetworkInterface(
         native=False,
     )
     def getByName(emu, s1):
-        print("getByName %r" % s1)
         pyname = s1.get_py_string()
         return NetworkInterface(pyname)
 

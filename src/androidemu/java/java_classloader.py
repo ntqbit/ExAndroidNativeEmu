@@ -1,4 +1,5 @@
-from androidemu.java.java_class_def import JavaClassDef
+from androidemu.java import JavaClassDef
+
 from androidemu.java.classes.clazz import Class
 
 
@@ -25,7 +26,6 @@ class JavaClassLoader(
             )
 
         if clazz.class_object is None:
-            # FIXME 两个emulaotr add_class是同一个class 实例,会互相影响
             clazz.class_object = Class(clazz, self)
 
         self.class_by_id[clazz.jvm_id] = clazz

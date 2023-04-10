@@ -1,8 +1,6 @@
-from androidemu.java.java_class_def import JavaClassDef
-from androidemu.java.java_field_def import JavaFieldDef
-from androidemu.java.java_method_def import java_method_def, JavaMethodDef
+from androidemu.java import JavaClassDef, JavaFieldDef, java_method_def
 from androidemu.java.classes.context import ContextImpl
-from androidemu.java.constant_values import *
+from androidemu.java.const import *
 from androidemu.java.classes.application import Application
 
 
@@ -148,12 +146,6 @@ class IActivityManager(
     def __init__(self):
         pass
 
-    @java_method_def(
-        name="getClass", signature="()Ljava/lang/Class;", native=False
-    )
-    def getClass(self, emu):
-        return self.class_object
-
 
 class ActivityManagerNative(
     metaclass=JavaClassDef, jvm_name="android/app/ActivityManagerNative"
@@ -176,12 +168,6 @@ class Instrumentation(
 ):
     def __init__(self):
         pass
-
-    @java_method_def(
-        name="getClass", signature="()Ljava/lang/Class;", native=False
-    )
-    def getClass(self, emu):
-        return self.class_object
 
 
 class IInterface(metaclass=JavaClassDef, jvm_name="android/os/IInterface"):

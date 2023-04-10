@@ -3,6 +3,9 @@ from androidemu.java.java_class_def import JavaClassDef
 from androidemu.java.java_field_def import JavaFieldDef
 from androidemu.java.java_method_def import java_method_def, JavaMethodDef
 
+from androidemu.java.classes.string import String
+from androidemu.java.classes.array import ByteArray
+
 
 class IntentFilter(
     metaclass=JavaClassDef, jvm_name="android/content/IntentFilter"
@@ -22,7 +25,23 @@ class IntentFilter(
 
 class Intent(metaclass=JavaClassDef, jvm_name="android/content/Intent"):
     def __init__(self):
-        pass
+        self._action = None
+        self._package_name = None
+        self._extra = {}
+
+    @java_method_def('<init>', '(Ljava/lang/String;)V', args_list=['jstring'])
+    def ctor(self, emu, action: String):
+        self._action = action
+
+    @java_method_def('setPackage', '(Ljava/lang/String;)Landroid/content/Intent;', args_list=['jstring'])
+    def setPackage(self, emu, package_name: String):
+        self._package_name = package_name.get_py_string()
+        return self
+
+    @java_method_def('putExtra', '(Ljava/lang/String;[B)Landroid/content/Intent;', args_list=['jstring', 'jobject'])
+    def putExtra(self, emu, name: String, value: ByteArray):
+        self._extra[name.get_py_string()] = value.get_py_items()
+        return self
 
     @java_method_def(
         name="getExtras", signature="()Landroid/os/Bundle;", native=False

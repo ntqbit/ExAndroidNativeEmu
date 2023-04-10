@@ -33,8 +33,7 @@ class SharedPreferences(
     metaclass=JavaClassDef, jvm_name="android/content/SharedPreferences"
 ):
     def __init__(self, emu, path):
-        vfs_root = emu.get_vfs_root()
-        real_path = misc_utils.vfs_path_to_system_path(vfs_root, path)
+        real_path = emu.vfs.translate_path(path)
         self._xml_tree = xml.dom.minidom.parse(real_path)
         self._editor = Editor()
         self._string_values = {}

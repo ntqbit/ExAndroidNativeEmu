@@ -14,5 +14,4 @@ class DexFile(metaclass=JavaClassDef, jvm_name="dalvik/system/DexFile"):
         native=False,
     )
     def ctor(self, emu, *args, **kwargs):
-        print("DexFile_ctor %r" % args)
         return DexFile()

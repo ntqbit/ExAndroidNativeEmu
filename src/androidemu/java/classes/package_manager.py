@@ -79,6 +79,8 @@ class PackageManager(
     jvm_name="android/content/pm/PackageManager",
     jvm_fields=[
         JavaFieldDef("GET_SIGNATURES", "I", True, 64),
+        JavaFieldDef('FEATURE_STRONGBOX_KEYSTORE', 'Ljava/lang/String;',
+                     True, String('android.hardware.strongbox_keystore'))
     ],
 ):
     GET_SIGNATURES = 64
@@ -112,6 +114,10 @@ class PackageManager(
     def getInstallerPackageName(self, emu, package_name: String):
         package = self._get_package(emu, package_name.get_py_string())
         return String(package.get_installer_package_name())
+
+    @java_method_def('hasSystemFeature', '(Ljava/lang/String;)Z', args_list=['jstring'])
+    def hasSystemFeature(self, emu, feature_name: String):
+        return False
 
     @java_method_def(
         name="checkPermission",

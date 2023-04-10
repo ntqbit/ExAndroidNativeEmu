@@ -31,7 +31,6 @@ class Modules:
         thread_internal_ptr = sp_helpers.reserve(pthread_internal_nptr)
 
         stack_guard_ptr = sp_helpers.write_val(0x1000)
-        # print(hex(stack_guard_ptr))
 
         # argv的实际字符串，目前只写一个
         argvs = ["app_process32"]
@@ -71,7 +70,6 @@ class Modules:
         }
         auxv_base = sp_helpers.reserve(0x100)
         auxv_offset = auxv_base
-        # print(hex(auxv_base).upper())
         for auxv_key in auxvs:
             # 填充auvx数组
             auxv_val = auxvs[auxv_key]
@@ -111,7 +109,6 @@ class Modules:
         # 0结尾
         memory_helpers.write_ptrs_sz(self.emu.mu, argv_offset, 0, ptr_sz)
 
-        # print(hex(kernel_args_base).upper())
 
         # KernelArgumentBlock
         # int argc;
@@ -412,9 +409,6 @@ class Modules:
                 rel_addr = load_bias + rel["r_offset"]
                 rel_info_type = rel["r_info_type"]
 
-                # print(filename)
-                # print("%x"%rel_addr)
-                # Relocation table for ARM
 
                 sym_name = reader.get_dyn_string_by_rel_sym(r_info_sym)
                 if rel_info_type == arm.R_ARM_ABS32:
@@ -467,7 +461,6 @@ class Modules:
                         value = symbols_resolved[sym_name]
 
                         # Write the new value
-                        # print(value)
                         self.emu.mu.mem_write(
                             rel_addr, value.to_bytes(4, byteorder="little")
                         )
@@ -483,7 +476,6 @@ class Modules:
                         value = symbols_resolved[sym_name]
                         addend = rel["r_addend"]
                         # Write the new value
-                        # print(value)
                         self.emu.mu.mem_write(
                             rel_addr,
                             (value + addend).to_bytes(8, byteorder="little"),

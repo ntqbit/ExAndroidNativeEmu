@@ -2,7 +2,11 @@ import struct
 import os
 import sys
 
+import verboselogs
+
 from androidemu.utils import memory_helpers, misc_utils
+
+logger = verboselogs.VerboseLogger(__name__)
 
 PT_NULL = 0
 PT_LOAD = 1
@@ -228,8 +232,6 @@ class ELFReader:
                 _,
             ) = struct.unpack(edhr_pattern, ehdr_bytes)
 
-            # print(phoff)
-            # __phdroff same as phdraddr
             self._phoff = phoff
             self._phdr_num = phdr_num
             f.seek(phoff, 0)
@@ -301,7 +303,6 @@ class ELFReader:
             while True:
                 dyn_item_bytes = f.read(elf_dyn_sz)
                 d_tag, d_val_ptr = struct.unpack(dyn_pattern, dyn_item_bytes)
-                # print(d_tag)
                 if d_tag == DT_NULL:
                     break
                 if d_tag == DT_RELA:
@@ -481,7 +482,7 @@ class ELFReader:
                 try:
                     name = self._st_name_to_name(st_name)
                 except UnicodeDecodeError as e:
-                    print(
+                    logger.warning(
                         "warning can not decode sym index %d at off 0x%08x skip"
                         % (i, st_name)
                     )

@@ -35,40 +35,7 @@ from androidemu.const.emu_const import (
     STACK_SIZE,
     Arch
 )
-
-import androidemu.java.classes.application
-import androidemu.java.classes.debug
-import androidemu.java.classes.array
-import androidemu.java.classes.okhttp
-import androidemu.java.classes.asset_manager
-import androidemu.java.classes.uri
-import androidemu.java.classes.constructor
-import androidemu.java.classes.proxy
-import androidemu.java.classes.contentresolver
-import androidemu.java.classes.system
-import androidemu.java.classes.package_manager
-import androidemu.java.classes.clazz
-import androidemu.java.classes.list
-import androidemu.java.classes.environment
-import androidemu.java.classes.intent
-import androidemu.java.classes.java_set
-import androidemu.java.classes.file
-import androidemu.java.classes.object
-import androidemu.java.classes.executable
-import androidemu.java.classes.types
-import androidemu.java.classes.shared_preferences
-import androidemu.java.classes.dexfile
-import androidemu.java.classes.context
-import androidemu.java.classes.network_interface
-import androidemu.java.classes.method
-import androidemu.java.classes.map
-import androidemu.java.classes.wifi
-import androidemu.java.classes.field
-import androidemu.java.classes.string
-import androidemu.java.classes.activity_thread
-import androidemu.java.classes.settings
-import androidemu.java.classes.bundle
-import androidemu.java.classes.arrays
+from androidemu.java.classes import get_java_classes
 
 logger = verboselogs.VerboseLogger(__name__)
 
@@ -179,8 +146,6 @@ class Emulator:
             STACK_ADDR, STACK_SIZE, UC_PROT_READ | UC_PROT_WRITE
         )
         self.mu.reg_write(sp_reg, STACK_ADDR + STACK_SIZE)
-        # sp = self.mu.reg_read(sp_reg)
-        # print ("stack addr %x"%sp)
 
         self._sch = Scheduler(self)
         # CPU
@@ -203,7 +168,7 @@ class Emulator:
             self, self.memory, self._syscall_handler
         )
         self._syscall_hooks = SyscallHooks(self, self._syscall_handler)
-        self._vfs = VirtualFileSystem(
+        self.vfs = VirtualFileSystem(
             self, vfs_root, self.config, self._syscall_handler, self.memory
         )
 
@@ -217,8 +182,6 @@ class Emulator:
         self._sym_hooks = SymbolHooks(
             self, self.modules, self._hooker, self._vfs_root
         )
-
-        self._add_classes()
 
         # Hack 为jmethod_id指向的内存分配一块空间，抖音会将jmethodID强转，为的是绕过去
         self.memory.map(
@@ -304,90 +267,8 @@ class Emulator:
         x |= 0x300000  # set FPEN bit
         self.mu.reg_write(UC_ARM64_REG_CPACR_EL1, x)
 
-    def _add_classes(self):
-        defualt_classes = [
-            androidemu.java.classes.application.Application,
-            androidemu.java.classes.debug.Debug,
-            androidemu.java.classes.array.Array,
-            androidemu.java.classes.array.ByteArray,
-            androidemu.java.classes.array.ObjectArray,
-            androidemu.java.classes.array.ClassArray,
-            androidemu.java.classes.array.StringArray,
-            androidemu.java.classes.okhttp.Buffer,
-            androidemu.java.classes.okhttp.ResponseBody,
-            androidemu.java.classes.okhttp.Builder,
-            androidemu.java.classes.okhttp.HttpUrl,
-            androidemu.java.classes.okhttp.RequestBody,
-            androidemu.java.classes.okhttp.Headers,
-            androidemu.java.classes.okhttp.Request,
-            androidemu.java.classes.okhttp.Response,
-            androidemu.java.classes.okhttp.Chain,
-            androidemu.java.classes.asset_manager.AssetManager,
-            androidemu.java.classes.uri.Uri,
-            androidemu.java.classes.constructor.Constructor,
-            androidemu.java.classes.proxy.Proxy,
-            androidemu.java.classes.contentresolver.ContentResolver,
-            androidemu.java.classes.system.System,
-            androidemu.java.classes.package_manager.Signature,
-            androidemu.java.classes.package_manager.ApplicationInfo,
-            androidemu.java.classes.package_manager.PackageInfo,
-            androidemu.java.classes.package_manager.PackageManager,
-            androidemu.java.classes.clazz.Class,
-            androidemu.java.classes.list.List,
-            androidemu.java.classes.environment.Environment,
-            androidemu.java.classes.intent.IntentFilter,
-            androidemu.java.classes.intent.Intent,
-            androidemu.java.classes.java_set.Set,
-            androidemu.java.classes.file.File,
-            androidemu.java.classes.object.Object,
-            androidemu.java.classes.executable.Executable,
-            androidemu.java.classes.types.Boolean,
-            androidemu.java.classes.types.Integer,
-            androidemu.java.classes.types.Long,
-            androidemu.java.classes.types.Float,
-            androidemu.java.classes.shared_preferences.Editor,
-            androidemu.java.classes.shared_preferences.SharedPreferences,
-            androidemu.java.classes.dexfile.DexFile,
-            androidemu.java.classes.context.Context,
-            androidemu.java.classes.context.ContextImpl,
-            androidemu.java.classes.context.ContextWrapper,
-            androidemu.java.classes.network_interface.NetworkInterface,
-            androidemu.java.classes.method.Method,
-            androidemu.java.classes.map.HashMap,
-            androidemu.java.classes.wifi.WifiInfo,
-            androidemu.java.classes.wifi.WifiConfiguration,
-            androidemu.java.classes.wifi.DhcpInfo,
-            androidemu.java.classes.wifi.WifiManager,
-            androidemu.java.classes.wifi.TelephonyManager,
-            androidemu.java.classes.wifi.RequestBuilder,
-            androidemu.java.classes.wifi.NetworkInfo,
-            androidemu.java.classes.wifi.ConnectivityManager,
-            androidemu.java.classes.field.AccessibleObject,
-            androidemu.java.classes.field.Field,
-            androidemu.java.classes.string.String,
-            androidemu.java.classes.activity_thread.AccessibilityManager,
-            androidemu.java.classes.activity_thread.AccessibilityInteractionController,
-            androidemu.java.classes.activity_thread.Window,
-            androidemu.java.classes.activity_thread.ViewRootImpl,
-            androidemu.java.classes.activity_thread.AttachInfo,
-            androidemu.java.classes.activity_thread.View,
-            androidemu.java.classes.activity_thread.Activity,
-            androidemu.java.classes.activity_thread.ActivityClientRecord,
-            androidemu.java.classes.activity_thread.ArrayMap,
-            androidemu.java.classes.activity_thread.ActivityManager,
-            androidemu.java.classes.activity_thread.IActivityManager,
-            androidemu.java.classes.activity_thread.ActivityManagerNative,
-            androidemu.java.classes.activity_thread.Instrumentation,
-            androidemu.java.classes.activity_thread.IInterface,
-            androidemu.java.classes.activity_thread.IPackageManager,
-            androidemu.java.classes.activity_thread.ActivityThread,
-            androidemu.java.classes.settings.Secure,
-            androidemu.java.classes.settings.Settings,
-            androidemu.java.classes.bundle.Bundle,
-            androidemu.java.classes.arrays.Arrays,
-        ]
-
-        for clz in defualt_classes:
+    def add_default_classes(self):
+        for clz in get_java_classes():
             self.java_classloader.add_class(clz)
 
         # also add classloader as java class

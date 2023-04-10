@@ -1,5 +1,6 @@
 from androidemu.java import JavaClassDef, java_method_def
-from androidemu.java.classes import List, Array
+from androidemu.java.classes.list import List
+from androidemu.java.classes.array import Array
 
 
 class Arrays(

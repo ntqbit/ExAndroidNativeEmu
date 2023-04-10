@@ -5,8 +5,9 @@ from androidemu.java.classes.contentresolver import ContentResolver
 from androidemu.java.classes.wifi import (
     TelephonyManager,
     WifiManager,
-    ConnectivityManager,
+    ConnectivityManager
 )
+from androidemu.java.classes.display import DisplayManager
 from androidemu.java.classes.shared_preferences import *
 from androidemu.java.classes.asset_manager import *
 from androidemu.java.classes.package_manager import *
@@ -15,26 +16,27 @@ from androidemu.java.java_field_def import JavaFieldDef
 from androidemu.java.java_method_def import java_method_def, JavaMethodDef
 
 
+class ComponentName(metaclass=JavaClassDef, jvm_name='android/content/ComponentName'):
+    def __init__(self):
+        pass
+
+
 class Context(
     metaclass=JavaClassDef,
     jvm_name="android/content/Context",
     jvm_fields=[
-        JavaFieldDef(
-            "WIFI_SERVICE", "Ljava/lang/String;", True, String("wifi")
-        ),
-        JavaFieldDef(
-            "TELEPHONY_SERVICE", "Ljava/lang/String;", True, String("phone")
-        ),
-        JavaFieldDef(
-            "CONNECTIVITY_SERVICE",
-            "Ljava/lang/String;",
-            True,
-            String("connectivity"),
-        ),
+        JavaFieldDef('DISPLAY_SERVICE', 'Ljava/lang/String;', True, String('display')),
+        JavaFieldDef("WIFI_SERVICE", "Ljava/lang/String;", True, String("wifi")),
+        JavaFieldDef("TELEPHONY_SERVICE", "Ljava/lang/String;", True, String("phone")),
+        JavaFieldDef("CONNECTIVITY_SERVICE", "Ljava/lang/String;", True, String("connectivity")),
     ],
 ):
     def __init__(self):
         pass
+
+    @java_method_def(name="getClass", signature="()Ljava/lang/Class;")
+    def getClass(self, emu):
+        return self.class_object
 
     @java_method_def(
         name="getPackageManager",
@@ -50,6 +52,14 @@ class Context(
         native=False,
     )
     def getContentResolver(self, emu):
+        raise RuntimeError("pure virtual function call")
+
+    @java_method_def(
+        name="getDatabasePath",
+        signature="(Ljava/lang/String;)Ljava/io/File;",
+        args_list=['jstring']
+    )
+    def getDatabasePath(self, emu, name):
         raise RuntimeError("pure virtual function call")
 
     @java_method_def(
@@ -120,6 +130,14 @@ class Context(
     def getSharedPreferences(self, emu, name, mode):
         raise RuntimeError("pure virtual function call")
 
+    @java_method_def(
+        name="startService",
+        args_list=["jobject"],
+        signature="(Landroid/content/Intent;)Landroid/content/ComponentName;"
+    )
+    def startService(self, emu, intent):
+        raise RuntimeError("pure virtual function call")
+
 
 class ContextImpl(
     Context,
@@ -130,7 +148,7 @@ class ContextImpl(
     def __init__(self, package_name):
         Context.__init__(self)
 
-        self._package_name = String(package_name)
+        self._package_name = package_name
         self._package_manager = PackageManager()
         self._content_resolver = ContentResolver()
         self._asset_mgr = None
@@ -151,10 +169,8 @@ class ContextImpl(
     )
     def getAssets(self, emu):
         if not self._asset_mgr:
-            # 调用getAssets才初始化assert_manager
-            # 因为不是每个so模拟执行都需要打开apk
             pyapk_path = self._package_manager.getPackageInfo(
-                emu, self._package_name, 0
+                emu, String(self._package_name), 0
             ).applicationInfo.sourceDir.get_py_string()
             self._asset_mgr = AssetManager(emu, pyapk_path)
 
@@ -169,24 +185,33 @@ class ContextImpl(
         return self._content_resolver
 
     @java_method_def(
+        name="getDatabasePath",
+        signature="(Ljava/lang/String;)Ljava/io/File;",
+        args_list=['jstring']
+    )
+    def getDatabasePath(self, emu, name: String):
+        name = name.get_py_string()
+        logger.debug('Getting database path: %s', name)
+        return File(f'/data/user/0/{self._package_name}/databases/{name}')
+
+    @java_method_def(
         name="getSystemService",
         args_list=["jstring"],
         signature="(Ljava/lang/String;)Ljava/lang/Object;",
         native=False,
     )
     def getSystemService(self, emu, s1):
-        print(s1)
         stype = s1.get_py_string()
         if stype == "phone":
             return TelephonyManager()
-
         elif stype == "wifi":
             return WifiManager()
-
         elif stype == "connectivity":
             return ConnectivityManager()
+        elif stype == 'display':
+            return DisplayManager()
 
-        raise NotImplementedError()
+        raise RuntimeError(f'Context.getSystemService not found: {stype}')
 
     @java_method_def(
         name="getApplicationInfo",
@@ -194,15 +219,13 @@ class ContextImpl(
         native=False,
     )
     def getApplicationInfo(self, emu):
-        pkgMgr = self._package_manager
-        pkgInfo = pkgMgr.getPackageInfo(emu, self._package_name, 0)
-        return pkgInfo.applicationInfo
+        return self._package_manager.getPackageInfo(emu, String(self._package_name), 0).applicationInfo
 
     @java_method_def(
         name="getPackageName", signature="()Ljava/lang/String;", native=False
     )
     def getPackageName(self, emu):
-        return self._package_name
+        return String(self._package_name)
 
     @java_method_def(
         name="checkSelfPermission",
@@ -226,24 +249,19 @@ class ContextImpl(
         native=False,
     )
     def getPackageCodePath(self, emu):
-        pkgName = emu.environment.get_package_name()
-        path = "/data/app/%s-1.apk" % (pkgName,)
-        return String(path)
+        return String(f"/data/app/{self._package_name}-1.apk")
 
     @java_method_def(
         name="getFilesDir", signature="()Ljava/io/File;", native=False
     )
     def getFilesDir(self, emu):
-        pkgName = emu.environment.get_package_name()
-        fdir = "/data/data/%s/files" % (pkgName,)
-        return File(fdir)
+        return String(f"/data/data/{self._package_name}/files")
 
     @java_method_def(
         name="getCacheDir", signature="()Ljava/io/File;", native=False
     )
     def getCacheDir(self, emu):
-        pkgName = emu.environment.get_package_name()
-        return File("/data/user/0/%s/cache" % pkgName)
+        return File(f"/data/user/0/{self._package_name}/cache")
 
     @java_method_def(
         name="getSharedPreferences",
@@ -251,17 +269,24 @@ class ContextImpl(
         signature="(Ljava/lang/String;I)Landroid/content/SharedPreferences;",
         native=False,
     )
-    def getSharedPreferences(self, emu, name, mode):
-        pkgName = emu.environment.get_package_name()
+    def getSharedPreferences(self, emu, name: String, mode):
         pyName = name.get_py_string()
         if pyName in self._sp_map:
             return self._sp_map[pyName]
 
         else:
-            path = "/data/data/%s/shared_prefs/%s.xml" % (pkgName, pyName)
+            path = "/data/data/%s/shared_prefs/%s.xml" % (self._package_name, pyName)
             sp = SharedPreferences(emu, path)
             self._sp_map[pyName] = sp
             return sp
+
+    @java_method_def(
+        name="startService",
+        args_list=["jobject"],
+        signature="(Landroid/content/Intent;)Landroid/content/ComponentName;"
+    )
+    def startService(self, emu, intent):
+        return ComponentName()
 
 
 class ContextWrapper(

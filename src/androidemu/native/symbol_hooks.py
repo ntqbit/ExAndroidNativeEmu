@@ -73,7 +73,7 @@ class SymbolHooks:
             memory_helpers.write_utf8(uc, buf_ptr, p)
             return nread
         else:
-            print("%s was not found in system_properties dictionary." % name)
+            logger.error("%s was not found in system_properties dictionary." % name)
 
         return 0
 

@@ -118,7 +118,7 @@ class MemoryMap:
         except UcError as e:
             # impossible
             for r in self._mu.mem_regions():
-                print(
+                logger.debug(
                     "region begin :0x%08X end:0x%08X, prot:%d"
                     % (r[0], r[1], r[2])
                 )
@@ -127,7 +127,6 @@ class MemoryMap:
 
     def _read_fully(self, fd, size):
         b_read = os.read(fd, size)
-        # print (b_read)
         sz_read = len(b_read)
         if sz_read <= 0:
             return b_read
@@ -136,7 +135,6 @@ class MemoryMap:
         while sz_left > 0:
             this_read = os.read(fd, sz_left)
             len_this_read = len(this_read)
-            # print (len_this_read)
             if len_this_read <= 0:
                 break
             b_read = b_read + this_read
@@ -188,7 +186,6 @@ class MemoryMap:
                 "read for offset %d sz %d data sz:%d"
                 % (offset, size, len(data))
             )
-            # print("data:%r"%data)
             self._mu.mem_write(res_addr, data)
             self._file_map_addr[res_addr] = (res_addr + al_size, offset, vf)
             os.lseek(vf.descriptor, ori_off, os.SEEK_SET)
@@ -246,7 +243,7 @@ class MemoryMap:
             # TODO:just for debug
 
             for r in self._mu.mem_regions():
-                print(
+                logger.debug(
                     "region begin :0x%08X end:0x%08X, prot:%d"
                     % (r[0], r[1], r[2])
                 )

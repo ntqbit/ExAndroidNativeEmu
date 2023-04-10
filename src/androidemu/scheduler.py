@@ -281,9 +281,6 @@ class Scheduler:
                         self._clear_reg0()
                         task.is_init = False
 
-                # print(hex(start_pos))
-                # 加上uc timeout参数有bug，会随机崩溃，这个机制是uc内部使用多线程实现的，但uc对象根本不是线程安全的，指令数可以加，但是很慢
-                # 第四个参数传100执行arm64的android6 libc会触发bug，具体原因见hooker.py FIXME注释
                 logger.debug(
                     "scheduler starting at 0x%X. stop pos: 0x%X",
                     start_pos,

@@ -40,6 +40,7 @@ class Environment:
     def __init__(self):
         self.package_name = None
         self.packages: Dict[str, AndroidPackage] = {}
+        self.uid = 1
 
     def add_package(self, package: AndroidPackage):
         self.packages[package.get_package_name()] = package
@@ -52,3 +53,6 @@ class Environment:
 
     def find_package_by_name(self, package_name: str) -> Optional[AndroidPackage]:
         return self.packages.get(package_name)
+
+    def get_uid(self):
+        return self.uid
