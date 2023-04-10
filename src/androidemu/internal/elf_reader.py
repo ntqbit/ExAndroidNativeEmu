@@ -1,10 +1,9 @@
 import struct
 import os
-import sys
 
 import verboselogs
 
-from androidemu.utils import memory_helpers, misc_utils
+from androidemu.utils import memory_helpers
 
 logger = verboselogs.VerboseLogger(__name__)
 
