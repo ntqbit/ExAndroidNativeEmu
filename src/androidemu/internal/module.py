@@ -44,10 +44,6 @@ class Module:
             return None
 
     def call_init(self, emu):
-        for fun_ptr in self.init_array:
-            fun_addr = fun_ptr
-            logger.debug(
-                "Calling Init_array %s function: 0x%08X "
-                % (self.filename, fun_addr)
-            )
+        for fun_addr in self.init_array:
+            logger.debug("Calling Init_array %s function: 0x%08X ", self.filename, fun_addr)
             emu.call_native(fun_addr)
