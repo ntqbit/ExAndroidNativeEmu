@@ -1,11 +1,29 @@
 import os
-import sys
 
 import verboselogs
 
-from unicorn import *
-from unicorn.arm_const import *
-from unicorn.arm64_const import *
+from unicorn import (
+    Uc,
+    UC_ARCH_ARM,
+    UC_MODE_ARM,
+    UC_ARCH_ARM64,
+    UC_PROT_READ,
+    UC_PROT_WRITE,
+    UC_PROT_EXEC
+)
+from unicorn.arm_const import (
+    UC_ARM_REG_SP,
+    UC_ARM_REG_PC,
+    UC_ARM_REG_R0,
+    UC_ARM_REG_R1
+)
+from unicorn.arm64_const import (
+    UC_ARM64_REG_SP,
+    UC_ARM64_REG_PC,
+    UC_ARM64_REG_CPACR_EL1,
+    UC_ARM64_REG_X0,
+    UC_ARM64_REG_X1
+)
 
 from androidemu import pcb
 from androidemu.const import emu_const
@@ -63,7 +81,7 @@ class Emulator:
         self._support_muti_task = muti_task
         self._pcb = pcb.Pcb()
 
-        logger.info("process pid:%d" % self._pcb.get_pid())
+        logger.info("process pid:%d", self._pcb.get_pid())
 
         sp_reg = 0
         if arch == emu_const.Arch.ARM32:
@@ -313,16 +331,12 @@ class Emulator:
         res = self.mu.reg_read(UC_ARM64_REG_X0)
         return res
 
-    # 返回值8个字节,用两个寄存器保存
-
     def _call_native_return_2reg32(self, addr, *argv):
         res = self._call_native32(addr, *argv)
 
         res_high = self.mu.reg_read(UC_ARM_REG_R1)
 
         return (res_high << 32) | res
-
-    # 返回值16个字节,用两个寄存器保存
 
     def _call_native_return_2reg64(self, addr, *argv):
         res = self._call_native64(addr, *argv)

@@ -281,3 +281,6 @@ $RECYCLE.BIN/
 
 !/tests/test_binaries/test_native.so
 *.idb
+
+# VSCode
+.vscode/

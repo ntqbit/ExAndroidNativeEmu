@@ -15,7 +15,7 @@ from androidemu.java.reference_table import ReferenceTable
 from androidemu.java.classes.string import String
 from androidemu.java.classes.array import Array
 from androidemu.java.const import JAVA_NULL, MODIFIER_STATIC
-from androidemu.java.jni_const import JNI_TRUE, JNI_FALSE
+from androidemu.java.jni_const import JNI_TRUE, JNI_FALSE, JNI_OK
 from androidemu.utils import memory_helpers, debug_utils
 from androidemu.utils.repr import short_bytes_repr
 from androidemu.const import emu_const
@@ -31,8 +31,6 @@ class JNIEnv:
     :type class_loader JavaClassLoader
     :type hooker Hooker
     """
-
-    JNI_OK = 0
 
     def __init__(self, emu, java_vm, class_loader, hooker):
         self._emu = emu
@@ -444,7 +442,8 @@ class JNIEnv:
 
                 result.append(obj)
             else:
-                raise NotImplementedError("Unknown arg name %s" % arg_name)
+                raise NotImplementedError(f"Unknown arg name {arg_name}")
+
             args_index = args_index + 1
             args_list_index = args_list_index + 1
 
@@ -875,7 +874,7 @@ class JNIEnv:
         return self.add_local_reference(obj)
 
     def ensure_local_capacity(self, mu, env):
-        return JNIEnv.JNI_OK
+        return JNI_OK
 
     def alloc_object(self, mu, env):
         raise NotImplementedError()
