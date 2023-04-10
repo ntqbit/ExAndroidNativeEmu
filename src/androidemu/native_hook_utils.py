@@ -1,21 +1,27 @@
-from keystone import (
-    Ks,
-    KS_ARCH_ARM,
-    KS_MODE_THUMB,
-    KS_ARCH_ARM64,
-    KS_MODE_LITTLE_ENDIAN,
-)
-from unicorn import *
-from unicorn.arm_const import *
-from unicorn.arm64_const import *
-from androidemu.const import emu_const
-from androidemu import config
-import sys
 import verboselogs
-from androidemu.java.helpers.native_method import (
-    native_write_args,
-    native_read_args_in_hook_code,
+
+from unicorn import (
+    UC_PROT_READ,
+    UC_PROT_WRITE,
+    UC_PROT_EXEC,
+    UC_HOOK_CODE
 )
+from unicorn.arm_const import (
+    UC_ARM_REG_R0,
+    UC_ARM_REG_R1,
+    UC_ARM_REG_CPSR,
+    UC_ARM_REG_LR,
+    UC_ARM_REG_PC
+)
+from unicorn.arm64_const import (
+    UC_ARM64_REG_X0,
+    UC_ARM64_REG_X1,
+    UC_ARM64_REG_X30,
+    UC_ARM64_REG_PC
+)
+
+from androidemu.const.emu_const import Arch
+from androidemu.java.helpers.native_method import native_read_args_in_hook_code
 
 logger = verboselogs.VerboseLogger(__name__)
 
@@ -68,7 +74,7 @@ class FuncHooker:
                 cb_after = hook_param[2]
                 r0 = 0
                 r1 = 0
-                if self._arch == emu_const.Arch.ARM32:
+                if self._arch == Arch.ARM32:
                     r0 = mu.reg_read(UC_ARM_REG_R0)
                     r1 = mu.reg_read(UC_ARM_REG_R1)
 
@@ -115,8 +121,8 @@ class FuncHooker:
                 is_handled = hook_param[1](self._emu, *args)
                 if is_handled:
                     # 如果逻辑已经被处理，则直接返回
-                    if self._arch == emu_const.Arch.ARM32:
-                        cpsr = mu.reg_read(uc, UC_ARM_REG_CPSR)
+                    if self._arch == Arch.ARM32:
+                        cpsr = mu.reg_read(mu, UC_ARM_REG_CPSR)
                         lr = self._emu.reg_read(UC_ARM_REG_LR)
                         # same as BX LR
                         if lr & 1:
@@ -133,9 +139,7 @@ class FuncHooker:
                     return
 
             if hook_param[2]:
-                # 因为不知道最后一条指令是什么，需要只能改变返回的地址，再hook从而达到 callback after的效果
-                # 改变lr，返回到跳板，
-                if self._arch == emu_const.Arch.ARM32:
+                if self._arch == Arch.ARM32:
                     mu.mem_write(
                         self._stub_off,
                         address.to_bytes(4, byteorder="little", signed=False),

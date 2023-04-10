@@ -4,7 +4,7 @@ import sys
 import verboselogs
 
 from androidemu.java.jvm_id_counter import (
-    next_cls_id,
+    next_class_id,
     next_field_id,
     next_method_id
 )
@@ -26,7 +26,7 @@ class JavaClassDef(type):
         jvm_ignore=False,
         jvm_super=None,
     ):
-        cls.jvm_id = next_cls_id()
+        cls.jvm_id = next_class_id()
         cls.jvm_name = jvm_name
         cls.jvm_methods = dict()
         cls.jvm_fields = dict()
@@ -207,9 +207,11 @@ def java_method_def(
             return_ch = signature[return_index]
             res = None
             arch = emulator.get_arch()
+            native_addr = getattr(native_wrapper, 'jvm_method').native_addr
+
             if return_ch in ("J", "D") and arch == Arch.ARM32:
                 res = emulator.call_native_return_2reg(
-                    native_wrapper.jvm_method.native_addr,
+                    native_addr,
                     emulator.java_vm.jni_env.address_ptr,  # JNIEnv*
                     first_obj,  # this object or this class
                     # method has been declared in
@@ -217,7 +219,7 @@ def java_method_def(
                 )
             else:
                 res = emulator.call_native(
-                    native_wrapper.jvm_method.native_addr,
+                    native_addr,
                     emulator.java_vm.jni_env.address_ptr,  # JNIEnv*
                     first_obj,  # this object or this class
                     # method has been declared in

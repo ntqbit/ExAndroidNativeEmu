@@ -30,14 +30,6 @@ class Array(metaclass=JavaClassDef, jvm_name="java/lang/reflect/Array"):
     def set(emu, obj, index):
         raise NotImplementedError()
 
-    # #TODO: 在继承多态机制完善后移动到Object类上
-
-    @java_method_def(
-        name="getClass", signature="()Ljava/lang/Class;", native=False
-    )
-    def getClass(self, emu):
-        return self.class_object
-
 
 class ByteArray(Array, metaclass=JavaClassDef, jvm_name="[B", jvm_super=Array):
     def __init__(self, item_list):

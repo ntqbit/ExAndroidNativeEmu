@@ -2,7 +2,7 @@ import verboselogs
 
 from androidemu.java.classes.executable import Executable
 from androidemu.java import JavaClassDef, JavaFieldDef, JavaMethodDef, java_method_def
-from androidemu.java.const import *
+from androidemu.java.const import JAVA_NULL
 
 logger = verboselogs.VerboseLogger(__name__)
 
@@ -72,6 +72,3 @@ class Method(
     )
     def setAccessible(self, emu, flag):
         pass
-
-    def __repr__(self):
-        return "Method(%s, %s)" % (self.declaringClass, self._method)

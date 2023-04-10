@@ -2,6 +2,11 @@ import sys
 
 import verboselogs
 
+from unicorn import (
+    UC_PROT_READ,
+    UC_PROT_WRITE
+)
+
 from androidemu.hooker import Hooker
 from androidemu.java.classes.constructor import Constructor
 from androidemu.java.classes.method import Method
@@ -764,7 +769,7 @@ class JNIEnv:
         else:
             msg = msg_obj.value.get_py_string()
 
-        class_obj = jclazz.value
+        class_obj = clazz.value
         pyclazz = class_obj.get_py_clazz()
         obj = jthrowable(pyclazz(msg))
 
@@ -1530,7 +1535,7 @@ class JNIEnv:
     def call_static_float_method_v(self, mu, env, clazz_idx, method_id, args):
         return self._call_static_xxx_method(mu, env, clazz_idx, method_id, args, 1)
 
-    def call_static_float_method_a(self, mu, env):
+    def call_static_float_method_a(self, mu, env, clazz_idx, method_id, args):
         return self._call_static_xxx_method(mu, env, clazz_idx, method_id, args, 2)
 
     def call_static_double_method(
@@ -1644,10 +1649,10 @@ class JNIEnv:
     def get_static_long_field(self, mu, env, clazz_idx, field_id):
         return self._get_static_xxx_field(mu, env, clazz_idx, field_id, True)
 
-    def get_static_float_field(self, mu, env):
+    def get_static_float_field(self, mu, env, clazz_idx, field_id):
         return self._get_static_xxx_field(mu, env, clazz_idx, field_id)
 
-    def get_static_double_field(self, mu, env):
+    def get_static_double_field(self, mu, env, clazz_idx, field_id):
         return self._get_static_xxx_field(mu, env, clazz_idx, field_id, True)
 
     def set_static_object_field(self, mu, env):

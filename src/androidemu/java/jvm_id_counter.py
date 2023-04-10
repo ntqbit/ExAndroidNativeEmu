@@ -1,21 +1,20 @@
 import itertools
+
 from androidemu.const.emu_const import JMETHOD_ID_BASE, JFIELD_ID_BASE
 
-g_next_jvm_id = itertools.count(start=1)
-g_next_jvm_method_id = itertools.count(start=JMETHOD_ID_BASE, step=4)
-g_next_jvm_field_id = itertools.count(start=JFIELD_ID_BASE, step=4)
+NEXT_JVM_CLASS_ID = itertools.count(start=1)
+NEXT_JVM_METHOD_ID = itertools.count(start=JMETHOD_ID_BASE, step=4)
+NEXT_JVM_FIELD_ID = itertools.count(start=JFIELD_ID_BASE, step=4)
 
 
-def next_cls_id():
-    global g_next_jvm_id
-    return next(g_next_jvm_id)
+def next_class_id():
+    return next(NEXT_JVM_CLASS_ID)
 
 
 def next_method_id():
-    global g_next_jvm_method_id
-    return next(g_next_jvm_method_id)
+    return next(NEXT_JVM_METHOD_ID)
 
 
 def next_field_id():
-    global g_next_jvm_field_id
-    return next(g_next_jvm_field_id)
+    return next(NEXT_JVM_FIELD_ID)
+

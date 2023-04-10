@@ -1,7 +1,7 @@
-import struct
-from unicorn.arm_const import *
-from unicorn.arm64_const import *
-from androidemu.const import emu_const
+from unicorn.arm_const import UC_ARM_REG_SP
+from unicorn.arm64_const import UC_ARM64_REG_SP
+
+from androidemu.const.emu_const import Arch
 from androidemu.utils import memory_helpers
 
 
@@ -9,10 +9,10 @@ class StackHelper:
     def __init__(self, emu):
         self._emu = emu
         arch = emu.get_arch()
-        if arch == emu_const.Arch.ARM32:
+        if arch == Arch.ARM32:
             sp_reg = UC_ARM_REG_SP
 
-        elif arch == emu_const.Arch.ARM64:
+        elif arch == Arch.ARM64:
             sp_reg = UC_ARM64_REG_SP
 
         sp = emu.mu.reg_read(sp_reg)
@@ -37,13 +37,12 @@ class StackHelper:
         return self._sp
 
     def commit(self):
-        # 对齐sp
-        if self._emu.get_arch() == emu_const.Arch.ARM32:
+        if self._emu.get_arch() == Arch.ARM32:
             self._sp = self._sp & (~7)
-        elif self._emu.get_arch() == emu_const.Arch.ARM64:
+        elif self._emu.get_arch() == Arch.ARM64:
             self._sp = self._sp & (~15)
 
         self._emu.mu.reg_write(self._sp_reg, self._sp)
 
-    def get_sp():
+    def get_sp(self):
         return self._sp

@@ -22,8 +22,8 @@ from androidemu.logging import SYSCALL
 
 logger = verboselogs.VerboseLogger(__name__)
 
-g_isWin = platform.system() == "Windows"
-if not g_isWin:
+IS_WINDOWS = platform.system() == "Windows"
+if not IS_WINDOWS:
     import fcntl
 
 
@@ -159,8 +159,7 @@ class VirtualFileSystem:
                 shutil.rmtree(fp)
 
     def _create_fd_link(self, fd, target):
-        global g_isWin
-        if g_isWin:
+        if IS_WINDOWS:
             return
 
         if fd >= 0:
@@ -178,8 +177,7 @@ class VirtualFileSystem:
             os.symlink(full_target, p, False)
 
     def _del_fd_link(self, fd):
-        global g_isWin
-        if g_isWin:
+        if IS_WINDOWS:
             return
 
         if fd >= 0:
@@ -319,9 +317,8 @@ class VirtualFileSystem:
 
     def _norm_file_name(self, filename_in_vm):
         filename_norm = os.path.normpath(filename_in_vm)
-        global g_isWin
-        if g_isWin:
-            # windows的路径标准化之后是反斜杠的，这里换成linux的正斜杠
+
+        if IS_WINDOWS:
             filename_norm = filename_norm.replace("\\", "/")
 
         return filename_norm
@@ -623,10 +620,9 @@ class VirtualFileSystem:
         raise NotImplementedError()
 
     def _fcntl64(self, mu, fd, cmd, arg1, arg2, arg3, arg4):
-        # fcntl is not support on windows
-        global g_isWin
-        if g_isWin:
+        if IS_WINDOWS:
             return 0
+        
         r = fcntl.fcntl(fd, cmd, arg1)
         return r
 

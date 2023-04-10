@@ -1,8 +1,6 @@
 import os
 import platform
 
-from androidemu.const import emu_const
-
 from unicorn.unicorn_const import (
     UC_PROT_NONE,
     UC_PROT_READ,
@@ -10,10 +8,13 @@ from unicorn.unicorn_const import (
     UC_PROT_EXEC,
     UC_PROT_ALL,
 )
-from unicorn.arm_const import *
-from unicorn.arm64_const import *
+from unicorn.arm_const import UC_ARM_REG_C13_C0_3
+from unicorn.arm64_const import UC_ARM64_REG_TPIDR_EL0
 
-g_isWin = platform.system() == "Windows"
+from androidemu.const import emu_const
+
+
+IS_WINDOWS = platform.system() == "Windows"
 
 
 def vfs_path_to_system_path(vfs_root, path):
@@ -52,9 +53,8 @@ def get_segment_protection(prot_in):
 
 
 def platform_open(fd, flag):
-    global g_isWin
-    if g_isWin:
-        flag = flag | os.O_BINARY
+    if IS_WINDOWS:
+        flag = flag | getattr(os, 'O_BINARY')
 
     return os.open(fd, flag)
 
