@@ -1,9 +1,5 @@
-from androidemu.java.java_class_def import JavaClassDef
-from androidemu.java.java_field_def import JavaFieldDef
-from androidemu.java.java_method_def import java_method_def, JavaMethodDef
-from androidemu.java.classes.string import String
+from androidemu.java import JavaClassDef, java_method_def
 from androidemu.java.classes.array import Array
-from androidemu import config
 
 
 class NetworkInterface(

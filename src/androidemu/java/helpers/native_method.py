@@ -4,7 +4,7 @@ from unicorn.arm_const import *
 from unicorn.arm64_const import *
 from androidemu.const import emu_const
 
-from androidemu.java.java_class_def import JavaClassDef
+from androidemu.java import JavaClassDef
 from androidemu.java.jni_ref import jobject
 
 

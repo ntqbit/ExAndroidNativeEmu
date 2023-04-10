@@ -622,15 +622,15 @@ class JNIEnv:
         Returns a class object from a fully-qualified name, or NULL if the class cannot be found.
         """
         name = memory_helpers.read_utf8(mu, name_ptr)
-        logger.debug("JNIEnv->FindClass(%s) was called" % name)
+        logger.debug("JNIEnv->FindClass(%s) was called", name)
 
         pyclazz = self._class_loader.find_class_by_name(name)
         if pyclazz is None:
-            raise RuntimeError("Could not find class '%s' for JNIEnv." % name)
+            raise RuntimeError(f"Could not find class '{name}' for JNIEnv.")
 
         if pyclazz.jvm_ignore:
             logger.debug("FindClass %s return 0 because of ignored")
-            return 0
+            return JAVA_NULL
 
         return self.add_local_reference(jclass(pyclazz.class_object))
 
@@ -2039,7 +2039,6 @@ class JNIEnv:
             )
 
         class_obj = clazz.value
-
         pyclazz = class_obj.get_py_clazz()
         ptr_sz = self._emu.get_ptr_size()
 

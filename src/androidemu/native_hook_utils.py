@@ -78,11 +78,9 @@ class FuncHooker:
 
                 cb_after(self._emu, r0, r1)
 
-        except Exception as e:
-            # Make sure we catch exceptions inside hooks and stop emulation.
+        except Exception:
             mu.emu_stop()
-            traceback.print_exc()
-            logger.exception("catch error in __hook_stub")
+            logger.exception("Caught an exception in __hook_stub:")
             raise
 
     def __init__(self, emu):
@@ -109,7 +107,7 @@ class FuncHooker:
             if address not in self._hook_params:
                 return
 
-            logger.debug("trigger hook on 0x%08X" % address)
+            logger.debug("trigger hook on 0x%08X", address)
             hook_param = self._hook_params[address]
             nargs = hook_param[0]
             args = native_read_args_in_hook_code(self._emu, nargs)
@@ -182,10 +180,9 @@ class FuncHooker:
                     self._stub_off += 8
                     mu.reg_write(UC_ARM64_REG_X30, new_lr)
 
-        except Exception as e:
-            # Make sure we catch exceptions inside hooks and stop emulation.
+        except Exception:
             mu.emu_stop()
-            logger.exception("catch error in __hook_func_head")
+            logger.exception("Caught an exception in __hook_func_head:")
             raise
 
     def fun_hook(self, fun_addr, nargs, cb_before, cb_after):

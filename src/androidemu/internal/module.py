@@ -21,6 +21,9 @@ class Module:
         self.init_array = list(init_array)
         self.soinfo_ptr = soinfo_ptr
 
+        for symbol_name in self.symbols:
+            logger.notice('Module %s symbol %s: 0x%X', filename, symbol_name, self.symbols[symbol_name])
+
         # Create fast lookup.
         for symbol_name in self.symbols:
             addr = self.symbols[symbol_name]

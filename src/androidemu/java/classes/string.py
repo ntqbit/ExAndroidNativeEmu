@@ -1,6 +1,4 @@
-from androidemu.java.java_class_def import JavaClassDef
-from androidemu.java.java_field_def import JavaFieldDef
-from androidemu.java.java_method_def import java_method_def, JavaMethodDef
+from androidemu.java import JavaClassDef, java_method_def
 from androidemu.java.classes.array import ByteArray, StringArray
 
 
@@ -52,9 +50,3 @@ class String(metaclass=JavaClassDef, jvm_name="java/lang/String"):
     @java_method_def('split', '(Ljava/lang/String;)[Ljava/lang/String;', args_list=['jstring'])
     def split(self, emu, separator: 'String'):
         return StringArray([String(s) for s in self._str.split(separator.get_py_string())])
-
-    @java_method_def(
-        name="getClass", signature="()Ljava/lang/Class;", native=False
-    )
-    def getClass(self, emu):
-        return self.class_object

@@ -1,9 +1,6 @@
-from androidemu.java.java_class_def import JavaClassDef
-from androidemu.java.java_field_def import JavaFieldDef
-from androidemu.java.java_method_def import java_method_def, JavaMethodDef
+from androidemu.java import JavaClassDef, java_method_def, JavaFieldDef
 from androidemu.java.classes.list import List
 from androidemu.java.classes.string import String
-from androidemu import config
 
 
 class WifiInfo(metaclass=JavaClassDef, jvm_name="android/net/wifi/WifiInfo"):
@@ -191,6 +188,4 @@ class ConnectivityManager(
         native=False,
     )
     def getActiveNetworkInfo(self, *args, **kwargs):
-        # IMEI
-        # FIXME 读配置文件
         return NetworkInfo()

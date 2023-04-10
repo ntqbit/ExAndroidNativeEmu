@@ -1,13 +1,8 @@
-from androidemu.java.java_class_def import JavaClassDef
-from androidemu.java.java_field_def import JavaFieldDef
-from androidemu.java.java_method_def import java_method_def, JavaMethodDef
-from androidemu.java.constant_values import *
-from androidemu.utils import misc_utils
-from androidemu.java.classes.string import String
-
-from xml.dom.minidom import parse
 import xml.dom.minidom
 
+
+from androidemu.java import JavaClassDef, java_method_def
+from androidemu.java.classes.string import String
 
 class Editor(
     metaclass=JavaClassDef, jvm_name="android/content/SharedPreferences$Editor"

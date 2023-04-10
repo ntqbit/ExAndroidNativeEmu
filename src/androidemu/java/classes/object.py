@@ -1,6 +1,4 @@
-from androidemu.java.java_class_def import JavaClassDef
-from androidemu.java.java_field_def import JavaFieldDef
-from androidemu.java.java_method_def import java_method_def, JavaMethodDef
+from androidemu.java import JavaClassDef
 
 
 class Object(metaclass=JavaClassDef, jvm_name="java/lang/Object"):
@@ -8,4 +6,4 @@ class Object(metaclass=JavaClassDef, jvm_name="java/lang/Object"):
         pass
 
     def __repr__(self):
-        return f"Object()"
+        return "Object()"

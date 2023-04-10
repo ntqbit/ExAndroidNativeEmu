@@ -32,7 +32,8 @@ class JavaClassDef(type):
         cls.jvm_fields = dict()
         cls.jvm_ignore = jvm_ignore
         cls.jvm_super = jvm_super
-        cls.class_object = java_method_def('getClass', '()Ljava/lang/Class;')(JavaClassDef._getClass)
+        cls.class_object = None
+        cls.getClass = java_method_def('getClass', '()Ljava/lang/Class;')(JavaClassDef._getClass)
 
         # Register all defined Java methods.
         for func in inspect.getmembers(cls, predicate=inspect.isfunction):

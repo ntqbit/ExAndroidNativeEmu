@@ -881,7 +881,6 @@ class SyscallHooks:
         return has_read
 
     def _ARM_cacheflush(self, mu):
-        logger.warning("syscall _ARM_cacheflush skip.")
         return 0
 
     def _ARM_set_tls(self, mu, tls_ptr):

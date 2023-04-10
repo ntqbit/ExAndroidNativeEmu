@@ -1,7 +1,6 @@
-from androidemu.java.java_class_def import JavaClassDef
-from androidemu.java.java_field_def import JavaFieldDef
-from androidemu.java.java_method_def import java_method_def, JavaMethodDef
 import verboselogs
+
+from androidemu.java import JavaClassDef, java_method_def
 
 logger = verboselogs.VerboseLogger(__name__)
 

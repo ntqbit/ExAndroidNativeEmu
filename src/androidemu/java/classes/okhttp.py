@@ -1,6 +1,4 @@
-from androidemu.java.java_class_def import JavaClassDef
-from androidemu.java.java_field_def import JavaFieldDef
-from androidemu.java.java_method_def import java_method_def, JavaMethodDef
+from androidemu.java import JavaClassDef, java_method_def
 
 
 class Buffer(metaclass=JavaClassDef, jvm_name="okio/Buffer"):
@@ -105,7 +103,7 @@ class RequestBody(metaclass=JavaClassDef, jvm_name="okhttp3/RequestBody"):
 
 
 class Headers(metaclass=JavaClassDef, jvm_name="okhttp3/Headers"):
-    def __init__(self):
+    def __init__(self, headers):
         pass
 
     @java_method_def(
@@ -217,8 +215,7 @@ class Chain(metaclass=JavaClassDef, jvm_name="okhttp3/Interceptor$Chain"):
     )
     def proceed(self, emu, req):
         self._req_after_proceed = req
-        # FIXME 暂时不知道这个Resonse返回的含义,暂时返回空Response应该没什么问题
         return Response()
 
-    def get_proceed_request():
+    def get_proceed_request(self):
         return self._req_after_proceed

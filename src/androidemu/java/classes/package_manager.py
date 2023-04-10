@@ -1,9 +1,7 @@
 import time
 import verboselogs
 
-from androidemu.java.java_class_def import JavaClassDef
-from androidemu.java.java_field_def import JavaFieldDef
-from androidemu.java.java_method_def import java_method_def
+from androidemu.java import JavaClassDef, java_method_def, JavaFieldDef
 from androidemu.java.classes.string import String
 from androidemu.java.classes.array import ObjectArray, ByteArray
 

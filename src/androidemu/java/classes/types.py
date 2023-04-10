@@ -1,10 +1,5 @@
-import sys
-
-from androidemu.java.java_class_def import JavaClassDef
-from androidemu.java.java_field_def import JavaFieldDef
-from androidemu.java.java_method_def import java_method_def, JavaMethodDef
+from androidemu.java import JavaClassDef, java_method_def
 from androidemu.java.classes.string import String
-from androidemu.utils import debug_utils
 
 
 class Boolean(metaclass=JavaClassDef, jvm_name="java/lang/Boolean"):
@@ -17,12 +12,6 @@ class Boolean(metaclass=JavaClassDef, jvm_name="java/lang/Boolean"):
 
     def __repr__(self):
         return "true" if self._value else "false"
-
-    @java_method_def(
-        name="getClass", signature="()Ljava/lang/Class;", native=False
-    )
-    def getClass(self, emu):
-        return self.class_object
 
 
 class Integer(metaclass=JavaClassDef, jvm_name="java/lang/Integer"):
@@ -41,14 +30,6 @@ class Integer(metaclass=JavaClassDef, jvm_name="java/lang/Integer"):
 
     def __repr__(self):
         return f"Int({self._value})"
-
-    # TODO: 在继承多态机制完善后移动到Object类上
-
-    @java_method_def(
-        name="getClass", signature="()Ljava/lang/Class;", native=False
-    )
-    def getClass(self, emu):
-        return self.class_object
 
 
 class Long(metaclass=JavaClassDef, jvm_name="java/lang/Long"):
@@ -69,10 +50,6 @@ class Long(metaclass=JavaClassDef, jvm_name="java/lang/Long"):
     def __repr__(self):
         return f"Long({self._value})"
 
-    @java_method_def(name="getClass", signature="()Ljava/lang/Class;", native=False)
-    def getClass(self, emu):
-        return self.class_object
-
     @java_method_def('toString', signature='()Ljava/lang/String;')
     def toString(self, emu):
         return String(str(self._value))
@@ -87,11 +64,3 @@ class Float(metaclass=JavaClassDef, jvm_name="java/lang/Float"):
 
     def __repr__(self):
         return f"Float({self._value})"
-
-    # #TODO: 在继承多态机制完善后移动到Object类上
-
-    @java_method_def(
-        name="getClass", signature="()Ljava/lang/Class;", native=False
-    )
-    def getClass(self, emu):
-        return self.class_object

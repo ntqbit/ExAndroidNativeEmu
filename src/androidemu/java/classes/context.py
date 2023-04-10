@@ -11,9 +11,7 @@ from androidemu.java.classes.display import DisplayManager
 from androidemu.java.classes.shared_preferences import *
 from androidemu.java.classes.asset_manager import *
 from androidemu.java.classes.package_manager import *
-from androidemu.java.java_class_def import JavaClassDef
-from androidemu.java.java_field_def import JavaFieldDef
-from androidemu.java.java_method_def import java_method_def, JavaMethodDef
+from androidemu.java import JavaClassDef, JavaFieldDef, java_method_def
 
 
 class ComponentName(metaclass=JavaClassDef, jvm_name='android/content/ComponentName'):
@@ -33,10 +31,6 @@ class Context(
 ):
     def __init__(self):
         pass
-
-    @java_method_def(name="getClass", signature="()Ljava/lang/Class;")
-    def getClass(self, emu):
-        return self.class_object
 
     @java_method_def(
         name="getPackageManager",

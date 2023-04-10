@@ -1,6 +1,4 @@
-from androidemu.java.java_class_def import JavaClassDef
-from androidemu.java.java_field_def import JavaFieldDef
-from androidemu.java.java_method_def import java_method_def, JavaMethodDef
+from androidemu.java import JavaClassDef, java_method_def
 
 
 class Uri(metaclass=JavaClassDef, jvm_name="android/net/Uri"):
@@ -11,7 +9,7 @@ class Uri(metaclass=JavaClassDef, jvm_name="android/net/Uri"):
         return self._uri
 
     def __repr__(self):
-        return "Uri(%s)" % self._uri
+        return f"Uri({self._uri})"
 
     @staticmethod
     @java_method_def(

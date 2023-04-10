@@ -97,7 +97,6 @@ class Hooker:
         try:
             hook_func(self._emu)
         except Exception:
-            # Make sure we catch exceptions inside hooks and stop emulation.
             mu.emu_stop()
-            logger.exception("catch error in _hook")
+            logger.exception("Caught an exception in _hook:")
             raise

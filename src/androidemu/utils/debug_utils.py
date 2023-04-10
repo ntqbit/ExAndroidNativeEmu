@@ -155,7 +155,6 @@ DUMP_REG_WRITE = 2
 def dump_code(emu, address, size, fd, dump_reg_type=DUMP_REG_READ):
     mu = emu.mu
     if emu.get_arch() == emu_const.Arch.ARM32:
-        # 判断是否arm，用不同的decoder
         cpsr = mu.reg_read(UC_ARM_REG_CPSR)
         if cpsr & (1 << 5):
             md = g_md_thumb
@@ -182,12 +181,12 @@ def dump_code(emu, address, size, fd, dump_reg_type=DUMP_REG_READ):
             base = module.base
             funName = module.is_symbol_addr(addr)
 
-        instruction_str = "".join("{:02X} ".format(x) for x in i.bytes)
+        instruction_str = " ".join("{:02X}".format(x) for x in i.bytes)
         tid = ""
         if emu.get_muti_task_support():
             sch = emu.get_schduler()
             tid = "%d:" % sch.get_current_tid()
-        line = "%s(%20s[0x%08X])[%-12s]0x%08X:\t%s\t%s" % (
+        line = "%s(%20s[0x%08X])[%-11s]0x%08X:\t%s\t%s" % (
             tid,
             name,
             base,

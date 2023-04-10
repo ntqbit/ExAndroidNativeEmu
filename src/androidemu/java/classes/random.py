@@ -1,7 +1,7 @@
 import random
 import verboselogs
 
-from androidemu.java import JavaClassDef, JavaFieldDef, java_method_def
+from androidemu.java import JavaClassDef, java_method_def
 
 logger = verboselogs.VerboseLogger(__name__)
 

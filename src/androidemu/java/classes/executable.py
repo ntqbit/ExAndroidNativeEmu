@@ -1,5 +1,4 @@
-from androidemu.java.java_class_def import JavaClassDef
-from androidemu.java.java_field_def import JavaFieldDef
+from androidemu.java import JavaClassDef, JavaFieldDef
 
 
 class Executable(

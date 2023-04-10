@@ -1,6 +1,6 @@
 import zipfile
 
-from androidemu.java.java_class_def import JavaClassDef
+from androidemu.java import JavaClassDef
 
 
 class AssetManager(

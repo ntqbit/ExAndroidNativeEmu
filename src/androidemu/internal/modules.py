@@ -1,6 +1,8 @@
 import os
 import verboselogs
 
+from typing import List
+
 from unicorn import UC_PROT_ALL, UC_PROT_WRITE, UC_PROT_READ
 
 from androidemu.internal import arm
@@ -109,7 +111,6 @@ class Modules:
         # 0结尾
         memory_helpers.write_ptrs_sz(self.emu.mu, argv_offset, 0, ptr_sz)
 
-
         # KernelArgumentBlock
         # int argc;
         # char** argv;
@@ -167,7 +168,7 @@ class Modules:
 
     def __init__(self, emu, vfs_root):
         self.emu = emu
-        self.modules = list()
+        self.modules: List[Module] = list()
         self.symbol_hooks = dict()
         self.counter_memory = BASE_ADDR
         self._vfs_root = vfs_root
@@ -409,7 +410,6 @@ class Modules:
                 rel_addr = load_bias + rel["r_offset"]
                 rel_info_type = rel["r_info_type"]
 
-
                 sym_name = reader.get_dyn_string_by_rel_sym(r_info_sym)
                 if rel_info_type == arm.R_ARM_ABS32:
                     if sym_name in symbols_resolved:
@@ -596,7 +596,8 @@ class Modules:
                     # Weak symbol initialized as 0
                     return 0
                 else:
-                    logger.error('=> Undefined external symbol: "%s"' % name)
+                    if name:
+                        logger.error('=> Undefined external symbol: "%s"' % name)
                     return None
             else:
                 return target

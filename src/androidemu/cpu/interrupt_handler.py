@@ -40,10 +40,10 @@ class InterruptHandler:
                 traceback.print_stack()
                 frame = inspect.currentframe()
                 stack_trace = traceback.format_stack(frame)
-                logger.error("catch error in _hook_interrupt")
+                logger.error("Caught an exception in _hook_interrupt:")
                 logger.error(stack_trace[:-1])
                 self._mu.emu_stop()
-        except Exception as e:
+        except Exception:
             logger.exception("exception in _hook_interrupt intno:[%d]" % intno)
             self._mu.emu_stop()
 
