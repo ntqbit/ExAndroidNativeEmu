@@ -404,7 +404,7 @@ class Modules:
                         # Write the new value
                         self.emu.mu.mem_write(rel_addr, (value + addend).to_bytes(8, byteorder="little"))
 
-                elif rel_info_type in (arm.R_ARM_RELATIVE,):
+                elif rel_info_type == arm.R_ARM_RELATIVE:
                     if sym_value == 0:
                         # Load address at which it was linked originally.
                         value_orig_bytes = self.emu.mu.mem_read(rel_addr, 4)
@@ -418,7 +418,7 @@ class Modules:
                         self.emu.mu.mem_write(rel_addr, value.to_bytes(4, byteorder="little"))
                     else:
                         raise NotImplementedError()  # impossible
-                elif rel_info_type in arm.R_AARCH64_RELATIVE:
+                elif rel_info_type == arm.R_AARCH64_RELATIVE:
                     if sym_value == 0:
                         addend = rel["r_addend"]
                         # Create the new value
