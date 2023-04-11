@@ -584,7 +584,7 @@ class VirtualFileSystem:
         else:
             file_helpers.stat_to_memory64(mu, stat_ptr, stats, uid, st_mode)
         
-        misc_utils.set_errno(self._emu, 2)
+        misc_utils.set_errno(self._emu, 5)
         return -1
 
     def _handle_getdents64(self, mu, fd, linux_dirent64_ptr, count):

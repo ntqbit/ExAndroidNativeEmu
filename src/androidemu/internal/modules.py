@@ -34,7 +34,6 @@ class Modules:
         self._counter_memory = BASE_ADDR
         soinfo_area_sz = 0x40000
         self._soinfo_area_base = emu.memory.map(0, soinfo_area_sz, UC_PROT_WRITE | UC_PROT_READ)
-        self._errno_ptr = 0
         self._linker: Module = None
         self._argv = None
         self._envp = None
@@ -181,7 +180,6 @@ class Modules:
         ptr_sz = self._emu.get_ptr_size()
 
         # auxv
-
         auxv_base = sp_helpers.reserve(0x100)
         auxv_offset = auxv_base
         for auxv_key, auxv_val in self._auxv:
@@ -230,7 +228,6 @@ class Modules:
         memory_helpers.write_ptrs_sz(self._emu.mu, kernel_args_base + 3 * ptr_sz, auxv_base, ptr_sz)
         memory_helpers.write_ptrs_sz(self._emu.mu, kernel_args_base + 4 * ptr_sz, 0, ptr_sz)
 
-        # tls单独一个区域，不放在stack中
         self._emu.mu.mem_map(TLS_BASE, TLS_SIZE, UC_PROT_WRITE | UC_PROT_READ)
         tls_ptr = TLS_BASE
         mu = self._emu.mu
@@ -239,7 +236,6 @@ class Modules:
         # TLS_SLOT_THREAD_ID
         memory_helpers.write_ptrs_sz(mu, tls_ptr + ptr_sz, thread_internal_ptr, ptr_sz)
         # TLS_SLOT_ERRNO
-        self._errno_ptr = tls_ptr + 2 * ptr_sz
         # TLS_SLOT_BIONIC_PREINIT
         memory_helpers.write_ptrs_sz(mu, tls_ptr + 3 * ptr_sz, kernel_args_base, ptr_sz)
         arch = self._emu.get_arch()
