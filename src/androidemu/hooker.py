@@ -29,7 +29,7 @@ class Hooker:
         self._hooks[hook_id] = func
 
         # the the hook_id to header
-        self._emu.mu.mem_write(self._hook_current, int(hook_id).to_bytes(4, byteorder="little", signed=False))
+        self._emu.mu.mem_write(self._hook_current, int(hook_id).to_bytes(4, "little", signed=False))
         self._hook_current += 4
 
         hook_addr = self._hook_current
@@ -62,7 +62,7 @@ class Hooker:
         for index in range(0, index_max):
             address = hook_map[index] if index in hook_map else 0
             table_bytes += int(address).to_bytes(
-                ptr_size, byteorder="little"
+                ptr_size, "little"
             )
 
         self._emu.mu.mem_write(table_address, table_bytes)
@@ -70,7 +70,7 @@ class Hooker:
 
         ptr_address = self._hook_current
         self._emu.mu.mem_write(
-            ptr_address, table_address.to_bytes(ptr_size, byteorder="little")
+            ptr_address, table_address.to_bytes(ptr_size, "little")
         )
         self._hook_current += ptr_size
 
@@ -79,7 +79,7 @@ class Hooker:
     def _hook(self, mu, address, size, user_data):
         hook_id_ptr = address - 4
         hook_id_bytes = mu.mem_read(hook_id_ptr, 4)
-        hook_id = int.from_bytes(hook_id_bytes, byteorder="little", signed=False)
+        hook_id = int.from_bytes(hook_id_bytes, "little", signed=False)
 
         hook_func = self._hooks[hook_id]
 

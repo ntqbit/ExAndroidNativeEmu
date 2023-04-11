@@ -420,7 +420,7 @@ class ELFReader:
                     ) = struct.unpack(sym_pattern, sym_bytes)
 
                 int_st_info = int.from_bytes(
-                    st_info, byteorder="little", signed=False
+                    st_info, "little", signed=False
                 )
                 st_info_bind = ELFReader.__elf_st_bind(int_st_info)
                 st_info_type = ELFReader.__elf_st_type(int_st_info)
@@ -578,153 +578,153 @@ class ELFReader:
         # phdr
         mu.mem_write(
             info_base + 128,
-            int(load_base + self._phoff).to_bytes(4, byteorder="little"),
+            int(load_base + self._phoff).to_bytes(4, "little"),
         )
         # phnum
         mu.mem_write(
             info_base + 132,
-            int(self._phdr_num).to_bytes(4, byteorder="little"),
+            int(self._phdr_num).to_bytes(4, "little"),
         )
         # entry
-        mu.mem_write(info_base + 136, int(self._entry_point).to_bytes(4, byteorder="little"))
+        mu.mem_write(info_base + 136, int(self._entry_point).to_bytes(4, "little"))
         # base
         mu.mem_write(
-            info_base + 140, int(load_base).to_bytes(4, byteorder="little")
+            info_base + 140, int(load_base).to_bytes(4, "little")
         )
         # size
         mu.mem_write(
-            info_base + 144, int(self._sz).to_bytes(4, byteorder="little")
+            info_base + 144, int(self._sz).to_bytes(4, "little")
         )
         # unused1
-        mu.mem_write(info_base + 148, int(0).to_bytes(4, byteorder="little"))
+        mu.mem_write(info_base + 148, int(0).to_bytes(4, "little"))
         # dynamic
         mu.mem_write(
             info_base + 152,
-            int(load_base + self._dyn_addr).to_bytes(4, byteorder="little"),
+            int(load_base + self._dyn_addr).to_bytes(4, "little"),
         )
         # unused2
-        mu.mem_write(info_base + 156, int(0).to_bytes(4, byteorder="little"))
+        mu.mem_write(info_base + 156, int(0).to_bytes(4, "little"))
         # unused3
-        mu.mem_write(info_base + 160, int(0).to_bytes(4, byteorder="little"))
+        mu.mem_write(info_base + 160, int(0).to_bytes(4, "little"))
         # next
-        mu.mem_write(info_base + 164, int(0).to_bytes(4, byteorder="little"))
+        mu.mem_write(info_base + 164, int(0).to_bytes(4, "little"))
         # flags
-        mu.mem_write(info_base + 168, int(0).to_bytes(4, byteorder="little"))
+        mu.mem_write(info_base + 168, int(0).to_bytes(4, "little"))
         # strtab
         mu.mem_write(
             info_base + 172,
             int(load_base + self._dyn_str_addr).to_bytes(
-                4, byteorder="little"
+                4, "little"
             ),
         )
         # symtab
         mu.mem_write(
             info_base + 176,
             int(load_base + self._dyn_str_addr).to_bytes(
-                4, byteorder="little"
+                4, "little"
             ),
         )
         # nbucket
         mu.mem_write(
-            info_base + 180, int(self._nbucket).to_bytes(4, byteorder="little")
+            info_base + 180, int(self._nbucket).to_bytes(4, "little")
         )
         # nchain
         mu.mem_write(
-            info_base + 184, int(self._nchain).to_bytes(4, byteorder="little")
+            info_base + 184, int(self._nchain).to_bytes(4, "little")
         )
 
         # bucket
         mu.mem_write(
             info_base + 188,
-            int(load_base + self._bucket_addr).to_bytes(4, byteorder="little"),
+            int(load_base + self._bucket_addr).to_bytes(4, "little"),
         )
         # nchain
         mu.mem_write(
             info_base + 192,
-            int(load_base + self._chain_addr).to_bytes(4, byteorder="little"),
+            int(load_base + self._chain_addr).to_bytes(4, "little"),
         )
 
         # plt_got
         mu.mem_write(
             info_base + 196,
             int(load_base + self._plt_got_addr).to_bytes(
-                4, byteorder="little"
+                4, "little"
             ),
         )
 
         # plt_rel
         mu.mem_write(
             info_base + 200,
-            int(load_base + self._pltrel_addr).to_bytes(4, byteorder="little"),
+            int(load_base + self._pltrel_addr).to_bytes(4, "little"),
         )
         # plt_rel_count
         mu.mem_write(
             info_base + 204,
-            int(self._pltrel_count).to_bytes(4, byteorder="little"),
+            int(self._pltrel_count).to_bytes(4, "little"),
         )
 
         # rel
         mu.mem_write(
             info_base + 208,
-            int(load_base + self._rel_addr).to_bytes(4, byteorder="little"),
+            int(load_base + self._rel_addr).to_bytes(4, "little"),
         )
         # rel_count
         mu.mem_write(
             info_base + 212,
-            int(self._rel_count).to_bytes(4, byteorder="little"),
+            int(self._rel_count).to_bytes(4, "little"),
         )
 
         # preinit_array
-        mu.mem_write(info_base + 216, int(0).to_bytes(4, byteorder="little"))
+        mu.mem_write(info_base + 216, int(0).to_bytes(4, "little"))
         # preinit_array_count
-        mu.mem_write(info_base + 220, int(0).to_bytes(4, byteorder="little"))
+        mu.mem_write(info_base + 220, int(0).to_bytes(4, "little"))
 
         # init_array
         mu.mem_write(
             info_base + 224,
             int(load_base + self._init_array_addr).to_bytes(
-                4, byteorder="little"
+                4, "little"
             ),
         )
         # init_array_count
         mu.mem_write(
             info_base + 228,
-            int(self._init_array_size / 4).to_bytes(4, byteorder="little"),
+            int(self._init_array_size / 4).to_bytes(4, "little"),
         )
 
         # finit_array
-        mu.mem_write(info_base + 232, int(0).to_bytes(4, byteorder="little"))
+        mu.mem_write(info_base + 232, int(0).to_bytes(4, "little"))
         # finit_array_count
-        mu.mem_write(info_base + 236, int(0).to_bytes(4, byteorder="little"))
+        mu.mem_write(info_base + 236, int(0).to_bytes(4, "little"))
 
         # init_func
         mu.mem_write(
             info_base + 240,
-            int(load_base + self._init_addr).to_bytes(4, byteorder="little"),
+            int(load_base + self._init_addr).to_bytes(4, "little"),
         )
         # fini_func
-        mu.mem_write(info_base + 244, int(0).to_bytes(4, byteorder="little"))
+        mu.mem_write(info_base + 244, int(0).to_bytes(4, "little"))
 
         # ARM_exidx
-        mu.mem_write(info_base + 248, int(0).to_bytes(4, byteorder="little"))
+        mu.mem_write(info_base + 248, int(0).to_bytes(4, "little"))
         # ARM_exidx_count
-        mu.mem_write(info_base + 252, int(0).to_bytes(4, byteorder="little"))
+        mu.mem_write(info_base + 252, int(0).to_bytes(4, "little"))
 
         # ref_count
-        mu.mem_write(info_base + 256, int(1).to_bytes(4, byteorder="little"))
+        mu.mem_write(info_base + 256, int(1).to_bytes(4, "little"))
 
         # link_map
-        mu.mem_write(info_base + 260, int(0).to_bytes(20, byteorder="little"))
+        mu.mem_write(info_base + 260, int(0).to_bytes(20, "little"))
 
         # constructors_called
-        mu.mem_write(info_base + 280, int(1).to_bytes(4, byteorder="little"))
+        mu.mem_write(info_base + 280, int(1).to_bytes(4, "little"))
 
         # Elf32_Addr load_bias
         load_bias = load_base - (
             self._loads[0]["p_vaddr"] - self._loads[0]["p_offset"]
         )
         mu.mem_write(
-            info_base + 284, int(load_bias).to_bytes(4, byteorder="little")
+            info_base + 284, int(load_bias).to_bytes(4, "little")
         )
 
         soinfo_sz = 288
@@ -740,57 +740,57 @@ class ELFReader:
         # phdr
         mu.mem_write(
             info_base + off,
-            int(load_base + self._phoff).to_bytes(8, byteorder="little"),
+            int(load_base + self._phoff).to_bytes(8, "little"),
         )
         off += 8
         # phnum
         mu.mem_write(
             info_base + off,
-            int(self._phdr_num).to_bytes(8, byteorder="little"),
+            int(self._phdr_num).to_bytes(8, "little"),
         )
         off += 8
 
         # entry
-        mu.mem_write(info_base + off, int(self._entry_point).to_bytes(8, byteorder="little"))
+        mu.mem_write(info_base + off, int(self._entry_point).to_bytes(8, "little"))
         off += 8
 
         # base
         mu.mem_write(
-            info_base + off, int(load_base).to_bytes(8, byteorder="little")
+            info_base + off, int(load_base).to_bytes(8, "little")
         )
         off += 8
 
         # size
         mu.mem_write(
-            info_base + off, int(self._sz).to_bytes(8, byteorder="little")
+            info_base + off, int(self._sz).to_bytes(8, "little")
         )
         off += 8
 
         # unused1
         mu.mem_write(
-            info_base + off, int(0).to_bytes(8, byteorder="little")
+            info_base + off, int(0).to_bytes(8, "little")
         )  # unsed uint32  占用8因为内存对齐
         off += 8
 
         # dynamic
         mu.mem_write(
             info_base + off,
-            int(load_base + self._dyn_addr).to_bytes(8, byteorder="little"),
+            int(load_base + self._dyn_addr).to_bytes(8, "little"),
         )
         off += 8
 
         # unused2
-        mu.mem_write(info_base + off, int(0).to_bytes(4, byteorder="little"))
+        mu.mem_write(info_base + off, int(0).to_bytes(4, "little"))
         off += 4
         # unused3
-        mu.mem_write(info_base + off, int(0).to_bytes(4, byteorder="little"))
+        mu.mem_write(info_base + off, int(0).to_bytes(4, "little"))
         off += 4
         # next
-        mu.mem_write(info_base + off, int(0).to_bytes(8, byteorder="little"))
+        mu.mem_write(info_base + off, int(0).to_bytes(8, "little"))
         off += 8
         # flags
         mu.mem_write(
-            info_base + off, int(0).to_bytes(8, byteorder="little")
+            info_base + off, int(0).to_bytes(8, "little")
         )  # 内存对齐
         off += 8
 
@@ -798,7 +798,7 @@ class ELFReader:
         mu.mem_write(
             info_base + off,
             int(load_base + self._dyn_str_addr).to_bytes(
-                8, byteorder="little"
+                8, "little"
             ),
         )
         off += 8
@@ -807,128 +807,128 @@ class ELFReader:
         mu.mem_write(
             info_base + off,
             int(load_base + self._dyn_str_addr).to_bytes(
-                8, byteorder="little"
+                8, "little"
             ),
         )
         off += 8
 
         # nbucket
         mu.mem_write(
-            info_base + off, int(self._nbucket).to_bytes(4, byteorder="little")
+            info_base + off, int(self._nbucket).to_bytes(4, "little")
         )
         off += 8
         # nchain
         mu.mem_write(
-            info_base + off, int(self._nchain).to_bytes(4, byteorder="little")
+            info_base + off, int(self._nchain).to_bytes(4, "little")
         )
         off += 8
 
         # bucket
         mu.mem_write(
             info_base + off,
-            int(load_base + self._bucket_addr).to_bytes(4, byteorder="little"),
+            int(load_base + self._bucket_addr).to_bytes(4, "little"),
         )
         off += 8
         # nchain
         mu.mem_write(
             info_base + off,
-            int(load_base + self._chain_addr).to_bytes(4, byteorder="little"),
+            int(load_base + self._chain_addr).to_bytes(4, "little"),
         )
         off += 8
 
         # plt_rela
         mu.mem_write(
             info_base + off,
-            int(load_base + self._pltrel_addr).to_bytes(8, byteorder="little"),
+            int(load_base + self._pltrel_addr).to_bytes(8, "little"),
         )
         off += 8
         # plt_rela_count
         mu.mem_write(
             info_base + off,
-            int(self._pltrel_count).to_bytes(8, byteorder="little"),
+            int(self._pltrel_count).to_bytes(8, "little"),
         )
         off += 8
 
         # rela
         mu.mem_write(
             info_base + off,
-            int(load_base + self._rel_addr).to_bytes(8, byteorder="little"),
+            int(load_base + self._rel_addr).to_bytes(8, "little"),
         )
         off += 8
 
         # rela_count
         mu.mem_write(
             info_base + off,
-            int(self._rel_count).to_bytes(8, byteorder="little"),
+            int(self._rel_count).to_bytes(8, "little"),
         )
         off += 8
 
         # preinit_array
-        mu.mem_write(info_base + off, int(0).to_bytes(8, byteorder="little"))
+        mu.mem_write(info_base + off, int(0).to_bytes(8, "little"))
         off += 8
         # preinit_array_count
-        mu.mem_write(info_base + off, int(0).to_bytes(8, byteorder="little"))
+        mu.mem_write(info_base + off, int(0).to_bytes(8, "little"))
         off += 8
 
         # init_array
         mu.mem_write(
             info_base + off,
             int(load_base + self._init_array_addr).to_bytes(
-                8, byteorder="little"
+                8, "little"
             ),
         )
         off += 8
         # init_array_count
         mu.mem_write(
             info_base + off,
-            int(self._init_array_size / 8).to_bytes(8, byteorder="little"),
+            int(self._init_array_size / 8).to_bytes(8, "little"),
         )
         off += 8
 
         # finit_array
-        mu.mem_write(info_base + off, int(0).to_bytes(8, byteorder="little"))
+        mu.mem_write(info_base + off, int(0).to_bytes(8, "little"))
         off += 8
         # finit_array_count
-        mu.mem_write(info_base + off, int(0).to_bytes(8, byteorder="little"))
+        mu.mem_write(info_base + off, int(0).to_bytes(8, "little"))
         off += 8
 
         # init_func
         mu.mem_write(
             info_base + off,
-            int(load_base + self._init_addr).to_bytes(8, byteorder="little"),
+            int(load_base + self._init_addr).to_bytes(8, "little"),
         )
         off += 8
         # fini_func
-        mu.mem_write(info_base + off, int(0).to_bytes(8, byteorder="little"))
+        mu.mem_write(info_base + off, int(0).to_bytes(8, "little"))
         off += 8
 
         # ARM_exidx
-        mu.mem_write(info_base + off, int(0).to_bytes(8, byteorder="little"))
+        mu.mem_write(info_base + off, int(0).to_bytes(8, "little"))
         off += 8
         # ARM_exidx_count
-        mu.mem_write(info_base + off, int(0).to_bytes(8, byteorder="little"))
+        mu.mem_write(info_base + off, int(0).to_bytes(8, "little"))
         off += 8
 
         # ref_count
-        mu.mem_write(info_base + off, int(1).to_bytes(4, byteorder="little"))
+        mu.mem_write(info_base + off, int(1).to_bytes(4, "little"))
         off += 8
 
         # link_map
-        mu.mem_write(info_base + off, int(0).to_bytes(40, byteorder="little"))
+        mu.mem_write(info_base + off, int(0).to_bytes(40, "little"))
         off += 40
 
         # constructors_called
-        mu.mem_write(info_base + off, int(1).to_bytes(8, byteorder="little"))
+        mu.mem_write(info_base + off, int(1).to_bytes(8, "little"))
         off += 8
 
         # Elf64_Addr load_bias
         mu.mem_write(
-            info_base + off, int(load_bias).to_bytes(8, byteorder="little")
+            info_base + off, int(load_bias).to_bytes(8, "little")
         )
         off += 8
 
         # has_DT_SYMBOLIC
-        mu.mem_write(info_base + off, int(0).to_bytes(8, byteorder="little"))
+        mu.mem_write(info_base + off, int(0).to_bytes(8, "little"))
         off += 8
 
         soinfo_sz = off

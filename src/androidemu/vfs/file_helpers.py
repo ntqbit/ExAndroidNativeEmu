@@ -44,32 +44,32 @@ def stat_to_memory2(uc, buf_ptr, stat, uid, st_mode):
     if stat.st_ino <= 0xFFFFFFFF:
         st_ino = stat.st_ino
 
-    uc.mem_write(buf_ptr, int(stdev).to_bytes(8, byteorder="little"))
-    uc.mem_write(buf_ptr + 8, int(0).to_bytes(4, byteorder="little"))  # PAD 4
-    uc.mem_write(buf_ptr + 12, int(st_ino).to_bytes(4, byteorder="little"))
-    uc.mem_write(buf_ptr + 16, int(st_mode).to_bytes(4, byteorder="little"))
+    uc.mem_write(buf_ptr, int(stdev).to_bytes(8, "little"))
+    uc.mem_write(buf_ptr + 8, int(0).to_bytes(4, "little"))  # PAD 4
+    uc.mem_write(buf_ptr + 12, int(st_ino).to_bytes(4, "little"))
+    uc.mem_write(buf_ptr + 16, int(st_mode).to_bytes(4, "little"))
     uc.mem_write(
-        buf_ptr + 20, int(stat.st_nlink).to_bytes(4, byteorder="little")
+        buf_ptr + 20, int(stat.st_nlink).to_bytes(4, "little")
     )
-    uc.mem_write(buf_ptr + 24, int(uid).to_bytes(4, byteorder="little"))
-    uc.mem_write(buf_ptr + 28, int(uid).to_bytes(4, byteorder="little"))
-    uc.mem_write(buf_ptr + 32, int(st_rdev).to_bytes(8, byteorder="little"))
-    uc.mem_write(buf_ptr + 40, int(0).to_bytes(4, byteorder="little"))  # PAD 4
+    uc.mem_write(buf_ptr + 24, int(uid).to_bytes(4, "little"))
+    uc.mem_write(buf_ptr + 28, int(uid).to_bytes(4, "little"))
+    uc.mem_write(buf_ptr + 32, int(st_rdev).to_bytes(8, "little"))
+    uc.mem_write(buf_ptr + 40, int(0).to_bytes(4, "little"))  # PAD 4
     uc.mem_write(
-        buf_ptr + 48, int(stat.st_size).to_bytes(8, byteorder="little")
+        buf_ptr + 48, int(stat.st_size).to_bytes(8, "little")
     )
-    uc.mem_write(buf_ptr + 56, int(st_blksize).to_bytes(4, byteorder="little"))
-    uc.mem_write(buf_ptr + 64, int(st_blocks).to_bytes(8, byteorder="little"))
+    uc.mem_write(buf_ptr + 56, int(st_blksize).to_bytes(4, "little"))
+    uc.mem_write(buf_ptr + 64, int(st_blocks).to_bytes(8, "little"))
     uc.mem_write(
-        buf_ptr + 72, int(stat.st_atime).to_bytes(8, byteorder="little")
-    )
-    uc.mem_write(
-        buf_ptr + 80, int(stat.st_mtime).to_bytes(8, byteorder="little")
+        buf_ptr + 72, int(stat.st_atime).to_bytes(8, "little")
     )
     uc.mem_write(
-        buf_ptr + 88, int(stat.st_ctime).to_bytes(8, byteorder="little")
+        buf_ptr + 80, int(stat.st_mtime).to_bytes(8, "little")
     )
-    uc.mem_write(buf_ptr + 96, int(st_ino).to_bytes(8, byteorder="little"))
+    uc.mem_write(
+        buf_ptr + 88, int(stat.st_ctime).to_bytes(8, "little")
+    )
+    uc.mem_write(buf_ptr + 96, int(st_ino).to_bytes(8, "little"))
 
 
 def stat_to_memory64(uc, buf_ptr, stat, uid, st_mode):
@@ -92,33 +92,33 @@ def stat_to_memory64(uc, buf_ptr, stat, uid, st_mode):
 
     st_ino = stat.st_ino
 
-    uc.mem_write(buf_ptr, int(stdev).to_bytes(8, byteorder="little"))
-    uc.mem_write(buf_ptr + 8, int(st_ino).to_bytes(8, byteorder="little"))
-    uc.mem_write(buf_ptr + 16, int(st_mode).to_bytes(4, byteorder="little"))
+    uc.mem_write(buf_ptr, int(stdev).to_bytes(8, "little"))
+    uc.mem_write(buf_ptr + 8, int(st_ino).to_bytes(8, "little"))
+    uc.mem_write(buf_ptr + 16, int(st_mode).to_bytes(4, "little"))
     uc.mem_write(
-        buf_ptr + 20, int(stat.st_nlink).to_bytes(4, byteorder="little")
+        buf_ptr + 20, int(stat.st_nlink).to_bytes(4, "little")
     )
-    uc.mem_write(buf_ptr + 24, int(uid).to_bytes(4, byteorder="little"))
-    uc.mem_write(buf_ptr + 28, int(uid).to_bytes(4, byteorder="little"))
-    uc.mem_write(buf_ptr + 32, int(st_rdev).to_bytes(8, byteorder="little"))
-    uc.mem_write(buf_ptr + 40, int(0).to_bytes(8, byteorder="little"))  # pad 0
+    uc.mem_write(buf_ptr + 24, int(uid).to_bytes(4, "little"))
+    uc.mem_write(buf_ptr + 28, int(uid).to_bytes(4, "little"))
+    uc.mem_write(buf_ptr + 32, int(st_rdev).to_bytes(8, "little"))
+    uc.mem_write(buf_ptr + 40, int(0).to_bytes(8, "little"))  # pad 0
     uc.mem_write(
-        buf_ptr + 48, int(stat.st_size).to_bytes(8, byteorder="little")
+        buf_ptr + 48, int(stat.st_size).to_bytes(8, "little")
     )
     uc.mem_write(
-        buf_ptr + 56, int(st_blksize).to_bytes(8, byteorder="little")
+        buf_ptr + 56, int(st_blksize).to_bytes(8, "little")
     )  # include pad2
-    uc.mem_write(buf_ptr + 64, int(st_blocks).to_bytes(8, byteorder="little"))
+    uc.mem_write(buf_ptr + 64, int(st_blocks).to_bytes(8, "little"))
     uc.mem_write(
-        buf_ptr + 72, int(stat.st_atime).to_bytes(16, byteorder="little")
+        buf_ptr + 72, int(stat.st_atime).to_bytes(16, "little")
     )
     uc.mem_write(
-        buf_ptr + 88, int(stat.st_mtime).to_bytes(16, byteorder="little")
+        buf_ptr + 88, int(stat.st_mtime).to_bytes(16, "little")
     )
     uc.mem_write(
-        buf_ptr + 104, int(stat.st_ctime).to_bytes(16, byteorder="little")
+        buf_ptr + 104, int(stat.st_ctime).to_bytes(16, "little")
     )
     uc.mem_write(
-        buf_ptr + 120, int(0).to_bytes(8, byteorder="little")
+        buf_ptr + 120, int(0).to_bytes(8, "little")
     )  # two unused
     # 128

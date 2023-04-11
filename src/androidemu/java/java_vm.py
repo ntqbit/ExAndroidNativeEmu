@@ -56,7 +56,7 @@ class JavaVM:
         mu.mem_write(
             env_ptr,
             self.jni_env.address_ptr.to_bytes(
-                self._emu.get_ptr_size(), byteorder="little"
+                self._emu.get_ptr_size(), "little"
             ),
         )
         return JNI_OK
@@ -76,7 +76,7 @@ class JavaVM:
         mu.mem_write(
             env_ptr,
             self.jni_env.address_ptr.to_bytes(
-                self._emu.get_ptr_size(), byteorder="little"
+                self._emu.get_ptr_size(), "little"
             ),
         )
         return JNI_OK
@@ -90,7 +90,7 @@ class JavaVM:
         mu.mem_write(
             env_ptr,
             self.jni_env.address_ptr.to_bytes(
-                self._emu.get_ptr_size(), byteorder="little"
+                self._emu.get_ptr_size(), "little"
             ),
         )
         return JNI_OK

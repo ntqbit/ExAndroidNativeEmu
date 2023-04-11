@@ -39,7 +39,7 @@ def native_write_args(emu, *argv):
             emu.mu.mem_write(
                 sp_current,
                 native_translate_arg(emu, arg).to_bytes(
-                    ptr_sz, byteorder="little"
+                    ptr_sz, "little"
                 ),
             )
             sp_current = sp_current + ptr_sz
@@ -75,7 +75,7 @@ def native_read_args_in_hook_code(emu, args_count):
         for x in range(0, args_count - max_regs_args):
             native_args.append(
                 int.from_bytes(
-                    mu.mem_read(sp + (x * ptr_sz), ptr_sz), byteorder="little"
+                    mu.mem_read(sp + (x * ptr_sz), ptr_sz), "little"
                 )
             )
 

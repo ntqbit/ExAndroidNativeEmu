@@ -172,7 +172,7 @@ class SymbolHooks:
         mu.mem_write(
             pthread_t_ptr,
             int(self._thread_id).to_bytes(
-                self._emu.get_ptr_size(), byteorder="little"
+                self._emu.get_ptr_size(), "little"
             ),
         )
         self._thread_id = self._thread_id + 1

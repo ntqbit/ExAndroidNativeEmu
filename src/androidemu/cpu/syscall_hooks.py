@@ -73,6 +73,7 @@ class SyscallHooks:
             self._syscall_handler.set_handler(0xC7, "getuid32", 0, self._get_uid)
             self._syscall_handler.set_handler(0xE0, "gettid", 0, self._gettid)
             self._syscall_handler.set_handler(0xF0, "futex", 6, self._handle_futex)
+            self._syscall_handler.set_handler(0xF8, "exit_group", 1, self._handle_exit_group)
             self._syscall_handler.set_handler(0x100, "set_tid_address", 1, self._set_tid_address)
             self._syscall_handler.set_handler(0x10C, "tgkill", 3, self._handle_tgkill)
             self._syscall_handler.set_handler(0x107, "clock_gettime", 2, self._handle_clock_gettime)
@@ -153,7 +154,7 @@ class SyscallHooks:
             tid_addr_futex = self._tid_2_tid_addr[cur_tid]
             sch.futex_wake(tid_addr_futex)
             mu.mem_write(
-                tid_addr_futex, int(0).to_bytes(4, byteorder="little")
+                tid_addr_futex, int(0).to_bytes(4, "little")
             )
             self._tid_2_tid_addr.pop(cur_tid)
 
@@ -238,8 +239,8 @@ class SyscallHooks:
         self._pcb.add_fd("[pipe_r]", "[pipe_r]", ps[0])
         self._pcb.add_fd("[pipe_w]", "[pipe_w]", ps[1])
         # files_ptr 无论32还是64 都是个int数组，因此写4没有问题
-        mu.mem_write(files_ptr, int(ps[0]).to_bytes(4, byteorder="little"))
-        mu.mem_write(files_ptr + 4, int(ps[1]).to_bytes(4, byteorder="little"))
+        mu.mem_write(files_ptr, int(ps[0]).to_bytes(4, "little"))
+        mu.mem_write(files_ptr + 4, int(ps[1]).to_bytes(4, "little"))
         return 0
 
     def _pipe(self, mu, files_ptr):
@@ -314,7 +315,7 @@ class SyscallHooks:
     def _getcpu(self, mu, _cpu, node, cache):
         if _cpu != 0:
             # unsigned *指针，写4没问题
-            mu.mem_write(_cpu, int(1).to_bytes(4, byteorder="little"))
+            mu.mem_write(_cpu, int(1).to_bytes(4, "little"))
         return 0
 
     def _handle_gettimeofday(self, uc, tv, tz):
@@ -328,13 +329,13 @@ class SyscallHooks:
                 uc.mem_write(
                     tv + 0,
                     int(OVERRIDE_TIMEOFDAY_SEC).to_bytes(
-                        ptr_sz, byteorder="little"
+                        ptr_sz, "little"
                     ),
                 )
                 uc.mem_write(
                     tv + ptr_sz,
                     int(OVERRIDE_TIMEOFDAY_USEC).to_bytes(
-                        ptr_sz, byteorder="little"
+                        ptr_sz, "little"
                     ),
                 )
             else:
@@ -343,18 +344,18 @@ class SyscallHooks:
                 usec = abs(int(usec * 100000))
 
                 uc.mem_write(
-                    tv + 0, int(sec).to_bytes(ptr_sz, byteorder="little")
+                    tv + 0, int(sec).to_bytes(ptr_sz, "little")
                 )
                 uc.mem_write(
-                    tv + ptr_sz, int(usec).to_bytes(ptr_sz, byteorder="little")
+                    tv + ptr_sz, int(usec).to_bytes(ptr_sz, "little")
                 )
 
         if tz != 0:
             # timezone结构体不64还是32都是两个4字节成员
             # minuteswest -(+GMT_HOURS) * 60
-            uc.mem_write(tz + 0, int(-120).to_bytes(4, byteorder="little"))
+            uc.mem_write(tz + 0, int(-120).to_bytes(4, "little"))
             uc.mem_write(
-                tz + 4, int().to_bytes(4, byteorder="little")
+                tz + 4, int().to_bytes(4, "little")
             )  # dsttime
 
         return 0
@@ -392,82 +393,82 @@ class SyscallHooks:
         uptime = int(self._clock_offset + time.time() - self._clock_start)
         if self._emu.get_arch() == Arch.ARM32:
             mu.mem_write(
-                info_ptr + 0, int(uptime).to_bytes(4, byteorder="little")
+                info_ptr + 0, int(uptime).to_bytes(4, "little")
             )
             mu.mem_write(
-                info_ptr + 4, int(503328).to_bytes(4, byteorder="little")
+                info_ptr + 4, int(503328).to_bytes(4, "little")
             )
             mu.mem_write(
-                info_ptr + 8, int(504576).to_bytes(4, byteorder="little")
+                info_ptr + 8, int(504576).to_bytes(4, "little")
             )
             mu.mem_write(
-                info_ptr + 12, int(537280).to_bytes(4, byteorder="little")
+                info_ptr + 12, int(537280).to_bytes(4, "little")
             )
             mu.mem_write(
-                info_ptr + 16, int(1945137152).to_bytes(4, byteorder="little")
+                info_ptr + 16, int(1945137152).to_bytes(4, "little")
             )
             mu.mem_write(
-                info_ptr + 20, int(47845376).to_bytes(4, byteorder="little")
+                info_ptr + 20, int(47845376).to_bytes(4, "little")
             )
-            mu.mem_write(info_ptr + 24, int(0).to_bytes(4, byteorder="little"))
+            mu.mem_write(info_ptr + 24, int(0).to_bytes(4, "little"))
             mu.mem_write(
-                info_ptr + 28, int(169373696).to_bytes(4, byteorder="little")
+                info_ptr + 28, int(169373696).to_bytes(4, "little")
             )
-            mu.mem_write(info_ptr + 32, int(0).to_bytes(4, byteorder="little"))
-            mu.mem_write(info_ptr + 36, int(0).to_bytes(4, byteorder="little"))
+            mu.mem_write(info_ptr + 32, int(0).to_bytes(4, "little"))
+            mu.mem_write(info_ptr + 36, int(0).to_bytes(4, "little"))
             mu.mem_write(
-                info_ptr + 40, int(1297).to_bytes(2, byteorder="little")
+                info_ptr + 40, int(1297).to_bytes(2, "little")
             )
-            mu.mem_write(info_ptr + 42, int(0).to_bytes(2, byteorder="little"))
+            mu.mem_write(info_ptr + 42, int(0).to_bytes(2, "little"))
             mu.mem_write(
-                info_ptr + 44, int(1185939456).to_bytes(4, byteorder="little")
+                info_ptr + 44, int(1185939456).to_bytes(4, "little")
             )
             mu.mem_write(
-                info_ptr + 48, int(1863680).to_bytes(4, byteorder="little")
+                info_ptr + 48, int(1863680).to_bytes(4, "little")
             )
-            mu.mem_write(info_ptr + 52, int(1).to_bytes(4, byteorder="little"))
-            mu.mem_write(info_ptr + 56, int(0).to_bytes(8, byteorder="little"))
+            mu.mem_write(info_ptr + 52, int(1).to_bytes(4, "little"))
+            mu.mem_write(info_ptr + 56, int(0).to_bytes(8, "little"))
             # sz 64
         else:
             # arm64
             mu.mem_write(
-                info_ptr + 0, int(uptime).to_bytes(8, byteorder="little")
+                info_ptr + 0, int(uptime).to_bytes(8, "little")
             )
             mu.mem_write(
-                info_ptr + 8, int(503328).to_bytes(8, byteorder="little")
+                info_ptr + 8, int(503328).to_bytes(8, "little")
             )
             mu.mem_write(
-                info_ptr + 16, int(504576).to_bytes(8, byteorder="little")
+                info_ptr + 16, int(504576).to_bytes(8, "little")
             )
             mu.mem_write(
-                info_ptr + 24, int(537280).to_bytes(8, byteorder="little")
+                info_ptr + 24, int(537280).to_bytes(8, "little")
             )
             mu.mem_write(
-                info_ptr + 32, int(1945137152).to_bytes(8, byteorder="little")
+                info_ptr + 32, int(1945137152).to_bytes(8, "little")
             )
             mu.mem_write(
-                info_ptr + 40, int(47845376).to_bytes(8, byteorder="little")
+                info_ptr + 40, int(47845376).to_bytes(8, "little")
             )
-            mu.mem_write(info_ptr + 48, int(0).to_bytes(8, byteorder="little"))
+            mu.mem_write(info_ptr + 48, int(0).to_bytes(8, "little"))
             mu.mem_write(
-                info_ptr + 56, int(169373696).to_bytes(8, byteorder="little")
+                info_ptr + 56, int(169373696).to_bytes(8, "little")
             )
-            mu.mem_write(info_ptr + 64, int(0).to_bytes(8, byteorder="little"))
-            mu.mem_write(info_ptr + 72, int(0).to_bytes(8, byteorder="little"))
+            mu.mem_write(info_ptr + 64, int(0).to_bytes(8, "little"))
+            mu.mem_write(info_ptr + 72, int(0).to_bytes(8, "little"))
             mu.mem_write(
-                info_ptr + 80, int(1297).to_bytes(2, byteorder="little")
+                info_ptr + 80, int(1297).to_bytes(2, "little")
             )
             mu.mem_write(
-                info_ptr + 82, int(0).to_bytes(6, byteorder="little")
+                info_ptr + 82, int(0).to_bytes(6, "little")
             )  # pading
 
-            mu.mem_write(info_ptr + 88, int(0).to_bytes(8, byteorder="little"))
-            mu.mem_write(info_ptr + 96, int(0).to_bytes(8, byteorder="little"))
+            mu.mem_write(info_ptr + 88, int(0).to_bytes(8, "little"))
+            mu.mem_write(info_ptr + 96, int(0).to_bytes(8, "little"))
             mu.mem_write(
-                info_ptr + 104, int(1).to_bytes(4, byteorder="little")
+                info_ptr + 104, int(1).to_bytes(4, "little")
             )
             mu.mem_write(
-                info_ptr + 108, int(0).to_bytes(4, byteorder="little")
+                info_ptr + 108, int(0).to_bytes(4, "little")
             )
             # sz 112
 
@@ -546,10 +547,10 @@ class SyscallHooks:
                 )
                 != 0
             ):
-                mu.mem_write(parent_tid, tid.to_bytes(4, byteorder="little"))
+                mu.mem_write(parent_tid, tid.to_bytes(4, "little"))
 
             if flags & (CLONE_CHILD_SETTID | CLONE_CHILD_CLEARTID) != 0:
-                mu.mem_write(child_tid, tid.to_bytes(4, byteorder="little"))
+                mu.mem_write(child_tid, tid.to_bytes(4, "little"))
 
             if flags & CLONE_CHILD_CLEARTID:
                 # save the child_tid ptr
@@ -610,7 +611,7 @@ class SyscallHooks:
             return 0
         elif option == PR_GET_DUMPABLE:
             mu.mem_write(
-                arg2, int(0).to_bytes(self._ptr_sz, byteorder="little")
+                arg2, int(0).to_bytes(self._ptr_sz, "little")
             )
             return 0
         elif option == PR_SET_NAME:
@@ -668,7 +669,7 @@ class SyscallHooks:
     def _handle_futex(self, mu, uaddr, op, val, timeout_ptr, uaddr2, val3):
         # uaddr 是u32指针，所以指向的大小恒为4
         v = mu.mem_read(uaddr, 4)
-        v = int.from_bytes(v, byteorder="little", signed=False)
+        v = int.from_bytes(v, "little", signed=False)
         """
         See: https://linux.die.net/man/2/futex
         """
@@ -692,11 +693,7 @@ class SyscallHooks:
                     ms = req_tv_sec * 1000 + req_tv_nsec / 1000000
                     timeout = ms
                     # TODO
-                    # 这里timeout返回-1和ETIMEOUT，不能在这里返回，需要在调度器判断是否timeout而写r0和set_errno，暂时没实现，写死返回0
-                    logger.warning(
-                        "futex timeout %d ms is set, the return value is 0 not matter if it expired"
-                        % ms
-                    )
+                    logger.warning("futex timeout %d ms is set, the return value is 0 not matter if it expired", ms)
 
                 sch.futex_wait(uaddr, timeout)
 
@@ -730,6 +727,10 @@ class SyscallHooks:
             raise NotImplementedError()
         else:
             raise NotImplementedError()
+        return 0
+
+    def _handle_exit_group(self, mu, exit_code):
+        self._emu.stop()
         return 0
 
     def _handle_tgkill(self, mu, tgid, tid, sig):
@@ -766,11 +767,11 @@ class SyscallHooks:
 
             mu.mem_write(
                 tp_ptr + 0,
-                int(clock_real).to_bytes(self._ptr_sz, byteorder="little"),
+                int(clock_real).to_bytes(self._ptr_sz, "little"),
             )
             mu.mem_write(
                 tp_ptr + self._ptr_sz,
-                int(0).to_bytes(self._ptr_sz, byteorder="little"),
+                int(0).to_bytes(self._ptr_sz, "little"),
             )
             return 0
         elif clk_id == CLOCK_MONOTONIC or clk_id == CLOCK_MONOTONIC_COARSE:
@@ -778,12 +779,12 @@ class SyscallHooks:
                 mu.mem_write(
                     tp_ptr + 0,
                     int(OVERRIDE_CLOCK_TIME).to_bytes(
-                        self._ptr_sz, byteorder="little"
+                        self._ptr_sz, "little"
                     ),
                 )
                 mu.mem_write(
                     tp_ptr + self._ptr_sz,
-                    int(0).to_bytes(self._ptr_sz, byteorder="little"),
+                    int(0).to_bytes(self._ptr_sz, "little"),
                 )
             else:
                 # Seconds passed since clock_start was set.
@@ -792,12 +793,12 @@ class SyscallHooks:
                 mu.mem_write(
                     tp_ptr + 0,
                     int(self._clock_start + clock_add).to_bytes(
-                        self._ptr_sz, byteorder="little"
+                        self._ptr_sz, "little"
                     ),
                 )
                 mu.mem_write(
                     tp_ptr + self._ptr_sz,
-                    int(0).to_bytes(self._ptr_sz, byteorder="little"),
+                    int(0).to_bytes(self._ptr_sz, "little"),
                 )
             return 0
         else:

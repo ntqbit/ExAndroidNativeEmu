@@ -392,13 +392,12 @@ class Modules:
             seg_file_end = page_end(seg_file_end)
 
             if seg_page_end > seg_file_end:
-                self._emu.memory.map(seg_file_end, seg_page_end - seg_file_end,
-                                     prot, vf, file_page_start + file_length)
+                self._emu.memory.map(seg_file_end, seg_page_end - seg_file_end, prot)
 
         # TODO: refactor
         if is_linker:
-            self._init_args(load_base, base_address + base.get_phdr_addr(), base_address + base.get_phdr_num(),
-                            base_address + base.get_phdr_entry_size(), base_address + base.get_entry_point())
+            self._init_args(load_base, base_address + base.get_phdr_addr(), base.get_phdr_num(),
+                            base.get_phdr_entry_size(), base_address + base.get_entry_point())
         elif not self._linker:
             self._load_linker(load_base, reader)
 
@@ -431,9 +430,9 @@ class Modules:
                 def apply_relative_relocation(offset):
                     rel_addr = load_bias + offset
                     value_orig_bytes = self._emu.mu.mem_read(rel_addr, wordsize)
-                    value_orig = int.from_bytes(value_orig_bytes, byteorder="little")
+                    value_orig = int.from_bytes(value_orig_bytes, "little")
                     value = load_bias + value_orig
-                    self._emu.mu.mem_write(rel_addr, value.to_bytes(wordsize, byteorder="little"))
+                    self._emu.mu.mem_write(rel_addr, value.to_bytes(wordsize, "little"))
 
                 if rel_name == 'relr':
                     # https://android.googlesource.com/platform/bionic/+/master/linker/linker.cpp#2727
@@ -475,14 +474,14 @@ class Modules:
                                 sym_addr = symbols_resolved[sym_name]
 
                                 value_orig_bytes = self._emu.mu.mem_read(rel_addr, 4)
-                                value_orig = int.from_bytes(value_orig_bytes, byteorder="little")
+                                value_orig = int.from_bytes(value_orig_bytes, "little")
 
                                 # R_ARM_ABS32 how to relocate see android linker source code
                                 # *reinterpret_cast<Elf32_Addr*>(reloc) += sym_addr;
                                 value = sym_addr + value_orig
                                 # Write the new value
                                 # print(value)
-                                self._emu.mu.mem_write(rel_addr, value.to_bytes(4, byteorder="little"))
+                                self._emu.mu.mem_write(rel_addr, value.to_bytes(4, "little"))
 
                         elif rel_info_type in (arm.R_AARCH64_ABS64, arm.R_AARCH64_ABS32):
                             if sym_name in symbols_resolved:
@@ -490,7 +489,7 @@ class Modules:
 
                                 value_orig_bytes = self._emu.mu.mem_read(rel_addr, 8)
                                 value_orig = int.from_bytes(
-                                    value_orig_bytes, byteorder="little"
+                                    value_orig_bytes, "little"
                                 )
                                 addend = rel["r_addend"]
 
@@ -498,7 +497,7 @@ class Modules:
                                 # Write the new value
                                 # print(value)
                                 self._emu.mu.mem_write(
-                                    rel_addr, value.to_bytes(8, byteorder="little")
+                                    rel_addr, value.to_bytes(8, "little")
                                 )
 
                         elif rel_info_type in (arm.R_ARM_GLOB_DAT, arm.R_ARM_JUMP_SLOT):
@@ -509,7 +508,7 @@ class Modules:
                                 value = symbols_resolved[sym_name]
 
                                 # Write the new value
-                                self._emu.mu.mem_write(rel_addr, value.to_bytes(4, byteorder="little"))
+                                self._emu.mu.mem_write(rel_addr, value.to_bytes(4, "little"))
 
                         elif rel_info_type in (arm.R_AARCH64_GLOB_DAT, arm.R_AARCH64_JUMP_SLOT):
                             # Resolve the symbol.
@@ -519,7 +518,7 @@ class Modules:
                                 value = symbols_resolved[sym_name]
                                 addend = rel["r_addend"]
                                 # Write the new value
-                                self._emu.mu.mem_write(rel_addr, (value + addend).to_bytes(8, byteorder="little"))
+                                self._emu.mu.mem_write(rel_addr, (value + addend).to_bytes(8, "little"))
 
                         elif rel_info_type == arm.R_ARM_RELATIVE:
                             apply_relative_relocation(offset)
@@ -531,7 +530,7 @@ class Modules:
 
                                 # print(value)
                                 # Write the new value
-                                self._emu.mu.mem_write(rel_addr, value.to_bytes(8, byteorder="little"))
+                                self._emu.mu.mem_write(rel_addr, value.to_bytes(8, "little"))
                             else:
                                 raise NotImplementedError()  # impossible
                         elif rel_info_type == arm.R_ARM_TLS_TPOFF32:
@@ -541,10 +540,10 @@ class Modules:
                                 raise NotImplementedError()
 
                             value_orig_bytes = self._emu.mu.mem_read(rel_addr, wordsize)
-                            value_orig = int.from_bytes(value_orig_bytes, byteorder="little")
+                            value_orig = int.from_bytes(value_orig_bytes, "little")
 
                             result = self._emu.call_native(load_bias + value_orig)
-                            self._emu.mu.mem_write(rel_addr, result.to_bytes(wordsize, byteorder="little"))
+                            self._emu.mu.mem_write(rel_addr, result.to_bytes(wordsize, "little"))
                         else:
                             logger.error("Unhandled relocation type %i. symname=%s", rel_info_type, sym_name)
                             raise NotImplementedError(f"Unhandled relocation type {rel_info_type}.")
@@ -563,7 +562,7 @@ class Modules:
 
         for _ in range(int(init_array_size / init_item_sz)):
             b = self._emu.mu.mem_read(load_bias + init_array_addr, init_item_sz)
-            fun_ptr = int.from_bytes(b, byteorder="little", signed=False)
+            fun_ptr = int.from_bytes(b, "little", signed=False)
             if fun_ptr != 0:
                 init_array.append(fun_ptr)
 

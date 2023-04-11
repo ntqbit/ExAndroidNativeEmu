@@ -497,14 +497,14 @@ class JNIEnv:
             return result
 
         for arg_name in args_type_list:
-            v = int.from_bytes(mu.mem_read(args_ptr, 4), byteorder="little")
+            v = int.from_bytes(mu.mem_read(args_ptr, 4), "little")
 
             if arg_name in ("jint", "jchar", "jbyte", "jboolean"):
                 result.append(v)
             elif arg_name in ("jlong", "jdouble"):
                 args_ptr = args_ptr + 4
                 vh = int.from_bytes(
-                    mu.mem_read(args_ptr, 4), byteorder="little"
+                    mu.mem_read(args_ptr, 4), "little"
                 )
                 value = (vh << 32) | v
                 result.append(value)
@@ -534,7 +534,7 @@ class JNIEnv:
         ptr_size = self._emu.get_ptr_size()
         for arg_name in args_type_list:
             v = int.from_bytes(
-                mu.mem_read(args_ptr, ptr_size), byteorder="little"
+                mu.mem_read(args_ptr, ptr_size), "little"
             )
             if arg_name in (
                 "jint",
@@ -572,13 +572,13 @@ class JNIEnv:
 
         for arg_name in args_type_list:
             if arg_name in ('jchar', 'jbyte', 'jboolean'):
-                result.append(int.from_bytes(mu.mem_read(args_ptr, 1), byteorder="little"))
+                result.append(int.from_bytes(mu.mem_read(args_ptr, 1), "little"))
             if arg_name == 'jint':
-                result.append(int.from_bytes(mu.mem_read(args_ptr, 4), byteorder="little"))
+                result.append(int.from_bytes(mu.mem_read(args_ptr, 4), "little"))
             elif arg_name in ("jlong", "jdouble"):
-                result.append(int.from_bytes(mu.mem_read(args_ptr, 8), byteorder="little"))
+                result.append(int.from_bytes(mu.mem_read(args_ptr, 8), "little"))
             elif arg_name in ("jstring", "jobject", "jthrowable"):
-                ref = int.from_bytes(mu.mem_read(args_ptr, 4), byteorder="little")
+                ref = int.from_bytes(mu.mem_read(args_ptr, 4), "little")
                 jobj = self.get_reference(ref)
 
                 if jobj is None:
@@ -668,11 +668,11 @@ class JNIEnv:
 
         if method.modifier & MODIFIER_STATIC:
             mu.mem_write(
-                is_static, int(JNI_TRUE).to_bytes(4, byteorder="little")
+                is_static, int(JNI_TRUE).to_bytes(4, "little")
             )
         else:
             mu.mem_write(
-                is_static, int(JNI_FALSE).to_bytes(4, byteorder="little")
+                is_static, int(JNI_FALSE).to_bytes(4, "little")
             )
 
         logger.debug(
@@ -1752,7 +1752,7 @@ class JNIEnv:
         if is_copy_ptr != 0:
             # TODO 观察行为,真机总是返回true,但是根据文档,返回false应该也没问题
             # https://stackoverflow.com/questions/30992989/is-iscopy-field-always-necessary-in-android
-            mu.mem_write(is_copy_ptr, int(0).to_bytes(1, byteorder="little"))
+            mu.mem_write(is_copy_ptr, int(0).to_bytes(1, "little"))
 
         memory_helpers.write_utf8(mu, str_ptr, str_val)
 
@@ -1933,7 +1933,7 @@ class JNIEnv:
         )
         true_buf = elems - 4
         b = mu.mem_read(true_buf, 4)
-        elems_sz = int.from_bytes(b, byteorder="little", signed=False)
+        elems_sz = int.from_bytes(b, "little", signed=False)
         self._emu.memory.unmap(true_buf, elems_sz + 4)
 
     def release_char_array_elements(self, mu, env):
@@ -2072,7 +2072,7 @@ class JNIEnv:
         logger.debug("JNIEnv->GetJavaVM(0x%08x) was called" % vm)
 
         mu.mem_write(
-            vm, self._emu.java_vm.address_ptr.to_bytes(4, byteorder="little")
+            vm, self._emu.java_vm.address_ptr.to_bytes(4, "little")
         )
 
         return JNI_OK

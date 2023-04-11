@@ -57,6 +57,14 @@ from androidemu.java.classes import get_java_classes
 logger = verboselogs.VerboseLogger(__name__)
 
 
+class EmulatorException(Exception):
+    pass
+
+
+class EmulatorStopped(EmulatorException):
+    pass
+
+
 class Emulator:
     def __init__(
         self,
@@ -208,6 +216,7 @@ class Emulator:
     def stop(self):
         self._scheduler.stop()
         self.mu.emu_stop()
+        raise EmulatorStopped()
 
     def get_pc(self):
         if self.get_arch() == Arch.ARM32:

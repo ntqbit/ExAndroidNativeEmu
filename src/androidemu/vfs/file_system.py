@@ -490,8 +490,8 @@ class VirtualFileSystem:
                 fd = mu.mem_read(ptr, 4)
                 events = mu.mem_read(ptr + 4, 2)
                 p.register(
-                    int.from_bytes(fd, byteorder="little", signed=False),
-                    int.from_bytes(events, byteorder="little", signed=False),
+                    int.from_bytes(fd, "little", signed=False),
+                    int.from_bytes(events, "little", signed=False),
                 )
                 ptr = ptr + 8
 
@@ -502,11 +502,11 @@ class VirtualFileSystem:
             for item in poll_r:
                 for i in range(0, nfds):
                     fd = mu.mem_read(ptr, 4)
-                    ifd = int.from_bytes(fd, byteorder="little", signed=False)
+                    ifd = int.from_bytes(fd, "little", signed=False)
                     if item[0] == ifd:
                         mu.mem_write(
                             ptr + 6,
-                            int(item[1]).to_bytes(4, byteorder="little"),
+                            int(item[1]).to_bytes(4, "little"),
                         )
                         break
 
@@ -578,11 +578,14 @@ class VirtualFileSystem:
         stats = os.fstat(fd)
         uid = self._get_config_uid(detail.name)
         st_mode = self._fix_st_mode(detail.name, stats.st_mode)
+
         if self._emu.get_arch() == Arch.ARM32:
             file_helpers.stat_to_memory2(mu, stat_ptr, stats, uid, st_mode)
         else:
-            # 64
             file_helpers.stat_to_memory64(mu, stat_ptr, stats, uid, st_mode)
+        
+        misc_utils.set_errno(self._emu, 2)
+        return -1
 
     def _handle_getdents64(self, mu, fd, linux_dirent64_ptr, count):
         logger.warning(

@@ -67,7 +67,7 @@ class FuncHooker:
                 fun_entry_addr, self._emu.get_ptr_size()
             )
             fun_entry = int.from_bytes(
-                fun_entry_bytes, byteorder="little", signed=False
+                fun_entry_bytes, "little", signed=False
             )
             if fun_entry in self._hook_params:
                 hook_param = self._hook_params[fun_entry]
@@ -142,7 +142,7 @@ class FuncHooker:
                 if self._arch == Arch.ARM32:
                     mu.mem_write(
                         self._stub_off,
-                        address.to_bytes(4, byteorder="little", signed=False),
+                        address.to_bytes(4, "little", signed=False),
                     )  # 写入函数地址
                     self._stub_off += 4
 
@@ -157,14 +157,14 @@ class FuncHooker:
                     lr = mu.reg_read(UC_ARM_REG_LR)
                     mu.mem_write(
                         self._stub_off,
-                        lr.to_bytes(4, byteorder="little", signed=False),
+                        lr.to_bytes(4, "little", signed=False),
                     )  # 备份返回地址
                     self._stub_off += 4
                     mu.reg_write(UC_ARM_REG_LR, new_lr)
                 else:
                     mu.mem_write(
                         self._stub_off,
-                        address.to_bytes(8, byteorder="little", signed=False),
+                        address.to_bytes(8, "little", signed=False),
                     )  # 写入函数地址
                     self._stub_off += 8
 
@@ -179,7 +179,7 @@ class FuncHooker:
                     lr = mu.reg_read(UC_ARM64_REG_X30)
                     mu.mem_write(
                         self._stub_off,
-                        lr.to_bytes(8, byteorder="little", signed=False),
+                        lr.to_bytes(8, "little", signed=False),
                     )  # 备份返回地址
                     self._stub_off += 8
                     mu.reg_write(UC_ARM64_REG_X30, new_lr)

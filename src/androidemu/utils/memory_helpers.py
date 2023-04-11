@@ -3,11 +3,11 @@ from unicorn.arm_const import *
 
 
 def read_ptr_sz(mu, address, sz):
-    return int.from_bytes(mu.mem_read(address, sz), byteorder="little")
+    return int.from_bytes(mu.mem_read(address, sz), "little")
 
 
 def read_ptr(mu, address):
-    return int.from_bytes(mu.mem_read(address, 4), byteorder="little")
+    return int.from_bytes(mu.mem_read(address, 4), "little")
 
 
 def read_byte_array(mu, address, size):
@@ -49,7 +49,7 @@ def write_uints(mu, address, num):
         l = num
 
     for v in l:
-        mu.mem_write(address, int(v).to_bytes(4, byteorder="little"))
+        mu.mem_write(address, int(v).to_bytes(4, "little"))
         address += 4
 
 
@@ -61,7 +61,7 @@ def write_ptrs_sz(mu, address, num, ptr_sz):
         l = num
     n = 0
     for v in l:
-        mu.mem_write(address, int(v).to_bytes(ptr_sz, byteorder="little"))
+        mu.mem_write(address, int(v).to_bytes(ptr_sz, "little"))
         address += ptr_sz
         n += ptr_sz
 
