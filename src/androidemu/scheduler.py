@@ -33,7 +33,6 @@ class Task:
         self.tid = 0
         self.init_stack_ptr = 0
         self.tls_ptr = 0
-        # 是否第一次调用
         self.is_init = True
         self.is_main = False
         self.is_exit = False
@@ -54,6 +53,7 @@ class Scheduler:
         self._defer_task_map = {}
         self._tid_2_remove = set()
         self._cur_tid = 0
+        self._stopped = False
 
         self._emu.memory.map(
             STOP_MEMORY_BASE,
@@ -67,6 +67,9 @@ class Scheduler:
         self._futex_blocking_map = {}
         # just record all blocking tid
         self._blocking_set = set()
+
+    def stop(self):
+        self._stopped = True
 
     def _get_pc(self):
         if self._emu.get_arch() == Arch.ARM32:
@@ -240,15 +243,11 @@ class Scheduler:
                                 )
                                 continue
                             else:
-                                logger.debug(
-                                    "%d is wait up for timeout" % (tid,)
-                                )
+                                logger.debug("%d is wait up for timeout", tid)
                                 task.blocking_timeout = -1
                                 self._blocking_set.remove(tid)
                         else:
-                            logger.debug(
-                                "%d is blocking skip scheduling" % (tid,)
-                            )
+                            logger.debug("%d is blocking skip scheduling", tid)
                             continue
 
                 logger.debug("%d scheduling enter " % tid)
@@ -262,22 +261,18 @@ class Scheduler:
                         task.is_init = False
 
                     else:
-                        # 上下文切换
                         self._emu.mu.context_restore(task.context)
                         start_pos = self._get_interrupted_entry()
 
                 else:
-                    # 子线程
-                    # 先恢复上下文
                     self._emu.mu.context_restore(task.context)
                     start_pos = self._get_interrupted_entry()
 
                     if task.is_init:
-                        # 如果是第一次进入，需要设置child_stack指针
                         self._set_sp(task.init_stack_ptr)
                         if task.tls_ptr:
                             self._set_tls(task.tls_ptr)
-                        # 第一次进入子线程，需要将r0清空成0，这里模仿linux clone子线程返回0的逻辑
+
                         self._clear_reg0()
                         task.is_init = False
 
@@ -292,15 +287,17 @@ class Scheduler:
                 ctx = self._emu.mu.context_save()
                 task.context = ctx
 
-                # 运行结束，任务标记成可删除
+                if self._stopped:
+                    self._stopped = False
+                    return
+
                 if self._get_pc() == self._stop_pos or task.is_exit:
                     self._tid_2_remove.add(self._cur_tid)
-                    logger.debug("%d scheduling exit" % tid)
+                    logger.debug("%d scheduling exit", tid)
 
                 else:
-                    logger.debug("%d scheduling paused" % tid)
+                    logger.debug("%d scheduling paused", tid)
 
-            # 在调度里面清掉退出的线程
             for tid in self._tid_2_remove:
                 self._tasks_map.pop(tid)
                 # FIXME slow delete, try to optimize
@@ -315,11 +312,8 @@ class Scheduler:
             self._defer_task_map.clear()
 
             if self._pid not in self._tasks_map:
-                # 主线程退出，退出调度循环
-                logger.debug(
-                    "main_thead tid [%d] exit exec return" % self._pid
-                )
+                logger.debug("main_thead tid [%d] exit exec return", self._pid)
+
                 if clear_task_when_return:
                     # clear all unfinished task
                     self._tasks_map.clear()
-                return

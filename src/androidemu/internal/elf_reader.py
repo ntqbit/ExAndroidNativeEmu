@@ -43,6 +43,8 @@ DT_PLTREL = 20
 DT_DEBUG = 21
 DT_TEXTREL = 22
 DT_JMPREL = 23
+DT_FLAGS = 30
+DT_FLAGS_1 = 0x6FFFFFFB
 DT_RELRSZ = 35
 DT_RELR = 36
 DT_RELRENT = 37
@@ -74,55 +76,6 @@ STT_FILE = 4
 
 
 class ELFReader:
-    """
-    #define EI_NIDENT	16
-    typedef struct elf32_hdr{
-        unsigned char	e_ident[EI_NIDENT];
-        Elf32_Half	e_type;
-        Elf32_Half	e_machine;
-        Elf32_Word	e_version;
-        Elf32_Addr	e_entry;  /* Entry point */
-        Elf32_Off	e_phoff;
-        Elf32_Off	e_shoff;
-        Elf32_Word	e_flags;
-        Elf32_Half	e_ehsize;
-        Elf32_Half	e_phentsize;
-        Elf32_Half	e_phnum;
-        Elf32_Half	e_shentsize;
-        Elf32_Half	e_shnum;
-        Elf32_Half	e_shstrndx;
-    } Elf32_Ehdr;
-
-    typedef struct elf32_phdr{
-        Elf32_Word	p_type;
-        Elf32_Off	p_offset;
-        Elf32_Addr	p_vaddr;
-        Elf32_Addr	p_paddr;
-        Elf32_Word	p_filesz;
-        Elf32_Word	p_memsz;
-        Elf32_Word	p_flags;
-        Elf32_Word	p_align;
-    } Elf32_Phdr;
-
-    typedef struct elf32_sym{
-        Elf32_Word	st_name;
-        Elf32_Addr	st_value;
-        Elf32_Word	st_size;
-        unsigned char	st_info;
-        unsigned char	st_other;
-        Elf32_Half	st_shndx;
-        } Elf32_Sym;
-    typedef struct elf32_rel {
-        Elf32_Addr	r_offset;
-        Elf32_Word	r_info;
-    } Elf32_Rel;
-    typedef struct elf64_rela{
-        Elf64_Addr r_offset;	/* Location at which to apply the action */
-        Elf64_Xword r_info;	/* index and type of relocation */
-        Elf64_Sxword r_addend;	/* Constant addend used to compute value */
-    } Elf64_Rela;
-    """
-
     @staticmethod
     def _elf32_r_sym(x):
         return x >> 8
@@ -224,12 +177,12 @@ class ELFReader:
                 _,
                 _,
                 _,
-                _,
+                self._entry_point,
                 phoff,
                 _,
                 _,
                 _,
-                _,
+                phdr_ent_size,
                 phdr_num,
                 _,
                 _,
@@ -238,6 +191,7 @@ class ELFReader:
 
             self._phoff = phoff
             self._phdr_num = phdr_num
+            self._phdr_entry_size = phdr_ent_size
             f.seek(phoff, 0)
 
             dyn_off = 0
@@ -315,7 +269,6 @@ class ELFReader:
 
                 # REL
                 if d_tag == DT_RELA:
-                    # 根据linker源码 rela只出现在arm64中
                     assert not is_elf32, "get DT_RELA when parsing elf64 impossible in android"
                     rel_addr = d_val_ptr
                 elif d_tag == DT_RELASZ:
@@ -323,7 +276,6 @@ class ELFReader:
 
                 # REL
                 elif d_tag == DT_REL:
-                    # rel只出现在arm中
                     assert is_elf32, "get DT_REL when parsing elf32 impossible in android"
                     rel_addr = d_val_ptr
                 elif d_tag == DT_RELSZ:
@@ -417,6 +369,18 @@ class ELFReader:
 
                 elif d_tag == DT_PLTGOT:
                     self._plt_got_addr = d_val_ptr
+                elif d_tag == DT_SONAME:
+                    pass
+                elif d_tag == DT_FLAGS:
+                    pass
+                elif d_tag == DT_FLAGS_1:
+                    pass
+                elif d_tag == DT_PLTREL:
+                    pass
+                elif d_tag == DT_SYMENT:
+                    pass
+                else:
+                    logger.warning('Unsupported d_tag %d (0x%X) while loading library: %s', d_tag, d_tag, filename)
 
             assert nsymbol > -1, "can not detect nsymbol by DT_HASH or DT_GNU_HASH, make sure their exist in so"
             self._dyn_str_addr = dyn_str_addr
@@ -558,7 +522,6 @@ class ELFReader:
 
                 self._rels["relplt"] = relplt_table
                 for str_off in dt_needed:
-                    # 这里存的是相对于字符串表里面的偏移，因此不需要-bias，字符串表地址搞对就行
                     endId = self._dyn_str_buf.find(b"\x00", str_off)
                     so_name = self._dyn_str_buf[str_off:endId]
                     self._so_needed.append(so_name.decode("utf-8"))
@@ -589,68 +552,23 @@ class ELFReader:
     def get_init(self):
         return self._init_addr
 
+    def get_entry_point(self):
+        return self._entry_point
+
     def get_so_need(self):
         return self._so_needed
 
-    # android 4.4.4 soinfo
-    """
-    struct link_map_t {
-        uintptr_t l_addr;
-        char*  l_name;
-        uintptr_t l_ld;
-        link_map_t* l_next;
-        link_map_t* l_prev;
-    };
+    def get_phdr_addr(self):
+        return self._phoff
 
-    #define SOINFO_NAME_LEN 128
-    struct soinfo {
-    public:
-        char name[SOINFO_NAME_LEN];
-        const Elf32_Phdr* phdr;
-        size_t phnum;
-        Elf32_Addr entry;
-        Elf32_Addr base;
-        unsigned size;
-        uint32_t unused1;  // DO NOT USE, maintained for compatibility.
-        Elf32_Dyn* dynamic;
-        uint32_t unused2; // DO NOT USE, maintained for compatibility
-        uint32_t unused3; // DO NOT USE, maintained for compatibility
-        soinfo* next;
-        unsigned flags;
-        const char* strtab;
-        Elf32_Sym* symtab;
-        size_t nbucket;
-        size_t nchain;
-        unsigned* bucket;
-        unsigned* chain;
-        unsigned* plt_got;
-        Elf32_Rel* plt_rel;
-        size_t plt_rel_count;
-        Elf32_Rel* rel;
-        size_t rel_count;
-        linker_function_t* preinit_array;
-        size_t preinit_array_count;
-        linker_function_t* init_array;
-        size_t init_array_count;
-        linker_function_t* fini_array;
-        size_t fini_array_count;
-        linker_function_t init_func;
-        linker_function_t fini_func;
+    def get_phdr_num(self):
+        return self._phdr_num
 
-        // ARM EABI section used for stack unwinding.
-        unsigned* ARM_exidx;
-        size_t ARM_exidx_count;
-
-        size_t ref_count;
-        link_map_t link_map;
-        bool constructors_called;
-        // When you read a virtual address from the ELF file, add this
-        // value to get the corresponding address in the process' address space.
-        Elf32_Addr load_bias;
-    };
-    """
+    def get_phdr_entry_size(self):
+        return self._phdr_entry_size
 
     def _write_soinfo32(self, mu, load_base, load_bias, info_base):
+        # android 4.4.4 soinfo
 
         # 在虚拟机中构造一个soinfo结构
         assert len(self._filename) < 128
@@ -668,7 +586,7 @@ class ELFReader:
             int(self._phdr_num).to_bytes(4, byteorder="little"),
         )
         # entry
-        mu.mem_write(info_base + 136, int(0).to_bytes(4, byteorder="little"))
+        mu.mem_write(info_base + 136, int(self._entry_point).to_bytes(4, byteorder="little"))
         # base
         mu.mem_write(
             info_base + 140, int(load_base).to_bytes(4, byteorder="little")
@@ -833,7 +751,7 @@ class ELFReader:
         off += 8
 
         # entry
-        mu.mem_write(info_base + off, int(0).to_bytes(8, byteorder="little"))
+        mu.mem_write(info_base + off, int(self._entry_point).to_bytes(8, byteorder="little"))
         off += 8
 
         # base

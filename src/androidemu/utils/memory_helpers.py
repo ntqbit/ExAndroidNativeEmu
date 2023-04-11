@@ -7,7 +7,6 @@ def read_ptr_sz(mu, address, sz):
 
 
 def read_ptr(mu, address):
-    # FIXME 写死了ptr大小，所有调用这个函数都要改成read_ptr_sz
     return int.from_bytes(mu.mem_read(address, 4), byteorder="little")
 
 
@@ -20,7 +19,6 @@ def read_utf8(mu, address):
     buffer_read_size = 32
     buffer = b""
     null_pos = None
-    # FIXME 这个存在越界读，应该有bug，需要fix
     # Keep reading until we read something that contains a null terminator.
     while null_pos is None:
         buf_read = mu.mem_read(buffer_address, buffer_read_size)
@@ -44,7 +42,6 @@ def write_utf8(mu, address, value):
 
 
 def write_uints(mu, address, num):
-    # FIXME 写死了ptr大小，需要换成write_ptrs_sz
     l = []
     if not isinstance(num, list):
         l = [num]
@@ -69,3 +66,8 @@ def write_ptrs_sz(mu, address, num, ptr_sz):
         n += ptr_sz
 
     return n
+
+
+def write_int(mu, address, integer, size):
+    mu.mem_write(address, integer.to_bytes(size, 'little'))
+    return size

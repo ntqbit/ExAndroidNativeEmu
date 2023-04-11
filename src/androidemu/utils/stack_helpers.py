@@ -8,19 +8,23 @@ from androidemu.utils import memory_helpers
 class StackHelper:
     def __init__(self, emu):
         self._emu = emu
-        arch = emu.get_arch()
-        if arch == Arch.ARM32:
-            sp_reg = UC_ARM_REG_SP
 
-        elif arch == Arch.ARM64:
+        if emu.get_arch() == Arch.ARM32:
+            sp_reg = UC_ARM_REG_SP
+        else:
             sp_reg = UC_ARM64_REG_SP
 
-        sp = emu.mu.reg_read(sp_reg)
-        self._sp = sp
+        self._sp = emu.mu.reg_read(sp_reg)
         self._sp_reg = sp_reg
 
-    def reserve(self, nptr):
-        self._sp -= nptr * self._emu.get_ptr_size()
+    def get_sp(self):
+        return self._sp
+
+    def reserve(self, nptr: int):
+        return self.reserve_bytes(nptr * self._emu.get_ptr_size())
+
+    def reserve_bytes(self, size: int):
+        self._sp -= size
         return self._sp
 
     def write_val(self, value):
@@ -29,20 +33,20 @@ class StackHelper:
         memory_helpers.write_ptrs_sz(self._emu.mu, self._sp, value, ptr_sz)
         return self._sp
 
-    def write_utf8(self, str_val):
-        value_utf8 = str_val.encode(encoding="utf-8") + b"\x00"
-        n = len(value_utf8)
-        self._sp -= n
-        self._emu.mu.mem_write(self._sp, value_utf8)
+    def write_utf8(self, value: str):
+        return self.write_bytes(value.encode(encoding="utf-8") + b"\x00")
+
+    def write_bytes(self, value: bytes):
+        self._sp -= len(value)
+        self._emu.mu.mem_write(self._sp, value)
         return self._sp
 
-    def commit(self):
+    def align(self):
         if self._emu.get_arch() == Arch.ARM32:
             self._sp = self._sp & (~7)
         elif self._emu.get_arch() == Arch.ARM64:
             self._sp = self._sp & (~15)
 
+    def commit(self):
+        self.align()
         self._emu.mu.reg_write(self._sp_reg, self._sp)
-
-    def get_sp(self):
-        return self._sp

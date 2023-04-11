@@ -935,7 +935,7 @@ class JNIEnv:
             )
 
         pyobj = JNIEnv.jobject_to_pyobject(obj)
-        logger.debug("JNIEnv->GetObjectClass(%r) was called" % (pyobj,))
+        logger.debug("JNIEnv->GetObjectClass(%r) was called", pyobj)
 
         pyclazz = pyobj.__class__
 
@@ -1811,10 +1811,6 @@ class JNIEnv:
 
         pyarray_clazz = self._class_loader.find_class_by_name(new_jvm_name)
         if pyarray_clazz is None:
-            # jvm_name=None, jvm_fields=None, jvm_ignore=False, jvm_super=None
-            # 动态创建Array新类，因为Descriptor会变
-            # pyarray_clazz = JavaClassDef("%s_Array"%arr_item_cls_name, (Array,), {}, jvm_name=new_jvm_name, jvm_super=Array)
-            # self._class_loader.add_class(pyarray_clazz)
             raise RuntimeError(
                 "NewObjectArray Array Class %s not found" % new_jvm_name
             )

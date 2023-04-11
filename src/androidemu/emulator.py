@@ -26,7 +26,6 @@ from unicorn.arm64_const import (
 )
 
 from androidemu import pcb
-from androidemu.const import emu_const
 from androidemu.cpu.syscall_handlers import SyscallHandlers
 from androidemu.cpu.syscall_hooks import SyscallHooks
 from androidemu.hooker import Hooker
@@ -83,7 +82,6 @@ class Emulator:
 
         logger.info("process pid:%d", self._pcb.get_pid())
 
-        sp_reg = 0
         if arch == Arch.ARM32:
             self._ptr_sz = 4
             self.mu = Uc(UC_ARCH_ARM, UC_MODE_ARM)
@@ -101,7 +99,6 @@ class Emulator:
                 self._enable_vfp64()
 
             sp_reg = UC_ARM64_REG_SP
-
             self.call_native = self._call_native64
             self.call_native_return_2reg = self._call_native_return_2reg64
 
@@ -153,42 +150,25 @@ class Emulator:
                 "ro.product.brand": "Android",
             }
 
-        self.memory = MemoryMap(
-            self.mu,
-            MAP_ALLOC_BASE,
-            MAP_ALLOC_BASE + MAP_ALLOC_SIZE,
-        )
+        self.memory = MemoryMap(self.mu, MAP_ALLOC_BASE, MAP_ALLOC_BASE + MAP_ALLOC_SIZE)
 
         # Stack.
-        addr = self.memory.map(
-            STACK_ADDR, STACK_SIZE, UC_PROT_READ | UC_PROT_WRITE
-        )
+        self.memory.map(STACK_ADDR, STACK_SIZE, UC_PROT_READ | UC_PROT_WRITE)
         self.mu.reg_write(sp_reg, STACK_ADDR + STACK_SIZE)
 
-        self._sch = Scheduler(self)
+        self._scheduler = Scheduler(self)
+
         # CPU
-        self._syscall_handler = SyscallHandlers(
-            self.mu, self._sch, self.get_arch()
-        )
+        self._syscall_handler = SyscallHandlers(self.mu, self._scheduler, self.get_arch())
 
         # Hooker
-        self.memory.map(
-            BRIDGE_MEMORY_BASE,
-            BRIDGE_MEMORY_SIZE,
-            UC_PROT_READ | UC_PROT_WRITE | UC_PROT_EXEC,
-        )
-        self._hooker = Hooker(
-            self, BRIDGE_MEMORY_BASE, BRIDGE_MEMORY_SIZE
-        )
+        self.memory.map(BRIDGE_MEMORY_BASE, BRIDGE_MEMORY_SIZE, UC_PROT_READ | UC_PROT_WRITE | UC_PROT_EXEC)
+        self._hooker = Hooker(self, BRIDGE_MEMORY_BASE, BRIDGE_MEMORY_SIZE)
 
         # syscalls
-        self._mem_handler = MemorySyscallHandler(
-            self, self.memory, self._syscall_handler
-        )
+        self._mem_handler = MemorySyscallHandler(self, self.memory, self._syscall_handler)
         self._syscall_hooks = SyscallHooks(self, self._syscall_handler)
-        self.vfs = VirtualFileSystem(
-            self, vfs_root, self.config, self._syscall_handler, self.memory
-        )
+        self.vfs = VirtualFileSystem(self, vfs_root, self.config, self._syscall_handler, self.memory)
 
         # JavaVM
         self.java_classloader = JavaClassLoader()
@@ -197,11 +177,8 @@ class Emulator:
         # linker
         self.modules = Modules(self, self._vfs_root)
         # Native
-        self._sym_hooks = SymbolHooks(
-            self, self.modules, self._hooker, self._vfs_root
-        )
+        self._sym_hooks = SymbolHooks(self, self.modules, self._hooker, self._vfs_root)
 
-        # Hack 为jmethod_id指向的内存分配一块空间，抖音会将jmethodID强转，为的是绕过去
         self.memory.map(
             JMETHOD_ID_BASE,
             0x2000,
@@ -209,7 +186,6 @@ class Emulator:
         )
 
         if arch == Arch.ARM32:
-            # 映射app_process，android系统基本特征
             path = "%s/system/bin/app_process32" % vfs_root
             sz = os.path.getsize(path)
             vf = VirtualFile(
@@ -220,7 +196,6 @@ class Emulator:
             self.memory.map(0xAB006000, sz, UC_PROT_EXEC | UC_PROT_READ, vf, 0)
 
         else:
-            # 映射app_process，android系统基本特征
             path = "%s/system/bin/app_process64" % vfs_root
             sz = os.path.getsize(path)
             vf = VirtualFile(
@@ -229,6 +204,10 @@ class Emulator:
                 path,
             )
             self.memory.map(0xAB006000, sz, UC_PROT_EXEC | UC_PROT_READ, vf, 0)
+
+    def stop(self):
+        self._scheduler.stop()
+        self.mu.emu_stop()
 
     def get_pc(self):
         if self.get_arch() == Arch.ARM32:
@@ -295,9 +274,8 @@ class Emulator:
     def get_vfs_root(self):
         return self._vfs_root
 
-    def load_library(self, filename, do_init=True):
-        libmod = self.modules.load_module(filename, True)
-        return libmod
+    def load_library(self, filename, do_init=True, call_entry_point=False):
+        return self.modules.load_module(filename, do_init, call_entry_point)
 
     def call_symbol(self, module, symbol_name, *argv):
         symbol_addr = module.find_symbol(symbol_name)
@@ -312,21 +290,17 @@ class Emulator:
         return self.call_native(symbol_addr, *argv)
 
     def _call_native32(self, addr, *argv):
-        assert (
-            addr is not None
-        ), "call addr is None, make sure your jni native function has registered by RegisterNative!"
+        assert addr is not None, "call addr is None, make sure your jni native function has registered by RegisterNative!"
         native_write_args(self, *argv)
-        self._sch.exec(addr)
+        self._scheduler.exec(addr)
         # Read result from locals if jni.
         res = self.mu.reg_read(UC_ARM_REG_R0)
         return res
 
     def _call_native64(self, addr, *argv):
-        assert (
-            addr is not None
-        ), "call addr is None, make sure your jni native function has registered by RegisterNative!"
+        assert addr is not None, "call addr is None, make sure your jni native function has registered by RegisterNative!"
         native_write_args(self, *argv)
-        self._sch.exec(addr)
+        self._scheduler.exec(addr)
         # Read result from locals if jni.
         res = self.mu.reg_read(UC_ARM64_REG_X0)
         return res
@@ -355,7 +329,7 @@ class Emulator:
         return self._pcb
 
     def get_schduler(self):
-        return self._sch
+        return self._scheduler
 
     def get_muti_task_support(self):
         return self._support_muti_task

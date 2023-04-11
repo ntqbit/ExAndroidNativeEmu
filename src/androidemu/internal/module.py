@@ -11,7 +11,7 @@ class Module:
     """
 
     def __init__(
-        self, filename, address, size, symbols_resolved, init_array, soinfo_ptr
+        self, filename, address, size, symbols_resolved, init_array, entry_point, soinfo_ptr
     ):
         self.filename = filename
         self.base = address
@@ -19,6 +19,7 @@ class Module:
         self.symbols = symbols_resolved
         self.symbol_lookup = dict()
         self.init_array = list(init_array)
+        self._entry_point = entry_point
         self.soinfo_ptr = soinfo_ptr
 
         for symbol_name in self.symbols:
@@ -47,3 +48,10 @@ class Module:
         for fun_addr in self.init_array:
             logger.debug("Calling Init_array %s function: 0x%08X ", self.filename, fun_addr)
             emu.call_native(fun_addr)
+
+    def call_entry_point(self, emu):
+        if self._entry_point:
+            logger.debug("Calling entry point of %s. Function: 0x%08X ", self.filename, self._entry_point)
+            emu.call_native(self._entry_point)
+        else:
+            logger.debug("No entry point in library %s", self.filename)

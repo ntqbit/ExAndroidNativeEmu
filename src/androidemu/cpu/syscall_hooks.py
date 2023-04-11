@@ -63,15 +63,17 @@ class SyscallHooks:
             self._syscall_handler.set_handler(0x78, "clone", 5, self._clone)
             self._syscall_handler.set_handler(0x7A, "uname", 1, self._uname)
             self._syscall_handler.set_handler(0x7E, "sigprocmask", 3, self._handle_sigprocmask)
+            self._syscall_handler.set_handler(0x88, "personality", 1, self._handle_personality)
+            self._syscall_handler.set_handler(0x9D, "sched_setscheduler", 3, self._handle_sched_setscheduler)
             self._syscall_handler.set_handler(0xAC, "prctl", 5, self._handle_prctl)
             self._syscall_handler.set_handler(0xAE, "rt_sigaction", 4, self._rt_sigaction)
             self._syscall_handler.set_handler(0xAF, "rt_sigprocmask", 4, self._handle_rt_sigprocmask)
             self._syscall_handler.set_handler(0xBA, "sigaltstack", 2, self._sigaltstack)
             self._syscall_handler.set_handler(0xBE, "vfork", 0, self._vfork)
             self._syscall_handler.set_handler(0xC7, "getuid32", 0, self._get_uid)
-            self._syscall_handler.set_handler(0xDA, "set_tid_address", 1, self._set_tid_address)
             self._syscall_handler.set_handler(0xE0, "gettid", 0, self._gettid)
             self._syscall_handler.set_handler(0xF0, "futex", 6, self._handle_futex)
+            self._syscall_handler.set_handler(0x100, "set_tid_address", 1, self._set_tid_address)
             self._syscall_handler.set_handler(0x10C, "tgkill", 3, self._handle_tgkill)
             self._syscall_handler.set_handler(0x107, "clock_gettime", 2, self._handle_clock_gettime)
             self._syscall_handler.set_handler(0x119, "socket", 3, self._socket)
@@ -90,7 +92,6 @@ class SyscallHooks:
         else:
             # arm64
             self._syscall_handler.set_handler(0x5D, "exit", 1, self._exit)
-            # arm64没有fork，统一采用clone调用
             self._syscall_handler.set_handler(0xDD, "execve", 3, self._execve)
             self._syscall_handler.set_handler(0xAC, "getpid", 0, self._getpid)
             self._syscall_handler.set_handler(0xAE, "getuid", 0, self._get_uid)
@@ -101,13 +102,10 @@ class SyscallHooks:
             self._syscall_handler.set_handler(0xB3, "sysinfo", 1, self._sysinfo)
             self._syscall_handler.set_handler(0xDC, "clone", 5, self._clone)
             self._syscall_handler.set_handler(0xA0, "uname", 1, self._uname)
-            # no sigprocmask
             self._syscall_handler.set_handler(0xA7, "prctl", 5, self._handle_prctl)
             self._syscall_handler.set_handler(0x86, "rt_sigaction", 4, self._rt_sigaction)
             self._syscall_handler.set_handler(0x87, "rt_sigprocmask", 4, self._handle_rt_sigprocmask)
             self._syscall_handler.set_handler(0x84, "sigaltstack", 2, self._sigaltstack)
-            # no vfork
-            # no getuid32
             self._syscall_handler.set_handler(0xB2, "gettid", 0, self._gettid)
             self._syscall_handler.set_handler(0x62, "futex", 6, self._handle_futex)
             self._syscall_handler.set_handler(0x83, "tgkill", 3, self._handle_tgkill)
@@ -140,7 +138,7 @@ class SyscallHooks:
             # logging.basicConfig(level=logging.DEBUG, format='%(process)d - %(asctime)s - %(levelname)s - %(message)s', stream=sys.stdout)
 
         else:
-            logger.debug("-----here is parent process child pid=%d" % r)
+            logger.debug("-----here is parent process child pid=%d", r)
 
         return r
 
@@ -183,22 +181,22 @@ class SyscallHooks:
         logger.warning("execve %s %r" % (filename, params))
         cmd = " ".join(params)
 
-        pkg_name = self._emu.environment.get_process_name()
-        pm = "pm path %s" % (pkg_name,)
+        package_name = self._emu.environment.get_process_name()
+        pm = f"pm path {package_name}"
         if cmd.find(pm) > -1:
-            output = "package:/data/app/%s-1.apk" % pkg_name
-            logger.debug("write to stdout [%s]" % output)
+            output = "package:/data/app/%s-1.apk" % package_name
+            logger.debug("write to stdout [%s]", output)
             os.write(1, output.encode("utf-8"))
             sys.exit(0)
 
         elif cmd.find("wm density") > -1:
             output = "Physical density: 420"
-            logger.info("write to stdout [%s]" % output)
+            logger.info("write to stdout [%s]", output)
             os.write(1, output.encode("utf-8"))
             sys.exit(0)
         elif cmd.find("wm size") > -1:
             output = "Physical size: 1080x1920"
-            logger.info("write to stdout [%s]" % output)
+            logger.info("write to stdout [%s]", output)
             os.write(1, output.encode("utf-8"))
             sys.exit(0)
         elif cmd.find("adbd") > -1:
@@ -236,7 +234,7 @@ class SyscallHooks:
             logger.warning("pipe2 not support use pipe")
             ps = os.pipe()
 
-        logger.debug("pipe return %r" % (ps,))
+        logger.debug("pipe return %r", ps)
         self._pcb.add_fd("[pipe_r]", "[pipe_r]", ps[0])
         self._pcb.add_fd("[pipe_w]", "[pipe_w]", ps[1])
         # files_ptr 无论32还是64 都是个int数组，因此写4没有问题
@@ -366,8 +364,7 @@ class SyscallHooks:
         # return pid
         logger.debug("syscall wait4 pid %d" % pid)
         t = os.wait4(pid, options)
-        logger.debug("wait4 return %r" % (t,))
-        # wstatus 只是一个int指针，固定是4
+        logger.debug("wait4 return %r", t)
         mu.mem_write(wstatus, int(t[1]).to_bytes(4, "little"))
         return t[0]
 
@@ -564,6 +561,16 @@ class SyscallHooks:
         raise NotImplementedError("clone flags 0x%08X no suppport" % flags)
         return -1
 
+    def _handle_personality(self, mu, persona):
+        if persona == 0xFFFFFFFF:
+            return 0
+
+        return 0
+
+    def _handle_sched_setscheduler(self, mu, pid, policy, param):
+        # Skip for now
+        return 0
+
     def _handle_prctl(self, mu, option, arg2, arg3, arg4, arg5):
         """
         int prctl(int option, unsigned long arg2, unsigned long arg3, unsigned long arg4, unsigned long arg5);
@@ -650,7 +657,7 @@ class SyscallHooks:
         return self._emu.environment.get_uid()
 
     def _set_tid_address(self, mu, tidptr):
-        sch = self._emu.get_schduler
+        sch = self._emu.get_schduler()
         tid = sch.get_current_tid()
         if not tidptr:
             self._tid_2_tid_addr.pop(tid)
@@ -888,9 +895,7 @@ class SyscallHooks:
         return 0
 
     def _ARM_set_tls(self, mu, tls_ptr):
-        assert (
-            self._emu.get_arch() == Arch.ARM32
-        ), "error only arm32 has _ARM_set_tls syscall"
+        assert self._emu.get_arch() == Arch.ARM32, "error only arm32 has _ARM_set_tls syscall"
         self._emu.mu.reg_write(UC_ARM_REG_C13_C0_3, tls_ptr)
 
     def _nanosleep(self, mu, req, rem):
@@ -902,9 +907,7 @@ class SyscallHooks:
         };
         """
         req_tv_sec = memory_helpers.read_ptr_sz(mu, req, self._ptr_sz)
-        req_tv_nsec = memory_helpers.read_ptr_sz(
-            mu, req + self._ptr_sz, self._ptr_sz
-        )
+        req_tv_nsec = memory_helpers.read_ptr_sz(mu, req + self._ptr_sz, self._ptr_sz)
         ms = req_tv_sec * 1000 + req_tv_nsec / 1000000
         logger.debug("nanosleep sleep %.3f ms" % ms)
         sch = self._emu.get_schduler()

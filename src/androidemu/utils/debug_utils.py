@@ -140,7 +140,7 @@ g_md_arm64.detail = True
 def get_module_by_addr(emu, addr):
     ms = emu.modules
     module = None
-    for m in ms:
+    for m in ms.get_modules():
         if addr >= m.base and addr <= m.base + m.size:
             module = m
             break

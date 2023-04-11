@@ -1,7 +1,7 @@
 import inspect
 
-from unicorn.arm_const import *
-from unicorn.arm64_const import *
+from unicorn.arm_const import UC_ARM_REG_R0, UC_ARM_REG_R1, UC_ARM_REG_SP
+from unicorn.arm64_const import UC_ARM64_REG_X0, UC_ARM64_REG_X1, UC_ARM64_REG_SP
 from androidemu.const.emu_const import Arch
 
 from androidemu.java import JavaClassDef
@@ -9,11 +9,11 @@ from androidemu.java.jni_ref import jobject
 
 
 def native_write_args(emu, *argv):
-    max_regs_args = 4
-    reg_base = UC_ARM_REG_R0
-    sp_reg = UC_ARM_REG_SP
-
-    if emu.get_arch() == Arch.ARM64:
+    if emu.get_arch() == Arch.ARM32:
+        max_regs_args = 4
+        reg_base = UC_ARM_REG_R0
+        sp_reg = UC_ARM_REG_SP
+    else:
         max_regs_args = 8
         reg_base = UC_ARM64_REG_X0
         sp_reg = UC_ARM64_REG_SP
@@ -101,12 +101,6 @@ def native_write_arg_register(emu, reg, val):
 
 def create_native_method_wrapper(func, args_count):
     def native_method_wrapper(*argv):
-        """
-        :type self
-        :type emu androidemu.emulator.Emulator
-        :type mu Uc
-        """
-
         emu = argv[1] if len(argv) == 2 else argv[0]
         mu = emu.mu
 
@@ -125,14 +119,11 @@ def create_native_method_wrapper(func, args_count):
 
         if result is not None:
             if isinstance(result, tuple):
-                # tuple作为特殊返回8字节数据约定
                 rlow = result[0]
                 rhigh = result[1]
                 native_write_arg_register(emu, ret_reg0, rlow)
                 native_write_arg_register(emu, ret_reg1, rhigh)
             else:
-                # FIXME handle python基本类型str int float,处理返回值逻辑略为混乱，
-                # 返回值的问题统一在这里处理掉
                 native_write_arg_register(emu, ret_reg0, result)
 
     return native_method_wrapper

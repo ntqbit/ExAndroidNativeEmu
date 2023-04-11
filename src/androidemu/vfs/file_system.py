@@ -374,6 +374,7 @@ class VirtualFileSystem:
     def _handle_write(self, mu, fd, buf_addr, count):
 
         data = mu.mem_read(buf_addr, count)
+
         if fd == 1:
             s = bytes(data).decode("utf-8")
             logger.info("stdout: [%s]" % s)
@@ -622,7 +623,7 @@ class VirtualFileSystem:
     def _fcntl64(self, mu, fd, cmd, arg1, arg2, arg3, arg4):
         if IS_WINDOWS:
             return 0
-        
+
         r = fcntl.fcntl(fd, cmd, arg1)
         return r
 
@@ -800,7 +801,7 @@ class VirtualFileSystem:
 
     def _readlinkat(self, mu, dfd, path, buf, bufsz):
         path_utf8 = memory_helpers.read_utf8(mu, path)
-        logger.debug("%x %s %x %r" % (dfd, path_utf8, buf, bufsz))
+        logger.debug("%x %s %x %r", dfd, path_utf8, buf, bufsz)
         path_utf8 = self._dirfd_2_path(dfd, path_utf8)
         if path_utf8 is None:
             return -1
@@ -809,22 +810,31 @@ class VirtualFileSystem:
         pid = pobj.get_pid()
         path_std_utf = path_utf8.replace(str(pid), "self")
         fd_base = "/proc/self/fd/"
+
         if path_std_utf.startswith(fd_base):
             fd_str = os.path.basename(path_std_utf)
             fd = int(fd_str)
             detail = self._pcb.get_fd_detail(fd)
             name = detail.name
             n = len(name)
+
             if n <= bufsz:
                 memory_helpers.write_utf8(mu, buf, name)
-                return 0
-
+                return n
             else:
                 raise RuntimeError("buffer overflow")
 
-        else:
-            raise NotImplementedError()
+        # TODO: do not hard-code
+        if path_std_utf == '/proc/self/exe':
+            name = '/system/bin/app_process32'
+            n = len(name)
+            if n <= bufsz:
+                memory_helpers.write_utf8(mu, buf, name)
+                return n
+            else:
+                raise RuntimeError("buffer overflow")
 
+        logger.error('Could not handle _readlinkat: %s', path_utf8)
         return -1
 
     def _faccessat(self, mu, dirfd, pathname_ptr, mode, flag):

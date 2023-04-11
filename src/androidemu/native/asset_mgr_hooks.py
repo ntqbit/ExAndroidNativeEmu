@@ -86,7 +86,7 @@ class AssetManagerHooks:
 
     @native_method
     def _AAsset_close(self, uc, asset_ptr):
-        logger.debug("AAssetManager_close call [0x%08X]" % (asset_ptr,))
+        logger.debug("AAssetManager_close call [0x%08X]", asset_ptr)
         asset_sa = self._local_asset_ptr_map.pop(asset_ptr)
         asset_obj = asset_sa[0]
         asset_obj.close()

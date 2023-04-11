@@ -5,7 +5,6 @@ from androidemu.utils.alignment import page_end, page_start
 
 logger = verboselogs.VerboseLogger(__name__)
 
-# android中，不论64还是32，PAGE_SIZE都是4096
 PAGE_SIZE = 0x1000
 
 
@@ -126,21 +125,17 @@ class MemoryMap:
             raise
 
     def _read_fully(self, fd, size):
-        b_read = os.read(fd, size)
-        sz_read = len(b_read)
-        if sz_read <= 0:
-            return b_read
+        result = b''
 
-        sz_left = size - sz_read
-        while sz_left > 0:
-            this_read = os.read(fd, sz_left)
-            len_this_read = len(this_read)
-            if len_this_read <= 0:
+        while size > 0:
+            this_read = os.read(fd, size)
+            if not this_read:
                 break
-            b_read = b_read + this_read
-            sz_left = sz_left - len_this_read
 
-        return b_read
+            result += this_read
+            size -= len(this_read)
+
+        return result
 
     def map(
         self,
@@ -149,43 +144,35 @@ class MemoryMap:
         prot=UC_PROT_READ | UC_PROT_WRITE,
         vf=None,
         offset=0,
+        filesz=None
     ):
+        if filesz is None:
+            #logger.warning('Old map API call with filesz=None')
+            filesz = size
+
         if not self._is_page_align(address):
-            raise RuntimeError(
-                "map addr was not multiple of page size (%d, %d)."
-                % (address, PAGE_SIZE)
-            )
+            raise RuntimeError("map addr was not multiple of page size (%d, %d)." % (address, PAGE_SIZE))
 
         logger.debug(
             "map addr:0x%08X, end:0x%08X, sz:0x%08X vf=%s off=0x%08X"
             % (address, address + size, size, vf, offset)
         )
-        # traceback.print_stack()
+
         al_address = address
         al_size = page_end(al_address + size) - al_address
         res_addr = self._map(al_address, al_size, prot)
         if res_addr != -1 and vf is not None:
-            # 需要mmap映射文件的时候,开辟一块内存,并将文件内容复制过去模拟
             if not self._is_page_align(offset):
-                raise RuntimeError(
-                    "map offset was not multiple of page size (%d, %d)."
-                    % (offset, PAGE_SIZE)
-                )
+                raise RuntimeError("map offset was not multiple of page size (%d, %d)." % (offset, PAGE_SIZE))
 
             if offset > 0xFFFFFFFF:
-                raise NotImplementedError(
-                    "map offset %d > 4G not support now" % offset
-                )
+                raise NotImplementedError("map offset %d > 4G not support now" % offset)
 
             ori_off = os.lseek(vf.descriptor, 0, os.SEEK_CUR)
 
-            # logger.debug("mmap file ori_off %d"%(ori_off,))
             os.lseek(vf.descriptor, offset, os.SEEK_SET)
-            data = self._read_fully(vf.descriptor, size)
-            logger.debug(
-                "read for offset %d sz %d data sz:%d"
-                % (offset, size, len(data))
-            )
+            data = self._read_fully(vf.descriptor, filesz)
+            logger.debug("read for offset 0x%X sz 0x%X data sz:0x%X", offset, size, len(data))
             self._mu.mem_write(res_addr, data)
             self._file_map_addr[res_addr] = (res_addr + al_size, offset, vf)
             os.lseek(vf.descriptor, ori_off, os.SEEK_SET)

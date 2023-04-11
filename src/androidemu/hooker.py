@@ -9,10 +9,6 @@ logger = verboselogs.VerboseLogger(__name__)
 
 
 class Hooker:
-    """
-    :type emu androidemu.emulator.Emulator
-    """
-
     def __init__(self, emu, base_addr, size):
         self._emu = emu
         self._size = size
@@ -31,24 +27,18 @@ class Hooker:
         # Get the hook id.
         hook_id = self._get_next_id()
         self._hooks[hook_id] = func
+
         # the the hook_id to header
-        self._emu.mu.mem_write(
-            self._hook_current,
-            int(hook_id).to_bytes(4, byteorder="little", signed=False),
-        )
+        self._emu.mu.mem_write(self._hook_current, int(hook_id).to_bytes(4, byteorder="little", signed=False))
         self._hook_current += 4
 
         hook_addr = self._hook_current
+
         if self._emu.get_arch() == Arch.ARM32:
-            # Create the ARM assembly code.
-            self._emu.mu.mem_write(
-                self._hook_current, b"\x1E\xFF\x2F\xE1"
-            )  # bx lr
+            self._emu.mu.mem_write(self._hook_current, b"\x1E\xFF\x2F\xE1")  # bx lr
             self._hook_current += 4
         else:
-            self._emu.mu.mem_write(
-                self._hook_current, b"\xC0\x03\x5F\xD6"
-            )  # ret
+            self._emu.mu.mem_write(self._hook_current, b"\xC0\x03\x5F\xD6")  # ret
             self._hook_current += 4
 
         return hook_addr

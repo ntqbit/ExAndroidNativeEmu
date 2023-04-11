@@ -62,7 +62,7 @@ class SymbolHooks:
 
         r = 0
         if path.find("/") < 0:
-            for mod in self._modules.modules:
+            for mod in self._modules._modules:
                 if mod.filename.find(path) > -1:
                     r = mod.soinfo_ptr
                     logger.debug("Called dlopen(%s) return 0x%08x", path, r)
@@ -94,7 +94,7 @@ class SymbolHooks:
     def dladdr(self, mu, addr, info_ptr):
         logger.debug("Called dladdr(0x%x, 0x%x)", addr, info_ptr)
 
-        for mod in self._modules.modules:
+        for mod in self._modules._modules:
             if mod.base <= addr < mod.base + mod.size:
                 # FIXME: memory leak
                 dli_fname = self._emu.memory.map(

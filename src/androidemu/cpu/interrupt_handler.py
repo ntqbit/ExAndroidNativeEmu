@@ -1,6 +1,3 @@
-import traceback
-import inspect
-
 import verboselogs
 
 from unicorn import UC_HOOK_INTR, UC_ARCH_ARM, UC_ARCH_ARM64, UC_QUERY_ARCH
@@ -11,10 +8,6 @@ logger = verboselogs.VerboseLogger(__name__)
 
 
 class InterruptHandler:
-    """
-    :type mu Uc
-    """
-
     def __init__(self, mu):
         self._mu = mu
         self._mu.hook_add(UC_HOOK_INTR, self._hook_interrupt)
@@ -33,15 +26,12 @@ class InterruptHandler:
                     pc = self._mu.reg_read(UC_ARM64_REG_PC)
 
                 logger.error("Unhandled interrupt %d at %x, stopping emulation", intno, pc)
-                traceback.print_stack()
-                frame = inspect.currentframe()
-                stack_trace = traceback.format_stack(frame)
-                logger.error("Caught an exception in _hook_interrupt:")
-                logger.error(stack_trace[:-1])
                 self._mu.emu_stop()
+                raise RuntimeError('Unhandled interrupt')
         except Exception:
             logger.exception("Caught an exception in _hook_interrupt intno: %d", intno)
             self._mu.emu_stop()
+            raise
 
     def set_handler(self, intno, handler):
         self._handlers[intno] = handler

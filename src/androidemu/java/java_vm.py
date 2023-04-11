@@ -1,9 +1,7 @@
 import verboselogs
-import traceback
 
-from androidemu.hooker import Hooker
 from androidemu.java.helpers.native_method import native_method
-from androidemu.java.jni_const import *
+from androidemu.java.jni_const import JNI_OK
 from androidemu.java.jni_env import JNIEnv
 from androidemu.java.jni_ref import jthrowable
 
@@ -66,7 +64,7 @@ class JavaVM:
     @native_method
     def detach_current_thread(self, mu, java_vm):
         # TODO: NooOO idea.
-        logger.debug("JavaVM->DetachCurrentThread(0x%08x)" % (java_vm,))
+        logger.debug("JavaVM->DetachCurrentThread(0x%08x)", java_vm)
         return JNI_OK
 
     @native_method
