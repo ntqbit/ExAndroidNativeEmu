@@ -13,17 +13,23 @@ logger = verboselogs.VerboseLogger(__name__)
 class Hooker:
     def __init__(self, emu, base_addr, size):
         self._emu = emu
-        self._size = size
         self._current_id = 0xFF00
         self._hooks = dict()
         _hook_start = base_addr + emu.get_ptr_size()
         self._hook_current = _hook_start
+        self._hook_end = _hook_start + size
         self._emu.mu.hook_add(UC_HOOK_CODE, self._hook, None, _hook_start, _hook_start + size)
 
     def _get_next_id(self):
         idx = self._current_id
         self._current_id += 1
         return idx
+
+    def _increase_hook_current(self, s: int):
+        if self._hook_current + s >= self._hook_end:
+            raise RuntimeError('Hook buffer size exceeded')
+
+        self._hook_current += s
 
     def write_function(self, func):
         # Get the hook id.
@@ -32,16 +38,17 @@ class Hooker:
 
         # the the hook_id to header
         self._emu.mu.mem_write(self._hook_current, int(hook_id).to_bytes(4, "little", signed=False))
-        self._hook_current += 4
+        self._increase_hook_current(4)
 
         hook_addr = self._hook_current
 
         if self._emu.get_arch() == Arch.ARM32:
-            self._emu.mu.mem_write(self._hook_current, asm('bx lr'))
-            self._hook_current += 4
+            ret_bytes = asm('bx lr')
         else:
-            self._emu.mu.mem_write(self._hook_current, asm64('ret'))
-            self._hook_current += 4
+            ret_bytes = asm64('ret')
+
+        self._emu.mu.mem_write(self._hook_current, ret_bytes)
+        self._increase_hook_current(len(ret_bytes))
 
         return hook_addr
 
@@ -58,21 +65,20 @@ class Hooker:
             hook_map[index] = self.write_function(func)
 
         # Then we write the function table.
-        table_bytes = b""
+        table_bytes = bytearray()
         table_address = self._hook_current
         ptr_size = self._emu.get_ptr_size()
-        for index in range(0, index_max):
-            address = hook_map[index] if index in hook_map else 0
-            table_bytes += int(address).to_bytes(
-                ptr_size, "little"
-            )
 
-        self._emu.mu.mem_write(table_address, table_bytes)
-        self._hook_current += len(table_bytes)
+        for index in range(index_max):
+            address = hook_map[index] if index in hook_map else 0
+            table_bytes += int(address).to_bytes(ptr_size, "little")
+
+        self._emu.mu.mem_write(table_address, bytes(table_bytes))
+        self._increase_hook_current(len(table_bytes))
 
         ptr_address = self._hook_current
         self._emu.mu.mem_write(ptr_address, table_address.to_bytes(ptr_size, "little"))
-        self._hook_current += ptr_size
+        self._increase_hook_current(ptr_size)
 
         return ptr_address, table_address
 
