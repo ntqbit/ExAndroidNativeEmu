@@ -16,12 +16,19 @@ from unicorn.arm64_const import (
 )
 
 from androidemu.cpu.interrupt_handler import InterruptHandler
-from androidemu.cpu.syscall_handler import SyscallHandler
 from androidemu.const.emu_const import Arch
 from androidemu.logging import SYSCALL
 from androidemu.utils.misc_utils import format_addr
 
 logger = verboselogs.VerboseLogger(__name__)
+
+
+class SyscallHandler:
+    def __init__(self, idx, name, arg_count, callback):
+        self.idx = idx
+        self.name = name
+        self.arg_count = arg_count
+        self.callback = callback
 
 
 class SyscallHandlers:
