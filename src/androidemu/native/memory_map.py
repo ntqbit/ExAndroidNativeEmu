@@ -60,14 +60,22 @@ class MemoryMap:
 
     def get_map_file(self, address):
         # TODO: optimize
+        # TODO: temporary solution. 
+        # finds first entry of a mapped file instead of finding actual base address of a module.
+
+        self._first_entry = {}
+
         for start, (end, offset, vf) in self._file_map_addr.items():
             if start <= address <= end:
+                if vf.get_name() in self._first_entry:
+                    start = self._first_entry[vf.get_name()]
+
                 return {
                     'start': start,
-                    'end': end,
-                    'offset': offset,
                     'vf': vf
                 }
+
+            self._first_entry[vf.get_name()] = start
 
         return None
 
