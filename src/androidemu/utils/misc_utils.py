@@ -26,7 +26,7 @@ def format_addr(emu, address):
         file_name = map_file['vf'].get_name()
         addr_name = os.path.basename(file_name)
         rva = address - map_file['start']
-        return f'0x{address:08X} ({addr_name}!0x{rva:X})'
+        return f'0x{address:08X}[{addr_name}!0x{rva:X}]'
 
     return f'0x{address:08X}'
 
