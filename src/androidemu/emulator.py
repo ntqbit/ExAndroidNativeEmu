@@ -193,26 +193,6 @@ class Emulator:
             UC_PROT_READ | UC_PROT_WRITE | UC_PROT_EXEC,
         )
 
-        if arch == Arch.ARM32:
-            path = "%s/system/bin/app_process32" % vfs_root
-            sz = os.path.getsize(path)
-            vf = VirtualFile(
-                "/system/bin/app_process32",
-                misc_utils.platform_open(path, os.O_RDONLY),
-                path,
-            )
-            self.memory.map(0xAB006000, sz, UC_PROT_EXEC | UC_PROT_READ, vf, 0)
-
-        else:
-            path = "%s/system/bin/app_process64" % vfs_root
-            sz = os.path.getsize(path)
-            vf = VirtualFile(
-                "/system/bin/app_process64",
-                misc_utils.platform_open(path, os.O_RDONLY),
-                path,
-            )
-            self.memory.map(0xAB006000, sz, UC_PROT_EXEC | UC_PROT_READ, vf, 0)
-
     def stop(self):
         self._scheduler.stop()
         self.mu.emu_stop()

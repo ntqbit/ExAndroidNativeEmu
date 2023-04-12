@@ -80,6 +80,7 @@ class SyscallHooks:
             self._syscall_handler.set_handler(0x119, "socket", 3, self._socket)
             self._syscall_handler.set_handler(0x11A, "bind", 3, self._bind)
             self._syscall_handler.set_handler(0x11B, "connect", 3, self._connect)
+            self._syscall_handler.set_handler(0x120, "socketpair", 4, self._handle_socketpair)
             self._syscall_handler.set_handler(0x126, "setsockopt", 5, self._setsockopt)
             self._syscall_handler.set_handler(0x159, "getcpu", 3, self._getcpu)
             self._syscall_handler.set_handler(0x166, "dup3", 3, self._dup3)
@@ -132,14 +133,13 @@ class SyscallHooks:
 
     def _do_fork(self, mu):
         logger.debug("fork called")
-        r = os.fork()
-        if r == 0:
-            pass
-            # 实测这样改没效果
-            # logging.basicConfig(level=logging.DEBUG, format='%(process)d - %(asctime)s - %(levelname)s - %(message)s', stream=sys.stdout)
+        #r = os.fork()
+        r = 0
 
+        if r == 0:
+            logger.error('Failed to fork')
         else:
-            logger.debug("-----here is parent process child pid=%d", r)
+            logger.debug("Forked process child pid=%d", r)
 
         return r
 
@@ -506,29 +506,21 @@ class SyscallHooks:
         # 6.0 clone thread CLONE_FILES| CLONE_FS | CLONE_VM| CLONE_SIGHAND |
         # CLONE_THREAD | CLONE_SYSVSEM | CLONE_SETTLS | CLONE_PARENT_SETTID |
         # CLONE_CHILD_CLEARTID
-        if (
-            flags & fork_flags == fork_flags
-            or flags & vfork_flags == vfork_flags
-        ):
+        if flags & fork_flags == fork_flags or flags & vfork_flags == vfork_flags:
             # fork or vfork
             # 0x01200011 is fork flag
             # clone(0x01200011, 0x00000000, 0x00000000, 0x00000000, 0x00000008)
             logger.warning("syscall clone do fork...")
             return self._do_fork(mu)
-
         elif flags & thread_flags == thread_flags:
             logger.warning("syscall clone do thread clone...")
-            # clone一定要成功， 4.4
-            # 的libc有bug，当clone失败之后会释放一个锁，而锁的内存在child_stack中，而他逻辑先释放了stack再unlock锁，必蹦，之所以不出问题的原因是在真机上clone不会失败，这里注意
+
             sch = self._emu.get_schduler()
-            # 父线程调用clone，返回子线程tid
+
             tls_ptr = 0
-            if (
-                flags
-                & (CLONE_SETTLS | CLONE_CHILD_SETTID | CLONE_CHILD_CLEARTID)
-                != 0
-            ):
+            if flags & (CLONE_SETTLS | CLONE_CHILD_SETTID | CLONE_CHILD_CLEARTID) != 0:
                 tls_ptr = new_tls
+
             tid = sch.add_sub_task(child_stack, tls_ptr)
             logger.debug(
                 "clone thread call in parent thread return child thread tid [%d] child_stack [0x%08X] tls_ptr [0x%08X]"
@@ -536,7 +528,7 @@ class SyscallHooks:
             )
             # let the child thread run first
             sch.yield_task()
-            # 6.0的libc使用这几个参数设置tid，而不使用返回值，这跟4.4的libc实现不同，两个都要兼容
+
             if (
                 flags
                 & (
@@ -838,7 +830,9 @@ class SyscallHooks:
 
         # return 0
         return -1
-        # raise NotImplementedError()
+
+    def _handle_socketpair(self, mu, domain, type, protocol, sv):
+        return -1
 
     def _dup3(self, mu, oldfd, newfd, flags):
         assert flags == 0, "dup3 flag not support now"

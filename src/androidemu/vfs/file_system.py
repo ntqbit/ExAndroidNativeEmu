@@ -626,8 +626,8 @@ class VirtualFileSystem:
                 "warning ioctl SIOCGIFCONF to get net addrs not implemented return -1 and skip"
             )
             return -1
-
-        raise NotImplementedError()
+        
+        return 0
 
     def _fcntl64(self, mu, fd, cmd, arg1, arg2, arg3, arg4):
         if IS_WINDOWS:

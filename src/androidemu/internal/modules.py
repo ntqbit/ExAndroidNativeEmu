@@ -73,7 +73,7 @@ class Modules:
             (linux.AT_PHNUM, phdr_num),
             (linux.AT_BASE, linker_base),  # linker base address
             (linux.AT_FLAGS, 0x0),
-            (linux.AT_ENTRY, entry_point),  # somewhere in app_process32
+            (linux.AT_ENTRY, entry_point + 0x3d1),  # somewhere in app_process32
             (linux.AT_UID, 0x0),
             (linux.AT_EUID, 0x0),
             (linux.AT_GID, 0x0),

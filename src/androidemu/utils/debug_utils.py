@@ -9,6 +9,7 @@ from unicorn.arm_const import *
 from unicorn.arm64_const import *
 
 from androidemu.const.emu_const import Arch
+from androidemu.utils.misc_utils import format_addr
 
 
 def dump_memory(emu, fd, min_addr=0, max_addr=0xFFFFFFFF):
@@ -175,22 +176,23 @@ def dump_code(emu, address, size, fd, dump_reg_type=DUMP_REG_READ):
     for i in codes:
         addr = i.address
 
-        name = "unknown"
+        # name = "unknown"
+        name = format_addr(emu, addr)
         module = None
         base = 0
         funName = None
-        module = get_module_by_addr(emu, addr)
-        if module is not None:
-            name = os.path.basename(module.filename)
-            base = module.base
-            funName = module.is_symbol_addr(addr)
+        # module = get_module_by_addr(emu, addr)
+        # if module is not None:
+        #     name = os.path.basename(module.filename)
+        #     base = module.base
+        #     funName = module.is_symbol_addr(addr)
 
         instruction_str = " ".join("{:02X}".format(x) for x in i.bytes)
         tid = ""
         if emu.get_muti_task_support():
             sch = emu.get_schduler()
             tid = "%d:" % sch.get_current_tid()
-        line = "%s(%20s[0x%08X])[%-11s]0x%08X:\t%s\t%s" % (
+        line = "%s(%30s[0x%08X])[%-11s]0x%08X:\t%s\t%s" % (
             tid,
             name,
             base,
