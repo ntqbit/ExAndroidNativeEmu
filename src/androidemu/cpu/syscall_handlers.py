@@ -19,6 +19,7 @@ from androidemu.cpu.interrupt_handler import InterruptHandler
 from androidemu.cpu.syscall_handler import SyscallHandler
 from androidemu.const.emu_const import Arch
 from androidemu.logging import SYSCALL
+from androidemu.utils.misc_utils import format_addr
 
 logger = verboselogs.VerboseLogger(__name__)
 
@@ -28,12 +29,13 @@ class SyscallHandlers:
     :type interrupt_handler InterruptHandler
     """
 
-    def __init__(self, mu, schduler, arch):
+    def __init__(self, emu):
         self._handlers = dict()
-        self._scheduler = schduler
-        self._interrupt_handler = InterruptHandler(mu)
+        self._emu = emu
+        self._scheduler = emu.get_schduler()
+        self._interrupt_handler = InterruptHandler(emu)
 
-        if arch == Arch.ARM32:
+        if emu.get_arch() == Arch.ARM32:
             self._interrupt_handler.set_handler(2, self._handle_syscall)
         else:
             self._interrupt_handler.set_handler(2, self._handle_syscall64)
@@ -55,15 +57,15 @@ class SyscallHandlers:
         if idx in self._handlers:
             handler = self._handlers[idx]
             args = args[: handler.arg_count]
-            args_formatted = ", ".join(["0x%08X" % arg for arg in args])
+            args_formatted = ", ".join([format_addr(self._emu, arg) for arg in args])
 
             logger.log(
                 SYSCALL,
-                "%d Executing syscall %s(%s) at 0x%08X",
+                "%d Executing syscall %s(%s) at %s",
                 tid,
                 handler.name,
                 args_formatted,
-                mu.reg_read(UC_ARM_REG_PC),
+                format_addr(self._emu, mu.reg_read(UC_ARM_REG_PC)),
             )
 
             try:
@@ -80,10 +82,10 @@ class SyscallHandlers:
             if result is not None:
                 mu.reg_write(UC_ARM_REG_R0, result)
         else:
-            args_formatted = ", ".join(["0x%08X" % arg for arg in args])
+            args_formatted = ", ".join([format_addr(self._emu, arg) for arg in args])
 
-            logger.exception("%d Unhandled syscall 0x%x (%u) at 0x%x, args(%s) stopping emulation",
-                             tid, idx, idx, mu.reg_read(UC_ARM_REG_PC), args_formatted)
+            logger.exception("%d Unhandled syscall 0x%x (%u) at %s, args(%s) stopping emulation",
+                             tid, idx, idx, format_addr(self._emu, mu.reg_read(UC_ARM_REG_PC)), args_formatted)
             mu.emu_stop()
             raise RuntimeError('Unhandler syscall')
 
@@ -99,15 +101,15 @@ class SyscallHandlers:
         if idx in self._handlers:
             handler = self._handlers[idx]
             args = args[: handler.arg_count]
-            args_formatted = ", ".join(["0x%016X" % arg for arg in args])
+            args_formatted = ", ".join([format_addr(self._emu, arg) for arg in args])
 
             logger.log(
                 SYSCALL,
-                "%d Executing syscall %s(%s) at 0x%016X",
+                "%d Executing syscall %s(%s) at %s",
                 tid,
                 handler.name,
                 args_formatted,
-                mu.reg_read(UC_ARM64_REG_PC),
+                format_addr(self._emu, mu.reg_read(UC_ARM64_REG_PC)),
             )
 
             try:
@@ -120,8 +122,9 @@ class SyscallHandlers:
             if result is not None:
                 mu.reg_write(UC_ARM64_REG_X0, result)
         else:
-            args_formatted = ", ".join(["0x%016X" % arg for arg in args])
-            logger.exception("%d Unhandled syscall 0x%x (%u) at 0x%x, args(%s) stopping emulation",
-                             tid, idx, idx, mu.reg_read(UC_ARM64_REG_PC), args_formatted)
+            args_formatted = ", ".join([format_addr(self._emu, arg) for arg in args])
+
+            logger.exception("%d Unhandled syscall 0x%x (%u) at %s, args(%s) stopping emulation",
+                             tid, idx, idx, format_addr(self._emu, mu.reg_read(UC_ARM_REG_PC)), args_formatted)
             mu.emu_stop()
             raise RuntimeError('Unhandler syscall')

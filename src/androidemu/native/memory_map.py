@@ -58,6 +58,19 @@ class MemoryMap:
         self._alloc_max_addr = alloc_max_addr
         self._file_map_addr = {}
 
+    def get_map_file(self, address):
+        # TODO: optimize
+        for start, (end, offset, vf) in self._file_map_addr.items():
+            if start <= address <= end:
+                return {
+                    'start': start,
+                    'end': end,
+                    'offset': offset,
+                    'vf': vf
+                }
+
+        return None
+
     def _find_base_for_mapping(self, size):
         regions = sorted(list(self._mu.mem_regions()))
 
@@ -310,6 +323,7 @@ class MemoryMap:
         n = len(regions)
         if n < 1:
             return
+
         output = []
         last_attr = self._get_attrs(regions[0])
         start = last_attr[0]

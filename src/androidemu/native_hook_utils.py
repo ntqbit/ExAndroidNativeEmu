@@ -42,7 +42,6 @@ def standlize_addr(addr):
     return addr & (~1)
 
 
-# 函数hook
 class FuncHooker:
     # 32 layout
     """
@@ -158,14 +157,14 @@ class FuncHooker:
                     mu.mem_write(
                         self._stub_off,
                         lr.to_bytes(4, "little", signed=False),
-                    )  # 备份返回地址
+                    )
                     self._stub_off += 4
                     mu.reg_write(UC_ARM_REG_LR, new_lr)
                 else:
                     mu.mem_write(
                         self._stub_off,
                         address.to_bytes(8, "little", signed=False),
-                    )  # 写入函数地址
+                    )
                     self._stub_off += 8
 
                     new_lr = self._stub_off
@@ -180,7 +179,7 @@ class FuncHooker:
                     mu.mem_write(
                         self._stub_off,
                         lr.to_bytes(8, "little", signed=False),
-                    )  # 备份返回地址
+                    )
                     self._stub_off += 8
                     mu.reg_write(UC_ARM64_REG_X30, new_lr)
 

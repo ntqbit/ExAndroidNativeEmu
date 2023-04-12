@@ -20,6 +20,17 @@ logger = verboselogs.VerboseLogger(__name__)
 IS_WINDOWS = platform.system() == "Windows"
 
 
+def format_addr(emu, address):
+    map_file = emu.memory.get_map_file(address)
+    if map_file:
+        file_name = map_file['vf'].get_name()
+        addr_name = os.path.basename(file_name)
+        rva = address - map_file['start']
+        return f'0x{address:08X} ({addr_name}!0x{rva:X})'
+
+    return f'0x{address:08X}'
+
+
 def vfs_path_to_system_path(vfs_root, path):
     if os.name == "nt":
         path = path.replace(":", "_")

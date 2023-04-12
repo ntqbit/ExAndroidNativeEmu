@@ -1,10 +1,13 @@
 import os
 import io
+
+from typing import Tuple
+
 import capstone
 
-from unicorn import *
 from unicorn.arm_const import *
 from unicorn.arm64_const import *
+
 from androidemu.const.emu_const import Arch
 
 

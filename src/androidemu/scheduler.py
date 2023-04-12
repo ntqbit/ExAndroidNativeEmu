@@ -22,6 +22,8 @@ from unicorn.arm64_const import (
 
 from androidemu.const.emu_const import STOP_MEMORY_BASE, STOP_MEMORY_SIZE, Arch
 
+from androidemu.utils.misc_utils import format_addr
+
 
 logger = verboselogs.VerboseLogger(__name__)
 
@@ -274,10 +276,11 @@ class Scheduler:
                         task.is_init = False
 
                 logger.debug(
-                    "scheduler starting at 0x%X. stop pos: 0x%X",
-                    start_pos,
-                    self._stop_pos,
+                    "scheduler starting at %s. stop pos: %s",
+                    format_addr(self._emu, start_pos),
+                    format_addr(self._emu, self._stop_pos),
                 )
+                
                 self._emu.mu.emu_start(start_pos, self._stop_pos, 0, 0)
                 task.halt_ts = int(time.time() * 1000)
                 # after run

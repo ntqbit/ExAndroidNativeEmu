@@ -167,7 +167,7 @@ class Emulator:
         self._scheduler = Scheduler(self)
 
         # CPU
-        self._syscall_handler = SyscallHandlers(self.mu, self._scheduler, self.get_arch())
+        self._syscall_handler = SyscallHandlers(self)
 
         # Hooker
         self.memory.map(BRIDGE_MEMORY_BASE, BRIDGE_MEMORY_SIZE, UC_PROT_READ | UC_PROT_WRITE | UC_PROT_EXEC)
