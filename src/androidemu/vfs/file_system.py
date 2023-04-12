@@ -627,6 +627,7 @@ class VirtualFileSystem:
             )
             return -1
         
+        logger.warning('Do not know how to handle ioctl syscall')
         return 0
 
     def _fcntl64(self, mu, fd, cmd, arg1, arg2, arg3, arg4):

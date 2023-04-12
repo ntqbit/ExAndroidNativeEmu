@@ -22,6 +22,7 @@ from unicorn.arm64_const import (
 
 from androidemu.const.emu_const import Arch
 from androidemu.java.helpers.native_method import native_read_args_in_hook_code
+from androidemu.utils.assembler import asm, asm64
 
 logger = verboselogs.VerboseLogger(__name__)
 
@@ -148,10 +149,10 @@ class FuncHooker:
                     new_lr = self._stub_off
                     # 跳板跳回原返回地址
                     mu.mem_write(
-                        self._stub_off, b"\x00\xE0\x9F\xE5"
-                    )  # ldr lr, [pc, #0x0]
+                        self._stub_off, asm('ldr lr, [pc, #0x0]')
+                    )
                     self._stub_off += 4
-                    mu.mem_write(self._stub_off, b"\x1E\xFF\x2F\xE1")  # bx lr
+                    mu.mem_write(self._stub_off, asm('bx lr'))
                     self._stub_off += 4
                     lr = mu.reg_read(UC_ARM_REG_LR)
                     mu.mem_write(
@@ -169,10 +170,10 @@ class FuncHooker:
 
                     new_lr = self._stub_off
                     mu.mem_write(
-                        self._stub_off, b"\x5E\x00\x00\x58"
-                    )  # ldr x30, #0x8
+                        self._stub_off, asm64('ldr x30, #0x8')
+                    )
                     self._stub_off += 4
-                    mu.mem_write(self._stub_off, b"\xC0\x03\x1F\xD6")  # br x30
+                    mu.mem_write(self._stub_off, asm64('br x30'))
                     self._stub_off += 4
 
                     lr = mu.reg_read(UC_ARM64_REG_X30)

@@ -1,5 +1,3 @@
-import os
-
 import verboselogs
 
 from unicorn import (
@@ -26,6 +24,7 @@ from unicorn.arm64_const import (
 )
 
 from androidemu import pcb
+from androidemu.utils.assembler import asm_thumb
 from androidemu.cpu.syscall_handlers import SyscallHandlers
 from androidemu.cpu.syscall_hooks import SyscallHooks
 from androidemu.hooker import Hooker
@@ -205,29 +204,21 @@ class Emulator:
             return self.mu.reg_read(UC_ARM64_REG_PC)
 
     # https://github.com/unicorn-engine/unicorn/blob/8c6cbe3f3cabed57b23b721c29f937dd5baafc90/tests/regress/arm_fp_vfp_disabled.py#L15
-    # 关于arm32 64 fp https://www.raspberrypi.org/forums/viewtopic.php?t=259802
+    # arm32 64 fp https://www.raspberrypi.org/forums/viewtopic.php?t=259802
     # https://www.cnblogs.com/pengdonglin137/p/3727583.html
     def _enable_vfp32(self):
-        # MRC p15, #0, r1, c1, c0, #2
-        # ORR r1, r1, #(0xf << 20)
-        # MCR p15, #0, r1, c1, c0, #2
-        # MOV r1, #0
-        # MCR p15, #0, r1, c7, c5, #4
-        # MOV r0,#0x40000000
-        # FMXR FPEXC, r0
-        code = "11EE501F"
-        code += "41F47001"
-        code += "01EE501F"
-        code += "4FF00001"
-        code += "07EE951F"
-        code += "4FF08040"
-        code += "E8EE100A"
-        # vpush {d8}
-        code += "2ded028b"
-
         address = 0x1000
         mem_size = 0x1000
-        code_bytes = bytes.fromhex(code)
+        
+        code_bytes = asm_thumb([
+            'MRC p15, #0, r1, c1, c0, #2',
+            'ORR r1, r1, #(0xf << 20)',
+            'MCR p15, #0, r1, c1, c0, #2',
+            'isb',
+            'MOV r0,#0x40000000',
+            'FMXR FPEXC, r0',
+            'vpush {d8}'
+        ])
 
         try:
             self.mu.mem_map(address, mem_size)

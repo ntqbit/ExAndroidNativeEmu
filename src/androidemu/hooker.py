@@ -1,7 +1,9 @@
-from unicorn import UC_HOOK_CODE
-from androidemu.const.emu_const import Arch
-
 import verboselogs
+
+from unicorn import UC_HOOK_CODE
+
+from androidemu.utils.assembler import asm, asm64
+from androidemu.const.emu_const import Arch
 
 logger = verboselogs.VerboseLogger(__name__)
 
@@ -35,10 +37,10 @@ class Hooker:
         hook_addr = self._hook_current
 
         if self._emu.get_arch() == Arch.ARM32:
-            self._emu.mu.mem_write(self._hook_current, b"\x1E\xFF\x2F\xE1")  # bx lr
+            self._emu.mu.mem_write(self._hook_current, asm('bx lr'))
             self._hook_current += 4
         else:
-            self._emu.mu.mem_write(self._hook_current, b"\xC0\x03\x5F\xD6")  # ret
+            self._emu.mu.mem_write(self._hook_current, asm64('ret'))
             self._hook_current += 4
 
         return hook_addr
@@ -69,9 +71,7 @@ class Hooker:
         self._hook_current += len(table_bytes)
 
         ptr_address = self._hook_current
-        self._emu.mu.mem_write(
-            ptr_address, table_address.to_bytes(ptr_size, "little")
-        )
+        self._emu.mu.mem_write(ptr_address, table_address.to_bytes(ptr_size, "little"))
         self._hook_current += ptr_size
 
         return ptr_address, table_address
