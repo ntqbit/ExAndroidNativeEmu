@@ -1,6 +1,6 @@
-import sys
 import os
-from androidemu.utils.debug_utils import *
+
+from androidemu.utils.debug_utils import get_module_by_addr
 
 
 class MemoryMonitor:
@@ -10,7 +10,6 @@ class MemoryMonitor:
         self._read_not_writed = set()
 
     def feed_write(self, pc, address, size):
-        # data = self._emu.mu.mem_read(address, size)
         for addr in range(address, address + size):
             self._has_writed.add(addr)
 

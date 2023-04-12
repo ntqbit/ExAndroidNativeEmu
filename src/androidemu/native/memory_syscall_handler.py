@@ -4,6 +4,10 @@ from androidemu.const.emu_const import Arch
 
 logger = verboselogs.VerboseLogger(__name__)
 
+MREMAP_MAYMOVE = 1
+MREMAP_FIXED = 2
+MREMAP_DONTUNMAP = 4
+
 
 class MemorySyscallHandler:
     """
@@ -18,33 +22,18 @@ class MemorySyscallHandler:
         self._syscall_handler = syscall_handler
         if self._emu.get_arch() == Arch.ARM32:
             self._syscall_handler.set_handler(0x2D, "brk", 1, self._handle_brk)
-            self._syscall_handler.set_handler(
-                0x5B, "munmap", 2, self._handle_munmap
-            )
-            self._syscall_handler.set_handler(
-                0x7D, "mprotect", 3, self._handle_mprotect
-            )
-            self._syscall_handler.set_handler(
-                0xC0, "mmap2", 6, self._handle_mmap2
-            )
-            self._syscall_handler.set_handler(
-                0xDC, "madvise", 3, self._handle_madvise
-            )
+            self._syscall_handler.set_handler(0x5B, "munmap", 2, self._handle_munmap)
+            self._syscall_handler.set_handler(0x7D, "mprotect", 3, self._handle_mprotect)
+            self._syscall_handler.set_handler(0xA3, "mremap", 5, self._handle_mremap)
+            self._syscall_handler.set_handler(0xC0, "mmap2", 6, self._handle_mmap2)
+            self._syscall_handler.set_handler(0xDC, "madvise", 3, self._handle_madvise)
         else:
             # arm64
             self._syscall_handler.set_handler(0xD6, "brk", 1, self._handle_brk)
-            self._syscall_handler.set_handler(
-                0xD7, "munmap", 2, self._handle_munmap
-            )
-            self._syscall_handler.set_handler(
-                0xE2, "mprotect", 3, self._handle_mprotect
-            )
-            self._syscall_handler.set_handler(
-                0xDE, "mmap", 6, self._handle_mmap
-            )
-            self._syscall_handler.set_handler(
-                0xE9, "madvise", 3, self._handle_madvise
-            )
+            self._syscall_handler.set_handler(0xD7, "munmap", 2, self._handle_munmap)
+            self._syscall_handler.set_handler(0xE2, "mprotect", 3, self._handle_mprotect)
+            self._syscall_handler.set_handler(0xDE, "mmap", 6, self._handle_mmap)
+            self._syscall_handler.set_handler(0xE9, "madvise", 3, self._handle_madvise)
 
     def _handle_brk(self, uc, brk):
         # TODO: set errno
@@ -82,7 +71,7 @@ class MemorySyscallHandler:
                 raise NotImplementedError()
 
             vf = self._pcb.get_fd_detail(fd)
-            # mmap2 系统调用最后一个参数与mmap不同,注意阅读下面一句话!
+
             """
             The mmap2() system call provides the same interface as mmap(2),
             except that the final argument specifies the offset into the file in
@@ -96,7 +85,7 @@ class MemorySyscallHandler:
         else:
             res = self._memory.map(addr, length, prot)
 
-        logger.debug("mmap return 0x%08X" % res)
+        logger.debug("mmap return 0x%08X", res)
         return res
 
     def _handle_mmap(self, mu, addr, length, prot, flags, fd, offset):
@@ -116,11 +105,9 @@ class MemorySyscallHandler:
         res = None
         if flags & MAP_ANONYMOUS:
             res = self._memory.map(addr, length, prot)
-        elif fd != 0xFFFFFFFF:  # 如果有fd
+        elif fd != 0xFFFFFFFF:
             if fd <= 2:
-                raise NotImplementedError(
-                    "Unsupported read operation for file descriptor %d." % fd
-                )
+                raise NotImplementedError(f"Unsupported read operation for file descriptor {fd}.")
 
             if not self._pcb.has_fd(fd):
                 # TODO: Return valid error.
@@ -132,8 +119,20 @@ class MemorySyscallHandler:
         else:
             res = self._memory.map(addr, length, prot)
 
-        logger.debug("mmap return 0x%016X" % res)
+        logger.debug("mmap return 0x%016X", res)
         return res
+
+    def _handle_mremap(self, mu, addr, old_len, new_len, flags, new_addr):
+        if flags & MREMAP_FIXED:
+            if flags & MREMAP_MAYMOVE == 0 and addr != new_addr:
+                logger.error('mremap failed. MREMAP_MAYMOVE is not set, but new address is not the same as old address')
+                return -1
+        else:
+            new_addr = None
+
+        unmap = bool(flags & MREMAP_DONTUNMAP == 0)
+
+        return self._memory.remap(addr, old_len, new_len, new_addr, unmap=unmap)
 
     def _handle_madvise(self, mu, start, len_in, behavior):
         """

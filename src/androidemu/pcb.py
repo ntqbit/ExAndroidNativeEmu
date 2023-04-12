@@ -1,14 +1,17 @@
 import sys
-import os
+
+import verboselogs
 
 from androidemu.vfs.virtual_file import VirtualFile
 
-# 模仿进程控制块信息
-# process all info get be get from here including fd etc
+logger = verboselogs.VerboseLogger(__name__)
 
+
+DEFAULT_PID = 400
 
 class Pcb:
-    def __init__(self):
+    def __init__(self, pid=DEFAULT_PID):
+        self._pid = DEFAULT_PID
         self._fds = {}
         self._fds[sys.stdin.fileno()] = VirtualFile(
             "stdin", sys.stdin.fileno()
@@ -21,9 +24,10 @@ class Pcb:
         )
 
     def get_pid(self):
-        return os.getpid()
+        return self._pid
 
     def add_fd(self, name, name_in_system, fd):
+        logger.debug('add_fd: [name=%s,name_in_system=%s,fd=%d]', name, name_in_system, fd)
         self._fds[fd] = VirtualFile(name, fd, name_in_system=name_in_system)
         return fd
 
@@ -36,4 +40,5 @@ class Pcb:
         return fd in self._fds
 
     def remove_fd(self, fd):
+        logger.debug('remove_fd: [fd=%d]', fd)
         self._fds.pop(fd)

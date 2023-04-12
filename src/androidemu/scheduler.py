@@ -118,9 +118,7 @@ class Scheduler:
     def _set_main_task(self):
         tid = self._emu.get_pcb().get_pid()
         if tid in self._tasks_map:
-            raise RuntimeError(
-                "set_main_task fail for main task %d exist" % tid
-            )
+            raise RuntimeError(f"set_main_task fail for main task {tid} exist")
 
         t = self._create_task(tid, 0, None, True, 0)
         self._tasks_map[tid] = t
@@ -180,7 +178,6 @@ class Scheduler:
 
     def add_sub_task(self, stack_ptr, tls_ptr=0):
         tid = self._next_sub_tid
-        # 保存当前执行的上下文
         ctx = self._emu.mu.context_save()
         t = self._create_task(tid, stack_ptr, ctx, False, tls_ptr)
         self._defer_task_map[tid] = t
@@ -193,7 +190,7 @@ class Scheduler:
     # yield the task.
 
     def yield_task(self):
-        logger.debug("tid %d yield" % self._cur_tid)
+        logger.debug("tid %d yield", self._cur_tid)
         self._emu.mu.emu_stop()
 
     def exit_current_task(self):
@@ -250,7 +247,7 @@ class Scheduler:
                             logger.debug("%d is blocking skip scheduling", tid)
                             continue
 
-                logger.debug("%d scheduling enter " % tid)
+                logger.debug("%d scheduling enter ", tid)
 
                 self._cur_tid = tid
                 # run

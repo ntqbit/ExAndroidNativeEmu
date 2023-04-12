@@ -96,6 +96,7 @@ class VirtualFileSystem:
             syscall_handler.set_handler(0x8C, "_llseek", 5, self._handle_llseek)
             syscall_handler.set_handler(0x92, "writev", 3, self._handle_writev)
             syscall_handler.set_handler(0xA8, "poll", 3, self._handle_poll)
+            syscall_handler.set_handler(0xB4, "pread64", 4, self._handle_pread64)
             syscall_handler.set_handler(0xC3, "stat64", 2, self._handle_stat64)
             syscall_handler.set_handler(0xC4, "lstat64", 2, self._handle_lstat64)
             syscall_handler.set_handler(0xC5, "fstat64", 2, self._handle_fstat64)
@@ -103,6 +104,7 @@ class VirtualFileSystem:
             syscall_handler.set_handler(0xE4, "fsetxattr", 5, self._handle_fsetxattr)
             syscall_handler.set_handler(0xDD, "fcntl64", 6, self._fcntl64)
             syscall_handler.set_handler(0x10A, "statfs64", 3, self._statfs64)
+            syscall_handler.set_handler(0x10B, "fstatfs64", 3, self._fstatfs64)
             syscall_handler.set_handler(0x142, "openat", 4, self._handle_openat)
             syscall_handler.set_handler(0x143, "mkdirat", 3, self._mkdirat)
             syscall_handler.set_handler(0x147, "fstatat64", 4, self._handle_fstatat64)
@@ -287,13 +289,11 @@ class VirtualFileSystem:
 
             fd = misc_utils.platform_open(file_path, flags)
             self._pcb.add_fd(filename, file_path, fd)
-            logger.info(
-                "open [%s][0x%x] return fd %d" % (file_path, oflag, fd)
-            )
+            logger.info("open [%s][0x%x] return fd %d", file_path, oflag, fd)
             self._create_fd_link(fd, file_path)
             return fd
         else:
-            logger.warning("File does not exist '%s'" % filename)
+            logger.warning("File does not exist '%s'", filename)
             return -1
 
     def _dirfd_2_path(self, dirfd, relpath):
@@ -301,14 +301,12 @@ class VirtualFileSystem:
             return relpath
 
         if os.path.isabs(relpath):
-            # 绝对路径，直接忽略
             return relpath
 
         else:
             fdesc = self._pcb.get_fd_detail(dirfd)
             if fdesc is None:
-                # fd不存在，可能是bug...要看被模拟的程序逻辑
-                logger.info("dirfd %d is invalid" % dirfd)
+                logger.info("dirfd %d is invalid", dirfd)
                 return None
 
             dirpath = fdesc.name
@@ -357,16 +355,16 @@ class VirtualFileSystem:
         If count is greater than SSIZE_MAX, the result is unspecified.
         """
         if fd <= 2:
-            logger.warning("skip read for fd %d" % fd)
+            logger.warning("skip read for fd %d", fd)
             return 0
             # raise NotImplementedError("Unsupported read operation for file descriptor %d." % fd)
 
         file = self._pcb.get_fd_detail(fd)
-        logger.debug("Reading %d bytes from '%s'" % (count, file.name))
+        logger.debug("Reading %d bytes from '%s'", count, file.get_name())
 
         buf = os.read(fd, count)
 
-        logger.debug("read return %s" % buf.hex())
+        logger.debug("read return %s", buf.hex())
         result = len(buf)
         mu.mem_write(buf_addr, buf)
         return result
@@ -377,18 +375,18 @@ class VirtualFileSystem:
 
         if fd == 1:
             s = bytes(data).decode("utf-8")
-            logger.info("stdout: [%s]" % s)
+            logger.info("stdout: [%s]", s)
             return len(data)
         elif fd == 2:
             s = bytes(data).decode("utf-8")
-            logger.error("stderr: [%s]" % s)
+            logger.error("stderr: [%s]", s)
             return len(data)
 
         try:
             r = os.write(fd, data)
         except OSError as e:
             file = self._pcb.get_fd_detail(fd)
-            logger.warning("File write '%s' error %r skip" % (file.name, e))
+            logger.warning("File write '%s' error %r skip", file.name, e)
             return -1
 
         return r
@@ -419,13 +417,10 @@ class VirtualFileSystem:
                 os.close(fd)
                 self._del_fd_link(fd)
             else:
-                # 之前关闭过的直接返回0,与安卓系统行为一致
-                logger.warning(
-                    "fd 0x%08X not in fds maybe has closed, just return 0" % fd
-                )
+                logger.warning("fd 0x%08X not in fds maybe has closed, just return 0", fd)
                 return 0
-        except OSError as e:
-            logger.warning("fd %d close error." % fd)
+        except OSError:
+            logger.warning("fd %d close error.", fd)
             return -1
 
         return 0
@@ -433,7 +428,7 @@ class VirtualFileSystem:
     def _handle_unlink(self, mu, path_ptr):
         path = memory_helpers.read_utf8(mu, path_ptr)
         vfs_path = self.translate_path(path)
-        logger.debug("unlink call path [%s]" % path)
+        logger.debug("unlink call path [%s]", path)
         return 0
 
     def _handle_lseek(self, mu, fd, offset, whence):
@@ -447,14 +442,14 @@ class VirtualFileSystem:
         if rc:
             r = 0
 
-        logger.debug("access '%s' return %d" % (filename, r))
+        logger.debug("access '%s' return %d", filename, r)
         return r
 
     def _mkdir(self, mu, path_ptr, mode):
         path = memory_helpers.read_utf8(mu, path_ptr)
         vfs_path = self.translate_path(path)
 
-        logger.debug("mkdir call path [%s]" % path)
+        logger.debug("mkdir call path [%s]", path)
         if not os.path.exists(vfs_path):
             os.makedirs(vfs_path)
 
@@ -495,7 +490,7 @@ class VirtualFileSystem:
                 )
                 ptr = ptr + 8
 
-            logger.info("poll timeout %d" % timeout)
+            logger.info("poll timeout %d", timeout)
             poll_r = p.poll(timeout)
             logger.info("poll wakeup")
             ptr = pollfd_ptr
@@ -529,6 +524,18 @@ class VirtualFileSystem:
 
     def _handle_poll(self, mu, pollfd_ptr, nfds, timeout):
         return self._do_poll(mu, pollfd_ptr, nfds, timeout)
+
+    def _handle_pread64(self, mu, fd, buf, count, pos):
+        file = self._pcb.get_fd_detail(fd)
+        logger.debug("Reading %d bytes from '%s' at position %d", count, file.get_name(), pos)
+
+        os.lseek(fd, pos, os.SEEK_SET)
+        data = os.read(fd, count)
+
+        logger.debug("read return %s", data.hex())
+        result = len(data)
+        mu.mem_write(buf, data)
+        return result
 
     def _ppoll(self, mu, pollfd_ptr, nfds, timeout_ts_ptr, sigmask_ptr):
         timeout = -1
@@ -576,16 +583,15 @@ class VirtualFileSystem:
             return -1
 
         stats = os.fstat(fd)
-        uid = self._get_config_uid(detail.name)
-        st_mode = self._fix_st_mode(detail.name, stats.st_mode)
+        uid = self._get_config_uid(detail.get_name())
+        st_mode = self._fix_st_mode(detail.get_name(), stats.st_mode)
 
         if self._emu.get_arch() == Arch.ARM32:
             file_helpers.stat_to_memory2(mu, stat_ptr, stats, uid, st_mode)
         else:
             file_helpers.stat_to_memory64(mu, stat_ptr, stats, uid, st_mode)
-        
-        misc_utils.set_errno(self._emu, 5)
-        return -1
+
+        return 0
 
     def _handle_getdents64(self, mu, fd, linux_dirent64_ptr, count):
         logger.warning(
@@ -649,14 +655,7 @@ class VirtualFileSystem:
 
         return r
 
-    def _statfs64(self, mu, path_ptr, sz, buf):
-        path = memory_helpers.read_utf8(mu, path_ptr)
-        logger.debug("statfs64 path %s" % path)
-        path = self.translate_path(path)
-        if not os.path.exists(path):
-            return -1
-
-        statv = os.statvfs(path)
+    def _write_statv_to_buf(self, mu, statv, buf):
         """
         f_type = {uint32_t} 61267
         f_bsize = {uint32_t} 4096
@@ -672,9 +671,8 @@ class VirtualFileSystem:
         f_flags = {uint32_t} 1062
         f_spare = {uint32_t [4]}
         """
-        f_fsid = 0
-        if hasattr(statv, "f_fsid"):
-            f_fsid = statv.f_fsid
+
+        f_fsid = getattr(statv, 'f_fsid', 0)
 
         if self._emu.get_arch() == Arch.ARM32:
             mu.mem_write(buf, int(0xEF53).to_bytes(4, "little"))
@@ -704,7 +702,25 @@ class VirtualFileSystem:
             mu.mem_write(buf + 80, int(statv.f_flag).to_bytes(8, "little"))
             mu.mem_write(buf + 88, int(0).to_bytes(32, "little"))
 
-        # raise NotImplementedError()
+    def _statfs64(self, mu, path_ptr, sz, buf):
+        path = memory_helpers.read_utf8(mu, path_ptr)
+        logger.debug("statfs64 path %s" % path)
+        path = self.translate_path(path)
+        if not os.path.exists(path):
+            return -1
+
+        statv = os.statvfs(path)
+        self._write_statv_to_buf(mu, statv, buf)
+        return 0
+
+    def _fstatfs64(self, mu, fd, sz, buf):
+        if not self._pcb.has_fd(fd):
+            return -1
+
+        fd_detail = self._pcb.get_fd_detail(fd)
+        name_in_system = fd_detail.get_name_in_system()
+        statv = os.statvfs(name_in_system)
+        self._write_statv_to_buf(mu, statv, buf)
         return 0
 
     def _handle_openat(self, mu, dfd, filename_ptr, flags, mode):
@@ -818,7 +834,7 @@ class VirtualFileSystem:
             fd_str = os.path.basename(path_std_utf)
             fd = int(fd_str)
             detail = self._pcb.get_fd_detail(fd)
-            name = detail.name
+            name = detail.get_name()
             n = len(name)
 
             if n <= bufsz:

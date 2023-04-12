@@ -87,7 +87,7 @@ class Modules:
 
     def _load_linker(self, base_address, base: elf_reader.ELFReader):
         self._linker = self.load_module(
-            self._emu.vfs.translate_path('/system/bin/linker'),
+            '/system/bin/linker',
             do_init=False, call_entry_point=True, is_linker=True,
             base_address=base_address,
             base=base
@@ -291,6 +291,7 @@ class Modules:
 
     def find_module_by_name(self, filename):
         absp1 = os.path.abspath(filename)
+
         for m in self._modules:
             absm = os.path.abspath(m.filename)
             if absp1 == absm:
@@ -311,7 +312,8 @@ class Modules:
         logger.verbose("Loading module '%s'.", filename)
 
         # do sth like linker
-        reader = elf_reader.ELFReader(filename)
+        filepath = self._emu.vfs.translate_path(filename)
+        reader = elf_reader.ELFReader(filepath)
 
         if self._emu.get_arch() == Arch.ARM32 and not reader.is_elf32():
             raise RuntimeError(f"arch is ARCH_ARM32 but so {filename} is not elf32")
@@ -348,9 +350,9 @@ class Modules:
         load_bias = load_base - bound_low
 
         vf = VirtualFile(
-            self._emu.vfs.translate_path(filename),
-            misc_utils.platform_open(filename, os.O_RDONLY),
             filename,
+            misc_utils.platform_open(filepath, os.O_RDONLY),
+            filepath,
         )
         for segment in load_segments:
             p_flags = segment["p_flags"]
