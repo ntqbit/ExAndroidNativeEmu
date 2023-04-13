@@ -1,6 +1,8 @@
 
 import time
 
+from collections import deque
+
 import verboselogs
 
 from unicorn.unicorn_const import UC_PROT_READ, UC_PROT_EXEC
@@ -50,7 +52,7 @@ class Scheduler:
         self._mu = self._emu.mu
         self._pid = self._emu.get_pcb().get_pid()
         self._next_sub_tid = self._pid + 1
-        self._ordered_tasks_list = []
+        self._tasks_queue = deque()
         self._tasks_map = {}
         self._defer_task_map = {}
         self._tid_2_remove = set()
@@ -124,7 +126,7 @@ class Scheduler:
 
         t = self._create_task(tid, 0, None, True, 0)
         self._tasks_map[tid] = t
-        self._ordered_tasks_list.append(tid)
+        self._tasks_queue.append(tid)
 
     def sleep(self, ms):
         tid = self._cur_tid
@@ -210,16 +212,13 @@ class Scheduler:
             self._emu.mu.reg_write(UC_ARM64_REG_X30, self._stop_pos)
 
         while True:
-            for tid in reversed(self._ordered_tasks_list):
+            for tid in self._tasks_queue:
                 task = self._tasks_map[tid]
                 if tid in self._blocking_set:
                     # 处理block
-                    if len(self._ordered_tasks_list) == 1:
+                    if len(self._tasks_queue) == 1:
                         if task.blocking_timeout < 0:
-                            raise RuntimeError(
-                                "only one task %d exists, but blocking infinity dead lock bug!"
-                                % tid
-                            )
+                            raise RuntimeError("only one task %d exists, but blocking infinity dead lock bug!" % tid)
                         else:
                             logger.debug(
                                 "only on task %d block with timeout %d ms do sleep"
@@ -280,7 +279,7 @@ class Scheduler:
                     format_addr(self._emu, start_pos),
                     format_addr(self._emu, self._stop_pos),
                 )
-                
+
                 self._emu.mu.emu_start(start_pos, self._stop_pos, 0, 0)
                 task.halt_ts = int(time.time() * 1000)
                 # after run
@@ -301,13 +300,13 @@ class Scheduler:
             for tid in self._tid_2_remove:
                 self._tasks_map.pop(tid)
                 # FIXME slow delete, try to optimize
-                self._ordered_tasks_list.remove(tid)
+                self._tasks_queue.remove(tid)
 
             self._tid_2_remove.clear()
 
             for tid_defer in self._defer_task_map:
                 self._tasks_map[tid_defer] = self._defer_task_map[tid_defer]
-                self._ordered_tasks_list.append(tid_defer)
+                self._tasks_queue.append(tid_defer)
 
             self._defer_task_map.clear()
 
@@ -317,3 +316,4 @@ class Scheduler:
                 if clear_task_when_return:
                     # clear all unfinished task
                     self._tasks_map.clear()
+                    break

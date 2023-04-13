@@ -1,5 +1,4 @@
 import os
-import random
 
 from typing import List, Tuple, Dict
 
@@ -15,12 +14,17 @@ from androidemu.native.memory_map import PAGE_SIZE
 from androidemu.utils.alignment import page_start, page_end
 from androidemu.utils.stack_helpers import StackHelper
 from androidemu.internal.module import Module
-from androidemu.const.emu_const import Arch
+from androidemu.const.emu_const import (
+    Arch,
+    BASE_ADDR,
+    TLS_BASE,
+    TLS_SIZE,
+    STOP_MEMORY_BASE
+)
 from androidemu.utils import memory_helpers, misc_utils
 from androidemu.vfs.virtual_file import VirtualFile
 from androidemu.internal import elf_reader
 from androidemu.const import linux
-from androidemu.const.emu_const import BASE_ADDR, TLS_BASE, TLS_SIZE
 
 
 logger = verboselogs.VerboseLogger(__name__)
@@ -73,7 +77,7 @@ class Modules:
             (linux.AT_PHNUM, phdr_num),
             (linux.AT_BASE, linker_base),  # linker base address
             (linux.AT_FLAGS, 0x0),
-            (linux.AT_ENTRY, entry_point + 0x3d1),  # somewhere in app_process32
+            (linux.AT_ENTRY, STOP_MEMORY_BASE),  # somewhere in app_process32
             (linux.AT_UID, 0x0),
             (linux.AT_EUID, 0x0),
             (linux.AT_GID, 0x0),
@@ -398,6 +402,7 @@ class Modules:
                             base.get_phdr_entry_size(), base_address + base.get_entry_point())
         elif not self._linker:
             self._load_linker(load_base, reader)
+            return
 
         so_needed = reader.get_so_need()
         for so_name in so_needed:
