@@ -97,7 +97,7 @@ class Modules:
             base=base
         )
 
-        self._tls_init()
+        # self._tls_init()
 
     def _write_raw_args(self, argv: List[str], envp: Dict[str, str], auxv: List[Tuple[int, int]]):
         raw_args_parts = []
@@ -422,134 +422,6 @@ class Modules:
             if symbol_address is not None:
                 name = symbol["name"]
                 symbols_resolved[name] = symbol_address
-
-        # Relocate.
-        if is_linker:
-            logger.debug('R_ARM_IRELATIVE relocation skipped in linker')
-        else:
-            rels = reader.get_rels()
-
-            for rel_name, rel_tbl in rels.items():
-                def apply_relative_relocation(offset):
-                    rel_addr = load_bias + offset
-                    value_orig_bytes = self._emu.mu.mem_read(rel_addr, wordsize)
-                    value_orig = int.from_bytes(value_orig_bytes, "little")
-                    value = load_bias + value_orig
-                    self._emu.mu.mem_write(rel_addr, value.to_bytes(wordsize, "little"))
-
-                if rel_name == 'relr':
-                    # https://android.googlesource.com/platform/bionic/+/master/linker/linker.cpp#2727
-
-                    base = 0
-
-                    for rel in rel_tbl:
-                        if rel & 1:
-                            # bitmap encoding
-                            offset = base
-
-                            while rel:
-                                rel >>= 1
-
-                                if rel & 1:
-                                    apply_relative_relocation(offset)
-
-                                offset += wordsize
-
-                            base += (8 * wordsize - 1) * wordsize
-                        else:
-                            apply_relative_relocation(rel)
-                            base = rel + wordsize
-
-                else:
-                    for rel in rel_tbl:
-                        r_info_sym = rel["r_info_sym"]
-                        sym = symbols[r_info_sym]
-                        sym_value = sym["st_value"]
-
-                        # Location where relocation should happen
-                        offset = rel["r_offset"]
-                        rel_addr = load_bias + offset
-                        rel_info_type = rel["r_info_type"]
-
-                        sym_name = reader.get_dyn_string_by_rel_sym(r_info_sym)
-                        if rel_info_type == arm.R_ARM_ABS32:
-                            if sym_name in symbols_resolved:
-                                sym_addr = symbols_resolved[sym_name]
-
-                                value_orig_bytes = self._emu.mu.mem_read(rel_addr, 4)
-                                value_orig = int.from_bytes(value_orig_bytes, "little")
-
-                                # R_ARM_ABS32 how to relocate see android linker source code
-                                # *reinterpret_cast<Elf32_Addr*>(reloc) += sym_addr;
-                                value = sym_addr + value_orig
-                                # Write the new value
-                                # print(value)
-                                self._emu.mu.mem_write(rel_addr, value.to_bytes(4, "little"))
-
-                        elif rel_info_type in (arm.R_AARCH64_ABS64, arm.R_AARCH64_ABS32):
-                            if sym_name in symbols_resolved:
-                                sym_addr = symbols_resolved[sym_name]
-
-                                value_orig_bytes = self._emu.mu.mem_read(rel_addr, 8)
-                                value_orig = int.from_bytes(
-                                    value_orig_bytes, "little"
-                                )
-                                addend = rel["r_addend"]
-
-                                value = sym_addr + value_orig + addend
-                                # Write the new value
-                                # print(value)
-                                self._emu.mu.mem_write(
-                                    rel_addr, value.to_bytes(8, "little")
-                                )
-
-                        elif rel_info_type in (arm.R_ARM_GLOB_DAT, arm.R_ARM_JUMP_SLOT):
-                            # Resolve the symbol.
-                            # R_ARM_GLOB_DAT，R_ARM_JUMP_SLOT how to relocate see android linker source code
-                            # *reinterpret_cast<Elf32_Addr*>(reloc) = sym_addr;
-                            if sym_name in symbols_resolved:
-                                value = symbols_resolved[sym_name]
-
-                                # Write the new value
-                                self._emu.mu.mem_write(rel_addr, value.to_bytes(4, "little"))
-
-                        elif rel_info_type in (arm.R_AARCH64_GLOB_DAT, arm.R_AARCH64_JUMP_SLOT):
-                            # Resolve the symbol.
-                            # R_ARM_GLOB_DAT，R_ARM_JUMP_SLOT how to relocate see android linker source code
-                            # *reinterpret_cast<Elf32_Addr*>(reloc) = sym_addr;
-                            if sym_name in symbols_resolved:
-                                value = symbols_resolved[sym_name]
-                                addend = rel["r_addend"]
-                                # Write the new value
-                                self._emu.mu.mem_write(rel_addr, (value + addend).to_bytes(8, "little"))
-
-                        elif rel_info_type == arm.R_ARM_RELATIVE:
-                            apply_relative_relocation(offset)
-                        elif rel_info_type == arm.R_AARCH64_RELATIVE:
-                            if sym_value == 0:
-                                addend = rel["r_addend"]
-                                # Create the new value
-                                value = load_bias + addend
-
-                                # print(value)
-                                # Write the new value
-                                self._emu.mu.mem_write(rel_addr, value.to_bytes(8, "little"))
-                            else:
-                                raise NotImplementedError()  # impossible
-                        elif rel_info_type == arm.R_ARM_TLS_TPOFF32:
-                            logger.warning("reltype R_ARM_TLS_TPOFF32 skipped: [symname=%s]", sym_name)
-                        elif rel_info_type == arm.R_ARM_IRELATIVE:
-                            if self._emu.get_arch() != Arch.ARM32:
-                                raise NotImplementedError()
-
-                            value_orig_bytes = self._emu.mu.mem_read(rel_addr, wordsize)
-                            value_orig = int.from_bytes(value_orig_bytes, "little")
-
-                            result = self._emu.call_native(load_bias + value_orig)
-                            self._emu.mu.mem_write(rel_addr, result.to_bytes(wordsize, "little"))
-                        else:
-                            logger.error("Unhandled relocation type %i. symname=%s", rel_info_type, sym_name)
-                            raise NotImplementedError(f"Unhandled relocation type {rel_info_type}.")
 
         # Find init array.
         init_array_addr, init_array_size = reader.get_init_array()
