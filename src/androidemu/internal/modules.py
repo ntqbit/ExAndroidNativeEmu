@@ -69,7 +69,7 @@ class Modules:
         # But here it is required for auxv AT_NULL at the end of the list.
         self._auxv = [
             (linux.AT_SYSINFO_EHDR, 0),  # vdso (Virtual Dynamic Shared Object)
-            (linux.AT_HWCAP, 0x37B0D6),
+            (linux.AT_HWCAP, 0),
             (linux.AT_PAGESZ, PAGE_SIZE),
             (linux.AT_CLKTCK, 0x64),
             (linux.AT_PHDR, phdr_addr),  # app_process32 phdr
@@ -84,7 +84,7 @@ class Modules:
             (linux.AT_EGID, 0x0),
             (linux.AT_SECURE, 0x0),
             #(linux.AT_RANDOM, random.randbytes(16)),
-            (linux.AT_HWCAP2, 0x1F),
+            (linux.AT_HWCAP2, 0),
             #(linux.AT_EXECFN, '/dev/fd/4'),
             #(linux.AT_PLATFORM, 'v8l')
         ]
