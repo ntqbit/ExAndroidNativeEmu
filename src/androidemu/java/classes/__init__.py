@@ -40,6 +40,8 @@ import androidemu.java.classes.log
 import androidemu.java.classes.database
 import androidemu.java.classes.sqlite
 import androidemu.java.classes.reflect
+import androidemu.java.classes.battery
+import androidemu.java.classes.containers
 
 from .list import List
 from .string import String
@@ -154,4 +156,7 @@ def get_java_classes():
         androidemu.java.classes.sqlite.SQLiteCursor,
         androidemu.java.classes.database.Cursor,
         androidemu.java.classes.reflect.Modifier,
+        androidemu.java.classes.battery.BatteryManager,
+        androidemu.java.classes.containers.TreeSet,
+        androidemu.java.classes.containers.Iterator
     ]

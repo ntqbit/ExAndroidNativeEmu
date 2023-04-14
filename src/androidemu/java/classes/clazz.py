@@ -23,6 +23,9 @@ class Class(metaclass=JavaClassDef, jvm_name="java/lang/Class"):
         self._pyclazz = pyclazz
         self._descriptor_represent = pyclazz.jvm_name
 
+    def get_class_loader(self):
+        return self._class_loader
+
     def __repr__(self):
         return f"Class({self._descriptor_represent})"
 

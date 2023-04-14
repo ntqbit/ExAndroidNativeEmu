@@ -1,4 +1,6 @@
-from androidemu.java import JavaClassDef
+from androidemu.java import JavaClassDef, java_method_def
+from androidemu.java.classes import String
+from androidemu.java.const import JAVA_NULL
 
 from androidemu.java.classes.clazz import Class
 
@@ -33,3 +35,12 @@ class JavaClassLoader(metaclass=JavaClassDef, jvm_name="java/lang/ClassLoader"):
             return None
 
         return self._class_by_name[name]
+
+    @java_method_def('toString', '()Ljava/lang/String;')
+    def toString(self, emu):
+        # TODO: implement
+        return String('')
+
+    @java_method_def('getParent', '()Ljava/lang/ClassLoader;')
+    def getParent(self, emu):
+        return JAVA_NULL

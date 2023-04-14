@@ -1,10 +1,16 @@
+from typing import TYPE_CHECKING
+
 import verboselogs
 
 from androidemu.java import JavaClassDef, JavaFieldDef, java_method_def
 from androidemu.java.classes.string import String
+from androidemu.java.const import JAVA_NULL
 from androidemu.java.classes.array import StringArray, ByteArray, Array
 from androidemu.java.classes.enumeration import Enumeration
 from androidemu.java.classes.exceptions import UnsupportedOperationException
+
+if TYPE_CHECKING:
+    from androidemu.emulator import Emulator
 
 logger = verboselogs.VerboseLogger(__name__)
 
@@ -168,6 +174,11 @@ class KeyProperties(
         pass
 
 
+class KeyStore_Entry(metaclass=JavaClassDef, jvm_name='java/security/KeyStore$Entry'):
+    def __init__(self):
+        pass
+
+
 class KeyStore(metaclass=JavaClassDef, jvm_name='java/security/KeyStore'):
     def __init__(self, entries):
         self._entries = {}
@@ -211,4 +222,13 @@ class KeyStore(metaclass=JavaClassDef, jvm_name='java/security/KeyStore'):
                      args_list=['jstring'])
     def getCertificateChain(self, emu, alias: String):
         return emu.java_vm.throw(UnsupportedOperationException())
-        return Array([])
+        return JAVA_NULL
+
+    @java_method_def(
+        'getEntry',
+        '(Ljava/lang/String;Ljava/security/KeyStore$ProtectionParameter;)Ljava/security/KeyStore$Entry;',
+        args_list=['jstring', 'jobject']
+    )
+    def getEntry(self, emu: 'Emulator', alias: str, protection_parameter):
+        emu.java_vm.throw(UnsupportedOperationException())
+        return JAVA_NULL

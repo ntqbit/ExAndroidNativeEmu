@@ -1,4 +1,5 @@
-from androidemu import config
+import verboselogs
+
 from androidemu.java.classes.file import File
 from androidemu.java.classes.string import String
 from androidemu.java.classes.contentresolver import ContentResolver
@@ -8,10 +9,13 @@ from androidemu.java.classes.wifi import (
     ConnectivityManager
 )
 from androidemu.java.classes.display import DisplayManager
-from androidemu.java.classes.shared_preferences import *
-from androidemu.java.classes.asset_manager import *
-from androidemu.java.classes.package_manager import *
+from androidemu.java.classes.shared_preferences import SharedPreferences
+from androidemu.java.classes.asset_manager import AssetManager
+from androidemu.java.classes.package_manager import PackageManager
+from androidemu.java.classes.intent import Intent
 from androidemu.java import JavaClassDef, JavaFieldDef, java_method_def
+
+logger = verboselogs.VerboseLogger(__name__)
 
 
 class ComponentName(metaclass=JavaClassDef, jvm_name='android/content/ComponentName'):
@@ -156,6 +160,10 @@ class ContextImpl(
     def getPackageManager(self, emu):
         return self._package_manager
 
+    @java_method_def("getClassLoader", "()Ljava/lang/ClassLoader;")
+    def getClassLoader(self, emu):
+        return self.class_object.get_class_loader()
+
     @java_method_def(
         name="getAssets",
         signature="()Landroid/content/res/AssetManager;",
@@ -169,6 +177,14 @@ class ContextImpl(
             self._asset_mgr = AssetManager(emu, pyapk_path)
 
         return self._asset_mgr
+
+    @java_method_def(
+        'registerReceiver',
+        '(Landroid/content/BroadcastReceiver;Landroid/content/IntentFilter;)Landroid/content/Intent;',
+        args_list=['jobject', 'jobject']
+    )
+    def registerReceiver(self, emu, receiver, intent_filter):
+        return Intent(intent_filter)
 
     @java_method_def(
         name="getContentResolver",

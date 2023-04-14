@@ -9,7 +9,7 @@ class jobject:
 class jclass(jobject):
     def __init__(self, value=None):
         if value is None:
-            raise ValueError('jclass cannot be None')
+            raise ValueError('jclass cannot be None. Probably you have not added the class to emulator in __init__.py')
 
         super().__init__(value)
 
